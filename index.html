@@ -200,6 +200,7 @@
 
     /* 卡片网格 */
     .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0 24px; }
+    .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin: 16px 0 24px; }
     .card {
       background: var(--card);
       border: 1px solid var(--border);
@@ -274,6 +275,7 @@
 
     @media (max-width: 640px) {
       .grid { grid-template-columns: 1fr; }
+      .grid3 { grid-template-columns: 1fr; }
       .hero { padding: 40px 20px; }
       .hero h1 { font-size: 1.7rem; }
       .nav .links a { margin-left: 14px; }
@@ -287,6 +289,7 @@
   <nav class="nav">
     <div class="logo">玉衡计划<span>ASTRAEA PLAN</span></div>
     <div class="links">
+      <a href="#adv">优势</a>
       <a href="#arch">架构</a>
       <a href="#loop">闭环</a>
       <a href="#docs">文档</a>
@@ -309,6 +312,36 @@
     <div class="case">
       <span class="tag">落地实践案例</span>
       <p>玉衡计划（Astraea Plan）整套架构已落地应用于<strong>魔方小镇城市书房</strong>连锁体系，面向全国多门店复合自习书房业态完成私有化智能体集群部署，实现总部与线下门店统一办公调度、数据自动汇总、工单智能分发。方案依托Hermes调度中枢，验证了连锁企业本地私有化大模型、飞书+微信双渠道智能体长期稳定运行能力。</p>
+    </div>
+
+    <h2 id="adv">⚡ 三大核心优势 · 真正会办事的AI</h2>
+
+    <div class="grid3">
+      <div class="card">
+        <h3>🧠 超强长期记忆 · 永不遗忘</h3>
+        <ul>
+          <li>部署长期记忆库，每天的工作与决策持续累积</li>
+          <li>永远不会忘记：某年某月某天，公司发生了什么</li>
+          <li>新人来了不用重新教——历史经验自动沉淀为组织资产</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>🤝 智能体自主办事 · 招聘全流程</h3>
+        <ul>
+          <li>能自己登录招聘网站，整理应聘者信息与简历</li>
+          <li>与候选人自然对话、索取简历文件</li>
+          <li>整理后带文件返回公司办公平台，直接交付人事</li>
+          <li>还能结合岗位画像，辅助筛选谁更适合公司</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>🛡️ 对外客服 · 安全隔离不"AI味"</h3>
+        <ul>
+          <li>对外客服与内部办公智能体物理隔离，内部信息永不外泄</li>
+          <li>拥有独立专属知识库，灵活应答客户问题</li>
+          <li>告别传统AI机器人的"AI味"与弱智感，像真人一样专业服务</li>
+        </ul>
+      </div>
     </div>
 
     <h2 id="arch">🏗️ 核心架构</h2>
