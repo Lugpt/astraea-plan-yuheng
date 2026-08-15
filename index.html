@@ -490,10 +490,22 @@
     </div>
 
     <div class="footer">
+      <div style="margin-bottom: 20px; color: var(--muted); font-size: 0.9rem;">
+        项目咨询：
+        <a id="mail-link" style="color: var(--accent2); text-decoration: none; font-weight: 500;"></a>
+      </div>
       <p><span class="brand">玉衡计划（Astraea Plan）</span> · 企业级智能体部署架构 · 设计者：大军</p>
       <p>© 2026 玉衡计划 · <a href="https://github.com/Lugpt/astraea-plan-yuheng">GitHub: astraea-plan-yuheng</a></p>
     </div>
 
   </div>
+
+  <script>
+    const user = "longjunhao01";
+    const domain = "gmail.com";
+    const targetEmail = `${user}@${domain}`;
+    document.getElementById("mail-link").innerText = targetEmail;
+    document.getElementById("mail-link").href = `mailto:${targetEmail}`;
+  </script>
 </body>
 </html>
