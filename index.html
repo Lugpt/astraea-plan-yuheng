@@ -198,7 +198,46 @@
     }
     .arch pre .dim { color: var(--muted); }
 
-    /* 卡片网格 */
+    /* 核心架构树 */
+    .arch-tree { text-align: center; }
+    .ctrl-node {
+      display: inline-block;
+      background: linear-gradient(135deg, rgba(0,212,255,0.15), rgba(0,120,255,0.08));
+      border: 1.5px solid var(--accent);
+      border-radius: 14px;
+      padding: 16px 36px;
+      margin: 8px auto 0;
+      box-shadow: 0 0 24px rgba(0,212,255,0.15);
+    }
+    .ctrl-node .t { color: var(--accent); font-weight: 700; font-size: 1.05rem; letter-spacing: 1px; }
+    .ctrl-node .s { color: var(--muted); font-size: 0.82rem; margin-top: 4px; }
+    .ctrl-line { color: var(--accent-dim); font-size: 1.2rem; margin: 6px 0; letter-spacing: 2px; }
+    .branches { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-top: 10px; }
+    .branch {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 16px;
+      text-align: left;
+      backdrop-filter: blur(8px);
+    }
+    .branch-head { color: var(--accent2); font-weight: 700; font-size: 1rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+    .branch.outer .branch-head { color: #ffb74d; }
+    .branch.store .branch-head { color: #ff8a65; }
+    .agent-chip {
+      background: rgba(0,212,255,0.07);
+      border: 1px solid rgba(0,212,255,0.2);
+      border-radius: 8px;
+      padding: 8px 12px;
+      margin: 6px 0;
+      color: var(--text);
+      font-size: 0.9rem;
+    }
+    .branch.outer .agent-chip { border-color: rgba(255,183,77,0.3); background: rgba(255,183,77,0.06); }
+    .branch.store .agent-chip { border-color: rgba(255,138,101,0.3); background: rgba(255,138,101,0.06); }
+    .branch-foot { color: var(--muted); font-size: 0.78rem; margin-top: 12px; padding-top: 10px; border-top: 1px dashed rgba(0,212,255,0.15); }
+
+
     .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0 24px; }
     .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin: 16px 0 24px; }
     .card {
@@ -262,6 +301,7 @@
     @media (max-width: 640px) {
       .grid { grid-template-columns: 1fr; }
       .grid3 { grid-template-columns: 1fr; }
+      .branches { grid-template-columns: 1fr; }
       .hero { padding: 40px 20px; }
       .hero h1 { font-size: 1.7rem; }
       .nav .links a { margin-left: 14px; }
@@ -357,20 +397,36 @@
     </div>
 
     <h2 id="arch">🏗️ 核心架构</h2>
-    <div class="arch">
-<pre>
-              ┌──────────────────────────┐
-              │      总控智能体 · 中央       │
-              │  统一调度 / 学习 / 沉淀 / 汇报 │
-              └────────────┬─────────────┘
-        ┌──────────┬───────┴────────┬──────────┐
-        │          │                │          │
-   ┌────┴────┐ ┌───┴─────┐  ┌──────┴───┐ ┌────┴─────┐
-   │ 财务部   │ │ 运营部   │  │  图书部   │ │ 市场部    │ ...
-   │ 智能体   │ │ 智能体   │  │  智能体   │ │ 智能体    │
-   └─────────┘ └─────────┘  └──────────┘ └──────────┘
-      <span class="dim">每天自动拉数 / 出日报 / 标异常 / 发部门群</span>
-</pre>
+    <div class="arch-tree">
+      <div class="ctrl-node">
+        <div class="t">总控智能体 · 中央</div>
+        <div class="s">统一调度 / 学习 / 沉淀 / 汇报 —— 全局可控</div>
+      </div>
+      <div class="ctrl-line">▼ ▼ ▼</div>
+      <div class="branches">
+        <div class="branch">
+          <div class="branch-head">🏢 内部办公智能体</div>
+          <div class="agent-chip">财务部智能体</div>
+          <div class="agent-chip">运营部智能体</div>
+          <div class="agent-chip">图书部智能体</div>
+          <div class="agent-chip">市场部智能体</div>
+          <div class="branch-foot">每天自动拉数 / 出日报 / 标异常 / 发部门群</div>
+        </div>
+        <div class="branch outer">
+          <div class="branch-head">🌐 对外智能体</div>
+          <div class="agent-chip">招聘智能体</div>
+          <div class="agent-chip">客服智能体</div>
+          <div class="agent-chip">更多对外场景 …</div>
+          <div class="branch-foot">对外服务 / 独立知识库 / 物理隔离不泄密</div>
+        </div>
+        <div class="branch store">
+          <div class="branch-head">🏪 门店智能体</div>
+          <div class="agent-chip">数据监控智能体</div>
+          <div class="agent-chip">物料监控智能体</div>
+          <div class="agent-chip">门店运营节点 …</div>
+          <div class="branch-foot">终端场景 / 门店数据与物料实时管控</div>
+        </div>
+      </div>
     </div>
 
     <div class="grid">
