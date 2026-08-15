@@ -213,14 +213,35 @@
     .ctrl-node .s { color: var(--muted); font-size: 0.82rem; margin-top: 4px; }
     .ctrl-line { color: var(--accent-dim); font-size: 1.2rem; margin: 6px 0; letter-spacing: 2px; }
     .connector { display: block; width: 100%; height: 96px; margin: 2px 0 10px; }
-    .connector path.flow {
-      stroke-dasharray: 10 8;
-      animation: flow-line 1.1s linear infinite;
+    /* 实线流动光点 */
+    .flow-dot { animation: dot-pulse 1.2s ease-in-out infinite alternate; }
+    @keyframes dot-pulse {
+      from { opacity: 0.6; }
+      to { opacity: 1; }
     }
-    .connector path.flow.slow { animation-duration: 1.6s; }
-    .connector path.flow.fast { animation-duration: 0.8s; }
-    @keyframes flow-line {
-      to { stroke-dashoffset: -18; }
+    /* 总控方框：彩色流光边框 */
+    .ctrl-node { position: relative; z-index: 0; }
+    .ctrl-node::before {
+      content: "";
+      position: absolute;
+      inset: -2px;
+      border-radius: 16px;
+      padding: 2px;
+      background: conic-gradient(from var(--angle, 0deg), #00d4ff, #ff8a65, #ffb74d, #00d4ff, #ff8a65, #00d4ff);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask-composite: exclude;
+      animation: border-flow 4s linear infinite;
+      z-index: -1;
+    }
+    @property --angle {
+      syntax: '<angle>';
+      initial-value: 0deg;
+      inherits: false;
+    }
+    @keyframes border-flow {
+      to { --angle: 360deg; }
     }
     .branches { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-top: 10px; }
     .branch {
@@ -423,15 +444,24 @@
             </feMerge>
           </filter>
         </defs>
-        <!-- 总控 → 内部办公：青色流动线 -->
-        <path class="flow fast" d="M450,0 V20 L150,52 V110" stroke="#00d4ff" stroke-width="3" fill="none" filter="url(#glow-line)" opacity="0.95"/>
+        <!-- 总控 → 内部办公：青色实线 + 流动光点 -->
+        <path d="M450,0 V20 L150,52 V110" stroke="#00d4ff" stroke-width="3" fill="none" filter="url(#glow-line)" opacity="0.95"/>
         <path d="M450,0 V20 L150,52 V110" stroke="#00d4ff" stroke-width="1" fill="none" opacity="0.45"/>
-        <!-- 总控 → 对外：青色流动线 -->
-        <path class="flow" d="M450,0 V110" stroke="#00d4ff" stroke-width="3" fill="none" filter="url(#glow-line)" opacity="0.95"/>
+        <circle class="flow-dot" r="4" fill="#00d4ff" filter="url(#glow-line)">
+          <animateMotion dur="1.6s" repeatCount="indefinite" path="M450,0 V20 L150,52 V110"/>
+        </circle>
+        <!-- 总控 → 对外：青色实线 + 流动光点 -->
+        <path d="M450,0 V110" stroke="#00d4ff" stroke-width="3" fill="none" filter="url(#glow-line)" opacity="0.95"/>
         <path d="M450,0 V110" stroke="#00d4ff" stroke-width="1" fill="none" opacity="0.45"/>
-        <!-- 总控 → 门店：橙红流动线 -->
-        <path class="flow slow" d="M450,0 V20 L750,52 V110" stroke="#ff8a65" stroke-width="3" fill="none" filter="url(#glow-line)" opacity="0.95"/>
+        <circle class="flow-dot" r="4" fill="#00d4ff" filter="url(#glow-line)">
+          <animateMotion dur="2.2s" repeatCount="indefinite" path="M450,0 V110"/>
+        </circle>
+        <!-- 总控 → 门店：橙红实线 + 流动光点 -->
+        <path d="M450,0 V20 L750,52 V110" stroke="#ff8a65" stroke-width="3" fill="none" filter="url(#glow-line)" opacity="0.95"/>
         <path d="M450,0 V20 L750,52 V110" stroke="#ff8a65" stroke-width="1" fill="none" opacity="0.45"/>
+        <circle class="flow-dot" r="4" fill="#ff8a65" filter="url(#glow-line)">
+          <animateMotion dur="1.2s" repeatCount="indefinite" path="M450,0 V20 L750,52 V110"/>
+        </circle>
         <!-- 末端箭头：指向三个板块 -->
         <polygon points="138,92 150,110 162,92" fill="#00d4ff" filter="url(#glow-line)"/>
         <polygon points="438,92 450,110 462,92" fill="#00d4ff" filter="url(#glow-line)"/>
