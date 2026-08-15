@@ -10,3 +10,15 @@ Allow: /
 # 放行百度爬虫
 User-agent: Baiduspider
 Allow: /
+
+# 放行搜狗爬虫
+User-agent: Sogou web spider
+Allow: /
+
+# 放行360爬虫
+User-agent: 360Spider
+Allow: /
+
+# 放行神马爬虫
+User-agent: YisouSpider
+Allow: /
