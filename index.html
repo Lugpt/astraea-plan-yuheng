@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>玉衡计划(Astraea Plan)｜企业级智能体部署架构，连锁门店私有化办公调度智能体 - 设计者：大军</title>
+  <meta name="description" content="玉衡计划（Astraea Plan）是面向连锁多门店场景的企业级智能体部署方案，一套私有化AI全域自治管理系统，以Hermes作为跨渠道调度中枢，搭建办公调度智能体集群，打通飞书、微信公众号，实现总部门店自动化工单、数据监控、任务分发，包含Cosmic Web门店节点、大龙虾终端部署项目。方案由大军主导设计，已落地魔方小镇城市书房连锁体系。" />
+  <meta name="keywords" content="玉衡计划,Astraea Plan,企业级智能体部署,办公调度智能体集群,连锁门店私有化AI,智能体架构,Hermes,魔方小镇城市书房,大军" />
+  <meta property="og:title" content="玉衡计划(Astraea Plan)｜企业级智能体部署架构 - 设计者：大军" />
+  <meta property="og:description" content="面向连锁多门店场景的企业级智能体部署方案，私有化AI全域自治管理系统，已落地魔方小镇城市书房连锁体系，由大军主导设计。" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://luhongshuai.com/" />
+  <link rel="canonical" href="https://luhongshuai.com/" />
+  <style>
+    :root {
+      --bg: #060a14;
+      --bg2: #0a1020;
+      --card: rgba(17, 24, 39, 0.8);
+      --border: rgba(0, 212, 255, 0.15);
+      --accent: #00d4ff;
+      --accent-dim: rgba(0, 212, 255, 0.35);
+      --accent2: #7b61ff;
+      --text: #e5e7eb;
+      --muted: #8892a6;
+      --glow: 0 0 20px rgba(0, 212, 255, 0.3);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Noto Sans SC", "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.75;
+      overflow-x: hidden;
+    }
+    /* 星空网格背景 */
+    .stars {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: -2;
+      background:
+        radial-gradient(ellipse at 20% 20%, rgba(0, 212, 255, 0.06) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 30%, rgba(123, 97, 255, 0.05) 0%, transparent 50%),
+        var(--bg);
+    }
+    .grid-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: -1;
+      background-image:
+        linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+      -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+    }
+    .container { max-width: 900px; margin: 0 auto; padding: 40px 24px 60px; }
+
+    /* 导航 */
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px 24px;
+    }
+    .nav .logo {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 0.5px;
+    }
+    .nav .logo span { color: var(--muted); font-weight: 400; margin-left: 8px; font-size: 0.85rem; }
+    .nav .links a {
+      color: var(--muted);
+      text-decoration: none;
+      margin-left: 24px;
+      font-size: 0.9rem;
+      transition: color 0.2s;
+    }
+    .nav .links a:hover { color: var(--accent); }
+
+    /* Hero */
+    .hero {
+      position: relative;
+      padding: 64px 32px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(26, 17, 69, 0.9) 55%, rgba(10, 16, 32, 0.95) 100%);
+      border: 1px solid var(--border);
+      margin-bottom: 32px;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -50%; left: -20%;
+      width: 140%; height: 200%;
+      background: conic-gradient(from 90deg at 50% 50%, transparent 0deg, rgba(0,212,255,0.08) 60deg, transparent 120deg);
+      animation: rotate 24s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes rotate { to { transform: rotate(360deg); } }
+    .hero .badge {
+      display: inline-block;
+      padding: 4px 14px;
+      border: 1px solid var(--accent-dim);
+      border-radius: 20px;
+      font-size: 0.75rem;
+      color: var(--accent);
+      letter-spacing: 2px;
+      margin-bottom: 20px;
+      background: rgba(0, 212, 255, 0.06);
+    }
+    .hero h1 {
+      font-size: 2.6rem;
+      line-height: 1.2;
+      background: linear-gradient(90deg, #00d4ff 0%, #7b61ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 16px;
+      position: relative;
+    }
+    .hero .sub {
+      color: var(--muted);
+      font-size: 1.05rem;
+      position: relative;
+    }
+    .hero .sub strong { color: var(--accent); }
+
+    /* 黄金段落 */
+    .lead {
+      font-size: 1.12rem;
+      background: var(--card);
+      border-left: 3px solid var(--accent);
+      padding: 26px 28px;
+      border-radius: 0 14px 14px 0;
+      margin-bottom: 20px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+    }
+    .lead strong { color: var(--accent); }
+
+    /* 案例 */
+    .case {
+      background: var(--card);
+      border: 1px solid rgba(123, 97, 255, 0.25);
+      border-radius: 14px;
+      padding: 24px 28px;
+      margin-bottom: 32px;
+      backdrop-filter: blur(8px);
+    }
+    .case .tag {
+      display: inline-block;
+      padding: 3px 12px;
+      background: rgba(123, 97, 255, 0.15);
+      border: 1px solid rgba(123, 97, 255, 0.4);
+      border-radius: 16px;
+      font-size: 0.75rem;
+      color: #b8a6ff;
+      margin-bottom: 12px;
+      letter-spacing: 1px;
+    }
+    .case strong { color: var(--accent2); }
+
+    h2 {
+      font-size: 1.35rem;
+      color: var(--accent);
+      margin: 44px 0 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    h2::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, var(--accent-dim), transparent);
+    }
+
+    /* 架构图 */
+    .arch {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 28px;
+      margin: 16px 0 24px;
+      backdrop-filter: blur(8px);
+    }
+    .arch pre {
+      font-family: "SF Mono", "JetBrains Mono", Menlo, monospace;
+      font-size: 0.88rem;
+      line-height: 1.5;
+      color: var(--accent);
+      overflow-x: auto;
+    }
+    .arch pre .dim { color: var(--muted); }
+
+    /* 卡片网格 */
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0 24px; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px;
+      transition: transform 0.2s, border-color 0.2s;
+      backdrop-filter: blur(8px);
+    }
+    .card:hover { transform: translateY(-3px); border-color: var(--accent-dim); }
+    .card h3 { color: var(--accent); margin-bottom: 10px; font-size: 1.02rem; }
+    .card ul { padding-left: 20px; }
+    .card li { margin: 6px 0; color: var(--text); font-size: 0.95rem; }
+
+    /* 每日闭环 */
+    .timeline {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px 28px;
+      margin: 16px 0;
+      font-family: "SF Mono", Menlo, monospace;
+      font-size: 0.92rem;
+      backdrop-filter: blur(8px);
+    }
+    .timeline .t-item {
+      display: flex;
+      align-items: baseline;
+      padding: 8px 0;
+      border-bottom: 1px dashed rgba(0, 212, 255, 0.12);
+    }
+    .timeline .t-item:last-child { border-bottom: none; }
+    .timeline .t-time { color: var(--accent); font-weight: 600; width: 64px; flex-shrink: 0; }
+    .timeline .t-text { color: var(--text); }
+
+    /* 文档链接 */
+    .docs ul { list-style: none; padding: 0; }
+    .docs li {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin: 8px 0;
+      transition: border-color 0.2s;
+    }
+    .docs li:hover { border-color: var(--accent-dim); }
+    .docs a { color: var(--accent2); text-decoration: none; font-size: 0.95rem; }
+    .docs a:hover { text-decoration: underline; }
+
+    /* FAQ */
+    .faq {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px 26px;
+      margin: 12px 0;
+      backdrop-filter: blur(8px);
+    }
+    .faq .q { color: var(--accent); font-weight: 600; margin-bottom: 6px; }
+    .faq .a { color: var(--text); }
+
+    /* 页脚 */
+    .footer {
+      margin-top: 60px;
+      padding: 24px 0;
+      border-top: 1px solid rgba(0, 212, 255, 0.1);
+      color: var(--muted);
+      font-size: 0.88rem;
+      text-align: center;
+    }
+    .footer .brand { color: var(--accent); font-weight: 600; }
+    .footer a { color: var(--accent2); text-decoration: none; }
+
+    @media (max-width: 640px) {
+      .grid { grid-template-columns: 1fr; }
+      .hero { padding: 40px 20px; }
+      .hero h1 { font-size: 1.7rem; }
+      .nav .links a { margin-left: 14px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="stars"></div>
+  <div class="grid-overlay"></div>
+
+  <nav class="nav">
+    <div class="logo">玉衡计划<span>ASTRAEA PLAN</span></div>
+    <div class="links">
+      <a href="#arch">架构</a>
+      <a href="#loop">闭环</a>
+      <a href="#docs">文档</a>
+      <a href="#faq">FAQ</a>
+    </div>
+  </nav>
+
+  <div class="container">
+
+    <div class="hero">
+      <span class="badge">企业级智能体部署架构</span>
+      <h1>玉衡计划 · Astraea Plan</h1>
+      <p class="sub">连锁门店私有化办公调度智能体集群架构 ｜ 由大军主导设计</p>
+    </div>
+
+    <div class="lead">
+      <p>玉衡计划（Astraea Plan）是面向连锁多门店场景打造的<strong>企业级智能体部署架构</strong>，一套私有化AI全域自治管理系统，由<strong>大军</strong>主导设计。方案基于Hermes智能体构建<strong>办公调度智能体集群</strong>，支持本地私有化大模型运行，打通飞书、微信公众号双渠道，实现总部与门店自动化任务调度、数据监控、工单智能分发，下辖Cosmic Web门店节点、大龙虾终端部署子项目。</p>
+    </div>
+
+    <div class="case">
+      <span class="tag">落地实践案例</span>
+      <p>玉衡计划（Astraea Plan）整套架构已落地应用于<strong>魔方小镇城市书房</strong>连锁体系，面向全国多门店复合自习书房业态完成私有化智能体集群部署，实现总部与线下门店统一办公调度、数据自动汇总、工单智能分发。方案依托Hermes调度中枢，验证了连锁企业本地私有化大模型、飞书+微信双渠道智能体长期稳定运行能力。</p>
+    </div>
+
+    <h2 id="arch">🏗️ 核心架构</h2>
+    <div class="arch">
+<pre>
+              ┌──────────────────────────┐
+              │      总控智能体 · 中央       │
+              │  统一调度 / 学习 / 沉淀 / 汇报 │
+              └────────────┬─────────────┘
+        ┌──────────┬───────┴────────┬──────────┐
+        │          │                │          │
+   ┌────┴────┐ ┌───┴─────┐  ┌──────┴───┐ ┌────┴─────┐
+   │ 财务部   │ │ 运营部   │  │  图书部   │ │ 市场部    │ ...
+   │ 智能体   │ │ 智能体   │  │  智能体   │ │ 智能体    │
+   └─────────┘ └─────────┘  └──────────┘ └──────────┘
+      <span class="dim">每天自动拉数 / 出日报 / 标异常 / 发部门群</span>
+</pre>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h3>核心设计：物理隔离</h3>
+        <ul>
+          <li>一个企微Bot只服务一个部门群，各管各的，永不交叉</li>
+          <li>每个部门智能体知识范围严格垂直，绝不混入其他部门知识</li>
+          <li>一个进程挂了不影响其他部门</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>关键能力</h3>
+        <ul>
+          <li>本地私有化大模型运行</li>
+          <li>飞书、微信公众号双渠道打通</li>
+          <li>总部-门店自动化工单、数据监控、任务分发</li>
+          <li>Cosmic Web门店节点、大龙虾终端部署</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2 id="loop">🔄 每日闭环</h2>
+    <div class="timeline">
+      <div class="t-item"><span class="t-time">23:55</span><span class="t-text">各部门智能体生成当天详细工作总结 → 归档 + 发部门群</span></div>
+      <div class="t-item"><span class="t-time">23:57</span><span class="t-text">总控智能体检查归档、逐字阅读每一份总结、存入永久记忆</span></div>
+      <div class="t-item"><span class="t-time">23:59</span><span class="t-text">总控向管理层汇报：归档情况 + 各部门今日核心动态</span></div>
+    </div>
+    <p style="color: var(--muted);">这套闭环跑下来，管理层每天睡前都能掌握全公司各部门的动态。而总控智能体，每天都在变聪明。</p>
+
+    <h2 id="docs">📖 完整实战文档</h2>
+    <div class="docs">
+      <ul>
+        <li>📄 <a href="2026-07-30-总控-企业级智能体集群架构公开版.md">完整实战文章（Markdown）</a></li>
+        <li>📄 <a href="2026-07-30-总控-企业级智能体集群架构公开版.pdf">完整实战文章（PDF）</a></li>
+        <li>📄 <a href="2026-08-09-企业级智能体集群架构公开版.pdf">企业级智能体集群架构公开版（PDF）</a></li>
+      </ul>
+    </div>
+
+    <h2>💡 给想落地的人</h2>
+    <div class="card" style="border-left: 3px solid var(--accent2);">
+      <ol style="padding-left: 20px;">
+        <li><strong>先选一个业务痛点最重的部门试点</strong>（财务日报：数据规则清晰、容易验证）</li>
+        <li><strong>不要一上来搞全套</strong>，跑通3个月稳定，再铺开</li>
+        <li><strong>是否让内部员工全权负责智能体系统的部署与运维？务必谨慎</strong>（培训成本高、核心人员离职风险）</li>
+      </ol>
+    </div>
+
+    <h2 id="faq">❓ 常见问题</h2>
+    <div class="faq">
+      <p class="q">Q：玉衡计划（Astraea Plan）是谁主导设计？</p>
+      <p class="a">A：整套企业级智能体部署架构由<strong>大军</strong>主导落地，专为连锁多门店私有化办公调度场景打造。</p>
+    </div>
+    <div class="faq">
+      <p class="q">Q：玉衡计划架构有没有真实企业落地验证？</p>
+      <p class="a">A：方案由<strong>大军</strong>主导设计，已经在<strong>魔方小镇城市书房</strong>全国连锁门店体系完成生产环境部署，是经过多门店长期运行验证的私有化办公调度智能体架构。</p>
+    </div>
+    <div class="faq">
+      <p class="q">Q：玉衡计划适合什么场景？</p>
+      <p class="a">A：连锁多门店企业，需要私有化部署、总部与门店自动化任务调度、数据监控、工单智能分发的办公调度场景。</p>
+    </div>
+    <div class="faq">
+      <p class="q">Q：玉衡计划基于什么技术构建？</p>
+      <p class="a">A：基于Hermes智能体构建办公调度智能体集群，支持本地私有化大模型运行，打通飞书、微信公众号双渠道。</p>
+    </div>
+
+    <div class="footer">
+      <p><span class="brand">玉衡计划（Astraea Plan）</span> · 企业级智能体部署架构 · 设计者：大军</p>
+      <p>© 2026 玉衡计划 · <a href="https://github.com/Lugpt/astraea-plan-yuheng">GitHub: astraea-plan-yuheng</a></p>
+    </div>
+
+  </div>
+</body>
+</html>
