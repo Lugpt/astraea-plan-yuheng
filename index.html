@@ -212,6 +212,16 @@
     .ctrl-node .t { color: var(--accent); font-weight: 700; font-size: 1.05rem; letter-spacing: 1px; }
     .ctrl-node .s { color: var(--muted); font-size: 0.82rem; margin-top: 4px; }
     .ctrl-line { color: var(--accent-dim); font-size: 1.2rem; margin: 6px 0; letter-spacing: 2px; }
+    .connector { display: block; width: 100%; height: 96px; margin: 2px 0 10px; }
+    .connector path.flow {
+      stroke-dasharray: 10 8;
+      animation: flow-line 1.1s linear infinite;
+    }
+    .connector path.flow.slow { animation-duration: 1.6s; }
+    .connector path.flow.fast { animation-duration: 0.8s; }
+    @keyframes flow-line {
+      to { stroke-dashoffset: -18; }
+    }
     .branches { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-top: 10px; }
     .branch {
       background: var(--card);
@@ -402,7 +412,31 @@
         <div class="t">总控智能体 · 中央</div>
         <div class="s">统一调度 / 学习 / 沉淀 / 汇报 —— 全局可控</div>
       </div>
-      <div class="ctrl-line">▼ ▼ ▼</div>
+      <div class="ctrl-line"></div>
+      <svg class="connector" viewBox="0 0 900 110" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <filter id="glow-line" x="-80%" y="-80%" width="260%" height="260%">
+            <feGaussianBlur stdDeviation="4.5" result="blur"/>
+            <feMerge>
+              <feMergeNode in="blur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
+        <!-- 总控 → 内部办公：青色流动线 -->
+        <path class="flow fast" d="M450,0 V20 L150,52 V110" stroke="#00d4ff" stroke-width="3" fill="none" filter="url(#glow-line)" opacity="0.95"/>
+        <path d="M450,0 V20 L150,52 V110" stroke="#00d4ff" stroke-width="1" fill="none" opacity="0.45"/>
+        <!-- 总控 → 对外：青色流动线 -->
+        <path class="flow" d="M450,0 V110" stroke="#00d4ff" stroke-width="3" fill="none" filter="url(#glow-line)" opacity="0.95"/>
+        <path d="M450,0 V110" stroke="#00d4ff" stroke-width="1" fill="none" opacity="0.45"/>
+        <!-- 总控 → 门店：橙红流动线 -->
+        <path class="flow slow" d="M450,0 V20 L750,52 V110" stroke="#ff8a65" stroke-width="3" fill="none" filter="url(#glow-line)" opacity="0.95"/>
+        <path d="M450,0 V20 L750,52 V110" stroke="#ff8a65" stroke-width="1" fill="none" opacity="0.45"/>
+        <!-- 末端箭头：指向三个板块 -->
+        <polygon points="138,92 150,110 162,92" fill="#00d4ff" filter="url(#glow-line)"/>
+        <polygon points="438,92 450,110 462,92" fill="#00d4ff" filter="url(#glow-line)"/>
+        <polygon points="738,92 750,110 762,92" fill="#ff8a65" filter="url(#glow-line)"/>
+      </svg>
       <div class="branches">
         <div class="branch">
           <div class="branch-head">🏢 内部办公智能体</div>
