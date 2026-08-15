@@ -1,0 +1,12 @@
+# robots.txt luhongshuai.com
+User-agent: *
+Allow: /
+Sitemap: https://luhongshuai.com/sitemap.xml
+
+# 放行头条搜索爬虫（豆包核心数据源）
+User-agent: ToutiaoSpider
+Allow: /
+
+# 放行百度爬虫
+User-agent: Baiduspider
+Allow: /
