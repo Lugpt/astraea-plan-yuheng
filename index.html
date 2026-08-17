@@ -770,11 +770,41 @@
     { name: 'uranus',  tex: 'uranus',  x: 0.40, y: 0.50, r: 20, spin: -0.0010 },
     { name: 'neptune', tex: 'neptune', x: 0.60, y: 0.15, r: 19, spin: 0.0014 },
   ];
-  // 逐颗加载纹理
+  // 程序化兜底纹理：纹理加载失败时生成渐变球贴图（保证星球必显示）
+  function makeFallbackTexture(hue1, hue2) {
+    const cv = document.createElement('canvas');
+    cv.width = 256; cv.height = 128;
+    const cx = cv.getContext('2d');
+    const g = cx.createLinearGradient(0, 0, 256, 0);
+    g.addColorStop(0, hue1); g.addColorStop(0.5, hue2); g.addColorStop(1, hue1);
+    cx.fillStyle = g; cx.fillRect(0, 0, 256, 128);
+    // 加一些随机"表面"斑点，模拟星球纹理
+    for (let i = 0; i < 40; i++) {
+      cx.fillStyle = `rgba(255,255,255,${Math.random() * 0.15})`;
+      cx.beginPath();
+      cx.arc(Math.random() * 256, Math.random() * 128, 3 + Math.random() * 8, 0, Math.PI * 2);
+      cx.fill();
+    }
+    const img = new Image();
+    img.src = cv.toDataURL();
+    return img;
+  }
+  const FALLBACK_HUES = {
+    sun: ['#ffb347', '#ff6a00'], mercury: ['#b5a29a', '#8a7b70'],
+    venus: ['#e8cda0', '#c9a86a'], earth: ['#3a7bd5', '#5a9bd5'],
+    moon: ['#c8c8c8', '#9a9a9a'], mars: ['#c1440e', '#a0522d'],
+    jupiter: ['#d4a574', '#b07b4a'], saturn: ['#e0c9a0', '#c9a87a'],
+    uranus: ['#7fd4d9', '#5ab5bb'], neptune: ['#3a6fd5', '#2a4fd5'],
+  };
+  // 逐颗加载纹理（带兜底）
   PLANET_DEFS.forEach((p) => {
     loadTexture(PLANET_TEXTURES[p.tex]).then(() => {
       planets.push({ ...p, img: IMG_CACHE[PLANET_TEXTURES[p.tex]], rot: Math.random() * 360 });
-    }).catch(() => {});
+    }).catch(() => {
+      // 兜底：程序化渐变球，星球照样显示
+      const [h1, h2] = FALLBACK_HUES[p.tex] || ['#888888', '#555555'];
+      planets.push({ ...p, img: makeFallbackTexture(h1, h2), rot: Math.random() * 360, fallback: true });
+    });
   });
   // 土星环纹理
   let saturnRingImg = null;
@@ -806,7 +836,7 @@
 
   /* ── 绘制 3D 星球（贴图球体自转） ── */
   function drawPlanets() {
-    if (planets.length < 3) return;   // 纹理没加载完先不画
+    if (planets.length < 1) return;   // 至少1颗加载完就开画，其余逐步出现
     const now = performance.now();
 
     for (const p of planets) {
@@ -818,7 +848,7 @@
         py = p.orbit.cy * H + Math.sin(a) * p.orbit.rad * H;
       }
       const R = p.r * (W / 1440) * 2.2;   // 按视口缩放
-      p.rot = (p.rot || 0) + p.spin * 16; // 自转推进
+      p.rot = (p.rot || 0) + p.spin * 26; // 自转推进（更快可见）
 
       // 太阳：发光光晕
       if (p.name === 'sun') {
@@ -908,11 +938,11 @@
       y0 = Math.random() * H * 0.8;
       vx = -(7 + Math.random() * 6);
       vy = 7 + Math.random() * 5;
-    } else if (edge === 2) {                          // 底部 → 斜向左上（少量上飞）
-      x0 = Math.random() * W * 0.8;
-      y0 = H + 30 + Math.random() * 80;
-      vx = (Math.random() - 0.5) * 12;
-      vy = -(7 + Math.random() * 5);
+    } else if (edge === 2) {                          // 底部 → 斜向右上（低位横划，不上飞）
+      x0 = Math.random() * W * 0.7;
+      y0 = H + 30 + Math.random() * 60;
+      vx = -(5 + Math.random() * 5);
+      vy = -(6 + Math.random() * 4);
     } else {                                          // 左侧 → 斜向右下
       x0 = -30 - Math.random() * 80;
       y0 = Math.random() * H * 0.8;
