@@ -61,6 +61,14 @@
         radial-gradient(ellipse at 80% 30%, rgba(123, 97, 255, 0.05) 0%, transparent 50%),
         var(--bg);
     }
+    #bg-network {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.85;
+    }
     .grid-overlay {
       position: fixed;
       top: 0; left: 0;
@@ -359,6 +367,8 @@
 <body>
   <div class="stars"></div>
   <div class="grid-overlay"></div>
+  <canvas id="bg-network" aria-hidden="true"></canvas>
+
 
   <nav class="nav">
     <div class="logo">玉衡计划<span>ASTRAEA PLAN</span></div>
@@ -719,5 +729,112 @@
     document.getElementById("mail-link").innerText = targetEmail;
     document.getElementById("mail-link").href = `mailto:${targetEmail}`;
   </script>
+
+<script>
+/* ── 玉衡 · 动态粒子网络背景 ──
+   粒子=智能体节点，连线=A2A通信链路
+   鼠标移动产生引力 → 粒子聚拢，体现"总控指挥全局" */
+(function () {
+  const canvas = document.getElementById('bg-network');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let W, H, particles = [], mouse = { x: null, y: null }, rafId = null;
+
+  const COLORS = ['0, 212, 255', '123, 97, 255', '0, 180, 255'];
+
+  function resize() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = window.innerWidth; H = window.innerHeight;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    // 粒子数随屏幕自适应：约每 18000px² 一个，60~110 之间
+    const target = Math.round((W * H) / 18000);
+    const count = Math.max(60, Math.min(110, target));
+    particles = [];
+    for (let i = 0; i < count; i++) {
+      particles.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        vx: (Math.random() - 0.5) * 0.45,
+        vy: (Math.random() - 0.5) * 0.45,
+        r: Math.random() * 1.8 + 0.8,
+        c: COLORS[Math.floor(Math.random() * COLORS.length)]
+      });
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    const LINK_DIST = 130;
+    // 先画连线（在粒子下方）
+    for (let i = 0; i < particles.length; i++) {
+      const p = particles[i];
+      for (let j = i + 1; j < particles.length; j++) {
+        const q = particles[j];
+        const dx = p.x - q.x, dy = p.y - q.y;
+        const d2 = dx * dx + dy * dy;
+        if (d2 < LINK_DIST * LINK_DIST) {
+          const alpha = (1 - Math.sqrt(d2) / LINK_DIST) * 0.28;
+          ctx.strokeStyle = `rgba(${p.c}, ${alpha})`;
+          ctx.lineWidth = 0.7;
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(q.x, q.y);
+          ctx.stroke();
+        }
+      }
+    }
+    // 画粒子 + 鼠标引力
+    for (const p of particles) {
+      // 鼠标引力（总控吸引）
+      if (mouse.x !== null) {
+        const dx = mouse.x - p.x, dy = mouse.y - p.y;
+        const d = Math.sqrt(dx * dx + dy * dy);
+        if (d < 160 && d > 0.01) {
+          const force = (160 - d) / 160 * 0.06;
+          p.vx += (dx / d) * force;
+          p.vy += (dy / d) * force;
+        }
+      }
+      p.x += p.vx; p.y += p.vy;
+      // 边界反弹（留 20px 边距）
+      if (p.x < 20 || p.x > W - 20) p.vx *= -1;
+      if (p.y < 20 || p.y > H - 20) p.vy *= -1;
+      // 速度上限（防爆走）
+      const sp = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
+      if (sp > 0.8) { p.vx *= 0.8 / sp; p.vy *= 0.8 / sp; }
+      // 鼠标附近的粒子更亮
+      let glow = 1;
+      if (mouse.x !== null) {
+        const dx = mouse.x - p.x, dy = mouse.y - p.y;
+        const d = Math.sqrt(dx * dx + dy * dy);
+        if (d < 160) glow = 1.6;
+      }
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r * glow, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${p.c}, ${0.5 * Math.min(glow, 1.8)})`;
+      ctx.fill();
+    }
+    rafId = requestAnimationFrame(draw);
+  }
+
+  function onMouse(e) { mouse.x = e.clientX; mouse.y = e.clientY; }
+  function onLeave() { mouse.x = null; mouse.y = null; }
+
+  // 页面可见才动画（省电）
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) { cancelAnimationFrame(rafId); }
+    else { rafId = requestAnimationFrame(draw); }
+  });
+
+  window.addEventListener('resize', resize);
+  window.addEventListener('mousemove', onMouse, { passive: true });
+  document.documentElement.addEventListener('mouseleave', onLeave);
+
+  resize();
+  rafId = requestAnimationFrame(draw);
+})();
+</script>
 </body>
 </html>
