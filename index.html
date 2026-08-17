@@ -738,7 +738,7 @@
   const canvas = document.getElementById('bg-network');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
-  let W, H, particles = [], mouse = { x: null, y: null }, rafId = null;
+  let W, H, particles = [], meteors = [], mouse = { x: null, y: null }, rafId = null, meteorTimer = 0;
 
   const COLORS = ['0, 212, 255', '123, 97, 255', '0, 180, 255'];
 
@@ -764,6 +764,24 @@
     }
   }
 
+  /* ── 流星雨：从右上斜划向左下，带拖尾，快速划过 ── */
+  function spawnMeteor() {
+    const fromRight = Math.random() > 0.5;           // 随机从右上或左上
+    const x0 = fromRight ? W + 40 : Math.random() * W * 0.3;
+    const y0 = -20 - Math.random() * H * 0.25;        // 顶部之外出发
+    const speed = 11 + Math.random() * 7;             // 快速
+    const angle = Math.PI * (0.52 + Math.random() * 0.18);  // 斜向下 ~30-40°
+    meteors.push({
+      x: x0, y: y0,
+      vx: -Math.cos(angle) * speed,                   // 向左划
+      vy: Math.sin(angle) * speed,
+      tail: 70 + Math.random() * 90,                  // 拖尾长度
+      life: 1,                                        // 1→0 渐隐
+      w: Math.random() * 1.6 + 1.0,
+      hue: Math.random() > 0.7 ? '123, 97, 255' : '0, 212, 255'  // 主青，少量紫
+    });
+  }
+
   function draw() {
     ctx.clearRect(0, 0, W, H);
     const LINK_DIST = 130;
@@ -785,6 +803,42 @@
         }
       }
     }
+    // ── 流星雨：更新 + 绘制 ──
+    // 定时生成：平均每 1.8~3.5 秒一条
+    meteorTimer += 16;
+    if (meteorTimer > 1800 + Math.random() * 1700) {
+      meteorTimer = 0;
+      spawnMeteor();
+      if (Math.random() < 0.25) spawnMeteor();   // 25% 双流星
+    }
+    for (let i = meteors.length - 1; i >= 0; i--) {
+      const m = meteors[i];
+      m.x += m.vx; m.y += m.vy;
+      m.life -= 0.014;                            // 渐隐
+      if (m.life <= 0 || m.x < -m.tail - 60 || m.y > H + 60) {
+        meteors.splice(i, 1);
+        continue;
+      }
+      // 拖尾：从头部到尾部渐变
+      const tx = m.x - (m.vx / Math.hypot(m.vx, m.vy)) * m.tail;
+      const ty = m.y - (m.vy / Math.hypot(m.vx, m.vy)) * m.tail;
+      const grad = ctx.createLinearGradient(m.x, m.y, tx, ty);
+      grad.addColorStop(0, `rgba(${m.hue}, ${0.9 * m.life})`);
+      grad.addColorStop(1, `rgba(${m.hue}, 0)`);
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = m.w * m.life;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(m.x, m.y);
+      ctx.lineTo(tx, ty);
+      ctx.stroke();
+      // 头部亮点
+      ctx.beginPath();
+      ctx.arc(m.x, m.y, 1.6 * m.life, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255, 255, 255, ${0.85 * m.life})`;
+      ctx.fill();
+    }
+
     // 画粒子 + 鼠标引力
     for (const p of particles) {
       // 鼠标引力（总控吸引）
