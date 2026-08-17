@@ -867,10 +867,10 @@
       const dispH = R * 2;                        // 显示高 = 球直径（2:1贴图纵向拉伸成球）
       const off = ((p.rot % 360) / 360) * dispW;  // 自转偏移（绕一周=360°）
       ctx.globalAlpha = 0.72;                     // 整体调暗（不抢内容）
-      // 三张相邻贴图无缝滚动（消除接缝）
-      ctx.drawImage(img, -off - dispW, py - R, dispW, dispH);
-      ctx.drawImage(img, -off,        py - R, dispW, dispH);
-      ctx.drawImage(img, -off + dispW, py - R, dispW, dispH);
+      // 三张相邻贴图无缝滚动（消除接缝）—— 以球心 px 为基准，保证球面全覆盖
+      ctx.drawImage(img, px - off - dispW, py - R, dispW, dispH);
+      ctx.drawImage(img, px - off,          py - R, dispW, dispH);
+      ctx.drawImage(img, px - off + dispW,  py - R, dispW, dispH);
       ctx.globalAlpha = 1;
       // 球面体积光影：边缘暗 + 左上高光（光源在左上）——整体更暗
       const sg = ctx.createRadialGradient(
