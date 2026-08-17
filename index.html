@@ -742,7 +742,7 @@
 
   /* ── 真实星球：3D 贴图球体 + 自转 + 公转 ── */
   const PLANET_TEXTURES = {
-    jupiter: 'textures/jupiter.jpg',
+    earth: 'textures/earth.jpg', jupiter: 'textures/jupiter.jpg',
   };
   const IMG_CACHE = {};
   function loadTexture(src) {
@@ -755,9 +755,10 @@
     });
   }
   // 星球配置：位置(0-1比例)、半径(px基准)、自转速度、公转半径/速度、纹理
-  // 只保留木星一颗（左上角点缀，不抢内容）
+  // 两颗：木星（左上）+ 地球（右下），低调不抢内容
   const PLANET_DEFS = [
     { name: 'jupiter', tex: 'jupiter', x: 0.14, y: 0.30, r: 46, spin: 0.0021, glow: '210, 180, 150' },
+    { name: 'earth',   tex: 'earth',   x: 0.84, y: 0.74, r: 42, spin: 0.0016, glow: '70, 150, 255' },
   ];
   // 程序化兜底纹理：纹理加载失败时生成渐变球贴图（保证星球必显示）
   function makeFallbackTexture(hue1, hue2) {
@@ -779,7 +780,7 @@
     return img;
   }
   const FALLBACK_HUES = {
-    jupiter: ['#d4a574', '#b07b4a'],
+    earth: ['#3a7bd5', '#5a9bd5'], jupiter: ['#d4a574', '#b07b4a'],
   };
   // 逐颗加载纹理（带兜底）
   PLANET_DEFS.forEach((p) => {
@@ -920,8 +921,8 @@
 
   /* ── 流星雨：从右上斜划向左下，带拖尾，快速划过 ── */
   function spawnMeteor() {
-    // 从屏幕四周随机方向进入，分散不集中
-    const edge = Math.floor(Math.random() * 4);       // 0=上 1=右 2=下 3=左
+    // 全部从上方/两侧进入，只朝下或斜下方向（绝不向上飞）
+    const edge = Math.floor(Math.random() * 3);       // 0=上 1=右 2=左
     const speed = 10 + Math.random() * 6;
     const tail = 110 + Math.random() * 120;
     let x0, y0, vx, vy;
@@ -936,11 +937,6 @@
       y0 = Math.random() * H * 0.8;
       vx = -(7 + Math.random() * 6);
       vy = 7 + Math.random() * 5;
-    } else if (edge === 2) {                          // 底部 → 斜向右上（低位横划，不上飞）
-      x0 = Math.random() * W * 0.7;
-      y0 = H + 30 + Math.random() * 60;
-      vx = -(5 + Math.random() * 5);
-      vy = -(6 + Math.random() * 4);
     } else {                                          // 左侧 → 斜向右下
       x0 = -30 - Math.random() * 80;
       y0 = Math.random() * H * 0.8;
