@@ -738,7 +738,47 @@
   const canvas = document.getElementById('bg-network');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
-  let W, H, particles = [], meteors = [], mouse = { x: null, y: null }, rafId = null, meteorTimer = 0;
+  let W, H, particles = [], meteors = [], planets = [], mouse = { x: null, y: null }, rafId = null, meteorTimer = 0;
+
+  /* ── 真实星球：3D 贴图球体 + 自转 + 公转 ── */
+  const PLANET_TEXTURES = {
+    sun: 'textures/sun.jpg', mercury: 'textures/mercury.jpg', venus: 'textures/venus.jpg',
+    earth: 'textures/earth.jpg', moon: 'textures/moon.jpg', mars: 'textures/mars.jpg',
+    jupiter: 'textures/jupiter.jpg', saturn: 'textures/saturn.jpg',
+    uranus: 'textures/uranus.jpg', neptune: 'textures/neptune.jpg',
+  };
+  const IMG_CACHE = {};
+  function loadTexture(src) {
+    return new Promise((res, rej) => {
+      if (IMG_CACHE[src]) return res(IMG_CACHE[src]);
+      const img = new Image();
+      img.onload = () => { IMG_CACHE[src] = img; res(img); };
+      img.onerror = rej;
+      img.src = src;
+    });
+  }
+  // 星球配置：位置(0-1比例)、半径(px基准)、自转速度、公转半径/速度、纹理
+  const PLANET_DEFS = [
+    { name: 'sun',     tex: 'sun',     x: 0.12, y: 0.18, r: 62, spin: 0.0009, glow: '255, 180, 60' },
+    { name: 'mercury', tex: 'mercury', x: 0.30, y: 0.82, r: 13, spin: 0.0012 },
+    { name: 'venus',   tex: 'venus',   x: 0.88, y: 0.15, r: 22, spin: -0.0008 },
+    { name: 'earth',   tex: 'earth',   x: 0.72, y: 0.78, r: 24, spin: 0.0016, glow: '70, 150, 255' },
+    { name: 'moon',    tex: 'moon',    x: 0.62, y: 0.60, r: 9,  spin: 0.0004, orbit: { cx: 0.72, cy: 0.78, rad: 0.055, speed: 0.0005 } },
+    { name: 'mars',    tex: 'mars',    x: 0.48, y: 0.28, r: 16, spin: 0.0011 },
+    { name: 'jupiter', tex: 'jupiter', x: 0.20, y: 0.62, r: 40, spin: 0.0021 },
+    { name: 'saturn',  tex: 'saturn',  x: 0.85, y: 0.52, r: 30, spin: 0.0018, ring: true },
+    { name: 'uranus',  tex: 'uranus',  x: 0.40, y: 0.50, r: 20, spin: -0.0010 },
+    { name: 'neptune', tex: 'neptune', x: 0.60, y: 0.15, r: 19, spin: 0.0014 },
+  ];
+  // 逐颗加载纹理
+  PLANET_DEFS.forEach((p) => {
+    loadTexture(PLANET_TEXTURES[p.tex]).then(() => {
+      planets.push({ ...p, img: IMG_CACHE[PLANET_TEXTURES[p.tex]], rot: Math.random() * 360 });
+    }).catch(() => {});
+  });
+  // 土星环纹理
+  let saturnRingImg = null;
+  loadTexture('textures/saturn_ring.jpg').then((img) => { saturnRingImg = img; }).catch(() => {});
 
   const COLORS = ['0, 212, 255', '123, 97, 255', '0, 180, 255'];
 
@@ -764,12 +804,98 @@
     }
   }
 
+  /* ── 绘制 3D 星球（贴图球体自转） ── */
+  function drawPlanets() {
+    if (planets.length < 3) return;   // 纹理没加载完先不画
+    const now = performance.now();
+
+    for (const p of planets) {
+      // 公转（月球绕地球）
+      let px = p.x * W, py = p.y * H;
+      if (p.orbit) {
+        const a = now * p.orbit.speed;
+        px = p.orbit.cx * W + Math.cos(a) * p.orbit.rad * W;
+        py = p.orbit.cy * H + Math.sin(a) * p.orbit.rad * H;
+      }
+      const R = p.r * (W / 1440) * 2.2;   // 按视口缩放
+      p.rot = (p.rot || 0) + p.spin * 16; // 自转推进
+
+      // 太阳：发光光晕
+      if (p.name === 'sun') {
+        const g = ctx.createRadialGradient(px, py, R * 0.2, px, py, R * 3.2);
+        g.addColorStop(0, 'rgba(255, 190, 80, 0.55)');
+        g.addColorStop(0.4, 'rgba(255, 140, 40, 0.18)');
+        g.addColorStop(1, 'rgba(255, 120, 30, 0)');
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(px, py, R * 3.2, 0, Math.PI * 2); ctx.fill();
+      }
+      // 其他有 glow 的星球（地球）：淡蓝大气光晕
+      else if (p.glow) {
+        const g = ctx.createRadialGradient(px, py, R * 0.8, px, py, R * 1.8);
+        g.addColorStop(0, `rgba(${p.glow}, 0.25)`);
+        g.addColorStop(1, `rgba(${p.glow}, 0)`);
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(px, py, R * 1.8, 0, Math.PI * 2); ctx.fill();
+      }
+
+      // 土星环（在球体后面画下半，前面画上半 → 立体环绕感）
+      if (p.ring) drawSaturnRing(px, py, R, now, false);
+
+      // 球体本体：贴图裁剪成圆 + 水平偏移模拟自转
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(px, py, R, 0, Math.PI * 2);
+      ctx.clip();
+      const img = p.img;
+      const sw = img.width * 0.5;            // 半球宽（1:2 经度贴图）
+      const off = (p.rot / 360) * sw;        // 自转偏移
+      // 画两张相邻贴图实现无缝滚动
+      ctx.drawImage(img, -off - sw * 0.5, py - R, sw, R * 2);
+      ctx.drawImage(img, -off + sw * 0.5, py - R, sw, R * 2);
+      ctx.drawImage(img, -off + sw * 1.5, py - R, sw, R * 2);
+      // 球面明暗：右亮左暗渐变 = 立体球
+      const sg = ctx.createLinearGradient(px - R, 0, px + R, 0);
+      sg.addColorStop(0, 'rgba(0,0,0,0.75)');
+      sg.addColorStop(0.35, 'rgba(0,0,0,0.15)');
+      sg.addColorStop(0.65, 'rgba(255,255,255,0.08)');
+      sg.addColorStop(1, 'rgba(255,255,255,0.3)');
+      ctx.fillStyle = sg;
+      ctx.fillRect(px - R, py - R, R * 2, R * 2);
+      ctx.restore();
+
+      // 星球轮廓描边（深空感）
+      ctx.beginPath();
+      ctx.arc(px, py, R, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(255,255,255,0.10)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      // 土星环（球体前面上半）
+      if (p.ring) drawSaturnRing(px, py, R, now, true);
+    }
+  }
+
+  /* ── 土星环：椭圆环带 ── */
+  function drawSaturnRing(cx, cy, R, now, front) {
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(-0.42);                       // 倾角
+    const rx = R * 2.15, ry = R * 0.62;
+    // 前/后半环不同绘制避免遮挡错误
+    ctx.beginPath();
+    ctx.ellipse(0, 0, rx, ry, 0, front ? Math.PI : 0, front ? Math.PI * 2 : Math.PI, !front);
+    ctx.strokeStyle = 'rgba(210, 180, 140, 0.55)';
+    ctx.lineWidth = R * 0.38;
+    ctx.stroke();
+    ctx.restore();
+  }
+
   /* ── 流星雨：从右上斜划向左下，带拖尾，快速划过 ── */
   function spawnMeteor() {
     const fromRight = Math.random() > 0.5;           // 随机从右上或左上
     const x0 = fromRight ? W + 60 : Math.random() * W * 0.3;
     const y0 = -40 - Math.random() * H * 0.3;         // 顶部之外出发
-    const speed = 15 + Math.random() * 9;             // 更快
+    const speed = 10 + Math.random() * 6;             // 稍慢，看得清拖尾
     const angle = Math.PI * (0.52 + Math.random() * 0.16);  // 斜向下 ~30-40°
     meteors.push({
       x: x0, y: y0,
@@ -778,7 +904,10 @@
       tail: 130 + Math.random() * 130,                // 更长的拖尾
       life: 1,                                        // 1→0 渐隐
       w: Math.random() * 2.4 + 1.6,                   // 更粗
-      hue: Math.random() > 0.65 ? '123, 97, 255' : '0, 212, 255'  // 主青，更多紫
+      hue: (function () {                                  // 蓝/红/绿/橙/青/紫 随机
+        const palette = ['0, 212, 255', '80, 160, 255', '255, 90, 90', '120, 230, 140', '255, 170, 60', '200, 120, 255'];
+        return palette[Math.floor(Math.random() * palette.length)];
+      })()
     });
   }
 
@@ -851,6 +980,9 @@
       ctx.fillStyle = `rgba(${m.hue}, ${0.35 * m.life})`;
       ctx.fill();
     }
+
+    // ── 星球层（在粒子下层） ──
+    drawPlanets();
 
     // 画粒子 + 鼠标引力
     for (const p of particles) {
