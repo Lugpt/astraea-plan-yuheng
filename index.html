@@ -866,16 +866,13 @@
       const dispW = R * 2;                        // 显示宽 = 球直径
       const dispH = R * 2;                        // 显示高 = 球直径（2:1贴图纵向拉伸成球）
       const off = ((p.rot % 360) / 360) * dispW;  // 自转偏移（绕一周=360°）
-      // pattern 平铺 + setTransform 滚动 = 真正的无缝自转，球内必然全覆盖
-      const pat = ctx.createPattern(img, 'repeat');
-      if (pat) {
-        pat.setTransform(new DOMMatrix().translateSelf(-off, 0));
-        ctx.globalAlpha = 0.72;                   // 整体调暗（不抢内容）
-        ctx.fillStyle = pat;
-        // 只填圆的外接矩形（外层已 clip 成圆），任意自转角度都覆盖
-        ctx.fillRect(px - R, py - R, R * 2, R * 2);
-        ctx.globalAlpha = 1;
-      }
+      // 4 张相邻贴图平铺 = 无缝自转（drawImage 全浏览器兼容 + 数学上全覆盖）
+      ctx.globalAlpha = 0.72;                     // 整体调暗（不抢内容）
+      ctx.drawImage(img, px - off - dispW * 1.5, py - R, dispW, dispH);
+      ctx.drawImage(img, px - off - dispW * 0.5, py - R, dispW, dispH);
+      ctx.drawImage(img, px - off + dispW * 0.5, py - R, dispW, dispH);
+      ctx.drawImage(img, px - off + dispW * 1.5, py - R, dispW, dispH);
+      ctx.globalAlpha = 1;
       // 球面体积光影：边缘暗 + 左上高光（光源在左上）——整体更暗
       const sg = ctx.createRadialGradient(
         px - R * 0.4, py - R * 0.45, R * 0.2,
