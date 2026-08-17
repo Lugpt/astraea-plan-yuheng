@@ -742,10 +742,7 @@
 
   /* ── 真实星球：3D 贴图球体 + 自转 + 公转 ── */
   const PLANET_TEXTURES = {
-    sun: 'textures/sun.jpg', mercury: 'textures/mercury.jpg', venus: 'textures/venus.jpg',
-    earth: 'textures/earth.jpg', moon: 'textures/moon.jpg', mars: 'textures/mars.jpg',
-    jupiter: 'textures/jupiter.jpg', saturn: 'textures/saturn.jpg',
-    uranus: 'textures/uranus.jpg', neptune: 'textures/neptune.jpg',
+    earth: 'textures/earth.jpg', jupiter: 'textures/jupiter.jpg',
   };
   const IMG_CACHE = {};
   function loadTexture(src) {
@@ -758,17 +755,10 @@
     });
   }
   // 星球配置：位置(0-1比例)、半径(px基准)、自转速度、公转半径/速度、纹理
+  // 只保留两颗：地球（高清蓝弹珠）+ 木星，位置错开不抢内容
   const PLANET_DEFS = [
-    { name: 'sun',     tex: 'sun',     x: 0.12, y: 0.18, r: 62, spin: 0.0009, glow: '255, 180, 60' },
-    { name: 'mercury', tex: 'mercury', x: 0.30, y: 0.82, r: 13, spin: 0.0012 },
-    { name: 'venus',   tex: 'venus',   x: 0.88, y: 0.15, r: 22, spin: -0.0008 },
-    { name: 'earth',   tex: 'earth',   x: 0.72, y: 0.78, r: 24, spin: 0.0016, glow: '70, 150, 255' },
-    { name: 'moon',    tex: 'moon',    x: 0.62, y: 0.60, r: 9,  spin: 0.0004, orbit: { cx: 0.72, cy: 0.78, rad: 0.055, speed: 0.0005 } },
-    { name: 'mars',    tex: 'mars',    x: 0.48, y: 0.28, r: 16, spin: 0.0011 },
-    { name: 'jupiter', tex: 'jupiter', x: 0.20, y: 0.62, r: 40, spin: 0.0021 },
-    { name: 'saturn',  tex: 'saturn',  x: 0.85, y: 0.52, r: 30, spin: 0.0018, ring: true },
-    { name: 'uranus',  tex: 'uranus',  x: 0.40, y: 0.50, r: 20, spin: -0.0010 },
-    { name: 'neptune', tex: 'neptune', x: 0.60, y: 0.15, r: 19, spin: 0.0014 },
+    { name: 'earth',   tex: 'earth',   x: 0.84, y: 0.74, r: 42, spin: 0.0016, glow: '70, 150, 255' },
+    { name: 'jupiter', tex: 'jupiter', x: 0.14, y: 0.30, r: 46, spin: 0.0021, glow: '210, 180, 150' },
   ];
   // 程序化兜底纹理：纹理加载失败时生成渐变球贴图（保证星球必显示）
   function makeFallbackTexture(hue1, hue2) {
@@ -790,11 +780,7 @@
     return img;
   }
   const FALLBACK_HUES = {
-    sun: ['#ffb347', '#ff6a00'], mercury: ['#b5a29a', '#8a7b70'],
-    venus: ['#e8cda0', '#c9a86a'], earth: ['#3a7bd5', '#5a9bd5'],
-    moon: ['#c8c8c8', '#9a9a9a'], mars: ['#c1440e', '#a0522d'],
-    jupiter: ['#d4a574', '#b07b4a'], saturn: ['#e0c9a0', '#c9a87a'],
-    uranus: ['#7fd4d9', '#5ab5bb'], neptune: ['#3a6fd5', '#2a4fd5'],
+    earth: ['#3a7bd5', '#5a9bd5'], jupiter: ['#d4a574', '#b07b4a'],
   };
   // 逐颗加载纹理（带兜底）
   PLANET_DEFS.forEach((p) => {
@@ -871,27 +857,38 @@
       // 土星环（在球体后面画下半，前面画上半 → 立体环绕感）
       if (p.ring) drawSaturnRing(px, py, R, now, false);
 
-      // 球体本体：贴图裁剪成圆 + 水平偏移模拟自转
+      // 球体本体：真实球面渲染（贴图横向无缝滚动 = 自转）
       ctx.save();
       ctx.beginPath();
       ctx.arc(px, py, R, 0, Math.PI * 2);
       ctx.clip();
       const img = p.img;
-      const sw = img.width * 0.5;            // 半球宽（1:2 经度贴图）
-      const off = (p.rot / 360) * sw;        // 自转偏移
-      // 画两张相邻贴图实现无缝滚动
-      ctx.drawImage(img, -off - sw * 0.5, py - R, sw, R * 2);
-      ctx.drawImage(img, -off + sw * 0.5, py - R, sw, R * 2);
-      ctx.drawImage(img, -off + sw * 1.5, py - R, sw, R * 2);
-      // 球面明暗：右亮左暗渐变 = 立体球
-      const sg = ctx.createLinearGradient(px - R, 0, px + R, 0);
-      sg.addColorStop(0, 'rgba(0,0,0,0.75)');
-      sg.addColorStop(0.35, 'rgba(0,0,0,0.15)');
-      sg.addColorStop(0.65, 'rgba(255,255,255,0.08)');
-      sg.addColorStop(1, 'rgba(255,255,255,0.3)');
+      const imgW = img.width, imgH = img.height;
+      const dispW = R * 2;                        // 显示宽 = 球直径
+      const dispH = R * 2;                        // 显示高 = 球直径（2:1贴图纵向拉伸成球）
+      const off = ((p.rot % 360) / 360) * dispW;  // 自转偏移（绕一周=360°）
+      // 三张相邻贴图无缝滚动（消除接缝）
+      ctx.drawImage(img, -off - dispW, py - R, dispW, dispH);
+      ctx.drawImage(img, -off,        py - R, dispW, dispH);
+      ctx.drawImage(img, -off + dispW, py - R, dispW, dispH);
+      // 球面体积光影：边缘暗 + 左上高光（光源在左上）
+      const sg = ctx.createRadialGradient(
+        px - R * 0.4, py - R * 0.45, R * 0.2,
+        px, py, R * 1.15
+      );
+      sg.addColorStop(0, 'rgba(255,255,255,0.28)');   // 高光点
+      sg.addColorStop(0.45, 'rgba(255,255,255,0.05)');
+      sg.addColorStop(0.8, 'rgba(0,0,15,0.28)');
+      sg.addColorStop(1, 'rgba(0,0,25,0.62)');         // 边缘暗
       ctx.fillStyle = sg;
       ctx.fillRect(px - R, py - R, R * 2, R * 2);
       ctx.restore();
+      // 大气层光晕（地球淡蓝 / 木星淡棕）
+      const atm = ctx.createRadialGradient(px, py, R * 0.92, px, py, R * 1.3);
+      atm.addColorStop(0, `rgba(${p.glow || '180, 150, 120'}, 0.16)`);
+      atm.addColorStop(1, `rgba(${p.glow || '180, 150, 120'}, 0)`);
+      ctx.fillStyle = atm;
+      ctx.beginPath(); ctx.arc(px, py, R * 1.3, 0, Math.PI * 2); ctx.fill();
 
       // 星球轮廓描边（深空感）
       ctx.beginPath();
