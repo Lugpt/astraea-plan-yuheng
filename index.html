@@ -377,6 +377,34 @@
       .hero .sub { font-size: 0.95rem; }
       /* 星球调小避免抢屏 */
       #bg-network { opacity: 0.75; }
+      /* 核心架构三分支：横向滑动卡片（保留并列语义，不纵向堆叠） */
+      .branches {
+        display: flex;
+        grid-template-columns: none;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        gap: 14px;
+        margin: 10px -6px 0;
+        padding: 2px 6px 12px;
+        scrollbar-width: thin;
+      }
+      .branches::-webkit-scrollbar { height: 4px; }
+      .branches::-webkit-scrollbar-thumb { background: rgba(0,212,255,0.3); border-radius: 2px; }
+      .branch {
+        flex: 0 0 80%;
+        scroll-snap-align: center;
+      }
+      /* 滑动提示 */
+      .arch-tree .branches::after {
+        content: '← 左右滑动查看 →';
+        flex: 0 0 auto;
+        align-self: center;
+        color: var(--muted);
+        font-size: 0.72rem;
+        padding: 0 8px;
+        white-space: nowrap;
+      }
     }
     @media (max-width: 420px) {
       .hero h1 { font-size: 1.45rem; }
@@ -781,7 +809,7 @@
   // 星球配置：位置(0-1比例)、半径(px基准)、自转速度、公转半径/速度、纹理
   // 两颗：木星（左上）+ 地球（右下），低调不抢内容
   const PLANET_DEFS = [
-    { name: 'jupiter', tex: 'jupiter', x: 0.14, y: 0.30, r: 46, spin: 0.0021, glow: '210, 180, 150' },
+    { name: 'jupiter', tex: 'jupiter', x: 0.18, y: 0.30, r: 46, spin: 0.0021, glow: '210, 180, 150' },
     { name: 'earth',   tex: 'earth',   x: 0.84, y: 0.74, r: 42, spin: 0.0016, glow: '70, 150, 255' },
   ];
   // 程序化兜底纹理：纹理加载失败时生成渐变球贴图（保证星球必显示）
