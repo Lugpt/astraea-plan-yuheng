@@ -1,0 +1,22 @@
+# luhongshuai.com - Astraea Plan
+
+> 企业级AI智能体集群架构 · 魔方小镇城市书房
+
+## About
+luhongshuai.com is the official website for Astraea Plan (formerly 玉衡计划), an enterprise-grade AI agent cluster architecture. It showcases how a 150+ store chain (魔方小镇城市书房) deploys 17 AI agents across departments using Hermes Agent framework.
+
+## Key Topics
+- Enterprise AI agent architecture (17 agents, 12 departments)
+- Hermes Agent framework deployment
+- Multi-agent orchestration and A2A communication
+- Real-world retail AI implementation
+- Obsidian vault as agent memory system
+
+## Site Structure
+- / - Landing page with architecture overview
+- /sitemap.xml - Full site map
+
+## Contact
+- Author: Lu Hongshuai (陆红帅)
+- Company: 魔方小镇城市书房
+- WeChat: longjunhao
