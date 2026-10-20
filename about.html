@@ -144,6 +144,23 @@ li:not([class*="tag"]):not([class*="chip"]),
 dd,dt,blockquote{font-size:max(16px,1em)!important;line-height:1.8!important;}
 [class*="desc"]:not([class*="eyebrow"]),[class*="sub"]:not([class*="title"]){font-size:max(15px,0.92em)!important;line-height:1.75!important;}
 </style>
+<style id="mobile-v2">
+@media (max-width:768px){
+  h1{font-size:clamp(23px,6.2vw,27px)!important;line-height:1.32!important;letter-spacing:-.008em!important;text-wrap:balance;}
+  h2{font-size:clamp(19px,5vw,22px)!important;line-height:1.38!important;text-wrap:balance;}
+  h3{font-size:clamp(16px,4.2vw,18px)!important;line-height:1.45!important;}
+  h1,h2,h3{max-width:100%!important;word-break:normal!important;}
+  body{font-size:16px!important;}
+  p,li,dd,dt,blockquote{font-size:16px!important;line-height:1.8!important;}
+  [class*="container"],[class*="wrapper"],[class*="inner"],[class*="shell"],section,header,footer{padding-left:22px!important;padding-right:22px!important;}
+  [class*="glass"],[class*="card"],[class*="panel"]{padding-left:18px!important;padding-right:18px!important;}
+  .hero img,[class*="hero"] img,[class*="scene"] img,[class*="media"] img{max-height:240px!important;object-fit:cover!important;}
+  [class*="button"],[class*="btn"],[class*="cta"]{min-height:46px!important;margin-top:4px;margin-bottom:4px;padding-inline:18px!important;}
+  [class*="actions"],[class*="buttons"],[class*="cta-group"]{display:flex!important;flex-direction:column!important;gap:12px!important;align-items:stretch!important;}
+  [class*="grid"],[class*="cols"]{grid-template-columns:1fr!important;gap:20px!important;}
+  [class*="split"],[class*="two-col"]{display:block!important;}
+}
+</style>
 </head>
 <body class="page-about">
   <a class="skip-link" href="#main">跳到主要内容</a>
