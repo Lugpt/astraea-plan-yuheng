@@ -1,0 +1,804 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Astraea Plan 第三方平台情报能力：自动汇总美团点评、抖音、小红书的评分变化与评论内容，形成内部日报。" />
+  <title>第三方平台情报｜Astraea Plan</title>
+  <style>
+    :root {
+      --bg:#F6F7F9; --surface:#FFFFFF; --surface-soft:#F1F3F7;
+      --fg:#16233A; --muted:#6B7689; --muted-strong:#58657A; --border:#DDE2EA;
+      --accent:#FF5A1F; --blue:#2F6BFF; --blue-soft:#5B8DFF; --deep:#123A8F;
+      --font-body:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+      --font-mono:"SFMono-Regular","SF Mono",Menlo,Consolas,monospace;
+      --ease-out: cubic-bezier(0.23,1,0.32,1);
+      --shadow-soft:0 20px 60px rgba(18,35,58,.08);
+    }
+
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    html, body { overflow-x:hidden; max-width:100%; }
+    body {
+      margin:0;
+      background:var(--bg);
+      color:var(--fg);
+      font-family:var(--font-body);
+      font-size:17px;
+      line-height:1.8;
+      -webkit-font-smoothing:antialiased;
+      text-rendering:optimizeLegibility;
+    }
+    a { color:inherit; text-decoration:none; }
+    button, input, select, textarea { font:inherit; }
+    button, a { -webkit-tap-highlight-color:transparent; }
+    img { display:block; max-width:100%; }
+    ::selection { color:#fff; background:var(--deep); }
+    :focus-visible { outline:3px solid var(--accent); outline-offset:4px; }
+
+    .skip-link {
+      position:fixed; left:20px; top:16px; z-index:2000;
+      transform:translateY(-160%); padding:10px 16px;
+      background:var(--surface); color:var(--fg); border-radius:999px;
+      box-shadow:var(--shadow-soft); transition:transform .2s var(--ease-out);
+    }
+    .skip-link:focus { transform:translateY(0); }
+
+    .container {
+      max-width:1200px;
+      margin-inline:auto;
+      padding-inline:clamp(20px,5vw,64px);
+      box-sizing:border-box;
+    }
+    .section-space { padding-block:clamp(72px,8vw,120px); }
+
+    .glass {
+      position:relative; isolation:isolate;
+      background:rgba(255,255,255,.10);
+      -webkit-backdrop-filter:blur(24px) saturate(180%);
+      backdrop-filter:blur(24px) saturate(180%);
+      border:1.5px solid rgba(255,255,255,.45);
+      border-radius:28px;
+      box-shadow:0 28px 90px rgba(0,0,0,.55),
+                 inset 0 1px 0 rgba(255,255,255,.65),
+                 inset 0 -1px 0 rgba(255,255,255,.10);
+      overflow:hidden;
+    }
+    .glass::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+      background:linear-gradient(148deg,rgba(255,255,255,.30) 0%,rgba(255,255,255,.06) 30%,rgba(255,255,255,0) 52%);}
+    .glass::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.12), inset 0 24px 48px -24px rgba(255,255,255,.28);}
+    .glass, .glass h1, .glass h2, .glass h3, .glass p { color:#fff; }
+
+    .site-header {
+      position:fixed; inset:0 0 auto; z-index:1000;
+      height:82px;
+      display:flex; align-items:center;
+      color:#fff;
+      background:rgba(12,18,32,.35);
+      -webkit-backdrop-filter:blur(18px);
+      backdrop-filter:blur(18px);
+      border-bottom:1px solid rgba(255,255,255,.10);
+      transition:background .35s var(--ease-out), color .35s var(--ease-out), border-color .35s var(--ease-out), box-shadow .35s var(--ease-out);
+    }
+    .site-header.is-scrolled {
+      color:var(--fg);
+      background:rgba(255,255,255,.72);
+      -webkit-backdrop-filter:blur(14px);
+      backdrop-filter:blur(14px);
+      border-bottom-color:rgba(221,226,234,.7);
+      box-shadow:0 10px 40px rgba(18,35,58,.07);
+    }
+    .nav-wrap {
+      width:100%; max-width:1320px; margin:0 auto;
+      padding-inline:clamp(20px,4vw,52px);
+      display:grid; grid-template-columns:minmax(180px,1fr) auto minmax(180px,1fr);
+      align-items:center; gap:24px;
+    }
+    .brand {
+      justify-self:start;
+      display:inline-flex; align-items:center; gap:11px;
+      font-size:19px; font-weight:600; line-height:1; letter-spacing:.01em;
+    }
+    .brand-mark {
+      width:26px; height:26px; display:grid; place-items:center;
+      border:1px solid currentColor; border-radius:50%;
+      font:11px/1 var(--font-mono); letter-spacing:0;
+    }
+    .nav-links {
+      display:flex; align-items:center; justify-content:center; gap:clamp(18px,2.2vw,34px);
+      font-size:14px; font-weight:500; letter-spacing:.02em; white-space:nowrap;
+    }
+    .nav-link { position:relative; padding:29px 0 27px; opacity:.86; transition:opacity .2s var(--ease-out); }
+    .nav-link:hover { opacity:1; }
+    .nav-link::after {
+      content:""; position:absolute; left:0; right:0; bottom:19px; height:2px;
+      background:var(--accent); transform:scaleX(0); transform-origin:left;
+      transition:transform .25s var(--ease-out);
+    }
+    .nav-link[aria-current="page"]::after { transform:scaleX(1); }
+    .nav-link:hover::after { transform:scaleX(.36); }
+    .nav-link[aria-current="page"]:hover::after { transform:scaleX(1); }
+    .nav-cta {
+      justify-self:end;
+      min-height:44px; padding:0 21px;
+      display:inline-flex; align-items:center; justify-content:center;
+      background:var(--accent); color:#fff;
+      border-radius:999px; font-size:14px; font-weight:600; letter-spacing:.02em;
+      transition:transform .22s var(--ease-out), background .22s var(--ease-out);
+    }
+    .nav-cta:hover { background:#e94d14; transform:translateY(-1px); }
+    .nav-cta:active { transform:translateY(0); }
+    .menu-toggle {
+      display:none; justify-self:end;
+      width:44px; height:44px; padding:0;
+      align-items:center; justify-content:center;
+      color:currentColor; background:transparent; border:1px solid currentColor; border-radius:50%;
+      cursor:pointer;
+    }
+    .menu-toggle span { position:relative; width:17px; height:12px; }
+    .menu-toggle span::before, .menu-toggle span::after {
+      content:""; position:absolute; left:0; width:17px; height:1.5px; background:currentColor;
+      transition:transform .25s var(--ease-out), top .25s var(--ease-out);
+    }
+    .menu-toggle span::before { top:1px; }
+    .menu-toggle span::after { top:9px; }
+    .menu-toggle[aria-expanded="true"] span::before { top:6px; transform:rotate(45deg); }
+    .menu-toggle[aria-expanded="true"] span::after { top:6px; transform:rotate(-45deg); }
+    .mobile-menu {
+      position:fixed; top:82px; left:0; right:0; z-index:999;
+      display:none; flex-direction:column;
+      padding:18px clamp(20px,5vw,44px) 26px;
+      color:var(--fg); background:rgba(255,255,255,.97);
+      border-bottom:1px solid var(--border);
+      box-shadow:0 24px 50px rgba(18,35,58,.14);
+    }
+    .mobile-menu.is-open { display:flex; }
+    .mobile-menu a {
+      display:flex; align-items:center; min-height:52px;
+      border-bottom:1px solid var(--border); font-size:16px; font-weight:500;
+    }
+    .mobile-menu a:last-child { border-bottom:0; color:var(--accent); }
+
+    .hero {
+      position:relative; min-height:min(920px,100svh);
+      display:flex; align-items:center;
+      padding:138px 0 90px;
+      color:#fff;
+      background:var(--deep);
+      overflow:hidden;
+    }
+    .hero-media, .hero-shade { position:absolute; inset:0; }
+    .hero-media img {
+      width:100%; height:100%; object-fit:cover; object-position:56% 54%;
+      filter:saturate(.86) contrast(1.03);
+    }
+    .hero-shade { background:linear-gradient(105deg,rgba(6,10,20,.45),rgba(6,10,20,.12) 60%,transparent); }
+    .hero-layout {
+      position:relative; z-index:1; width:100%;
+      display:grid; grid-template-columns:minmax(0,680px) 1fr; gap:56px; align-items:end;
+    }
+    .hero-panel { padding:clamp(28px,4.2vw,52px); max-width:680px; }
+    .breadcrumb {
+      position:relative; z-index:1;
+      display:flex; align-items:center; gap:10px;
+      margin-bottom:42px; color:rgba(255,255,255,.78);
+      font-size:13px; line-height:1.5; letter-spacing:.02em;
+    }
+    .breadcrumb a { transition:color .2s var(--ease-out); }
+    .breadcrumb a:hover { color:#fff; }
+    .breadcrumb .current { color:#fff; }
+    .eyebrow {
+      position:relative; z-index:1;
+      margin:0 0 20px; color:rgba(255,255,255,.76);
+      font:11px/1.5 var(--font-mono); letter-spacing:.06em; text-transform:uppercase;
+    }
+    .hero h1 {
+      position:relative; z-index:1;
+      margin:0; max-width:9em;
+      font-size:clamp(38px,4.6vw,64px); font-weight:600;
+      line-height:1.3; letter-spacing:0;
+    }
+    .hero-definition {
+      position:relative; z-index:1;
+      max-width:26em; margin:24px 0 0;
+      color:rgba(255,255,255,.88);
+      font-size:clamp(17px,1.5vw,20px); line-height:1.8;
+    }
+    .platform-row {
+      position:relative; z-index:1;
+      display:flex; flex-wrap:wrap; align-items:center; gap:9px 0;
+      margin-top:30px; color:rgba(255,255,255,.78);
+      font-size:13px; line-height:1.5;
+    }
+    .platform-row span + span::before { content:"·"; padding:0 10px; color:rgba(255,255,255,.34); }
+    .hero-actions {
+      position:relative; z-index:1;
+      display:flex; flex-wrap:wrap; gap:12px; margin-top:34px;
+    }
+    .btn {
+      min-height:50px; padding:0 23px;
+      display:inline-flex; align-items:center; justify-content:center; gap:11px;
+      border:1px solid transparent; border-radius:999px;
+      font-size:15px; font-weight:600; line-height:1; letter-spacing:.02em;
+      cursor:pointer; transition:transform .22s var(--ease-out), background .22s var(--ease-out), color .22s var(--ease-out), border-color .22s var(--ease-out);
+    }
+    .btn:hover { transform:translateY(-2px); }
+    .btn:active { transform:translateY(0); }
+    .btn-light { color:var(--fg); background:#fff; }
+    .btn-light:hover { color:var(--fg); background:#eef3ff; }
+    .btn-glass { color:#fff; background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.54); }
+    .btn-glass:hover { color:#fff; background:rgba(255,255,255,.14); border-color:rgba(255,255,255,.72); }
+    .btn-blue { color:#fff; background:var(--blue); }
+    .btn-blue:hover { color:#fff; background:#1f58de; }
+    .btn-outline { color:var(--deep); background:transparent; border-color:#AAB9D8; }
+    .btn-outline:hover { color:var(--deep); background:#E9EFFF; border-color:#8EA5D0; }
+    .btn .arrow { font-family:var(--font-mono); font-size:17px; font-weight:400; }
+    .hero-aside {
+      justify-self:end; max-width:250px; align-self:end;
+      padding:0 0 6px 22px; border-left:1px solid rgba(255,255,255,.28);
+      color:rgba(255,255,255,.72); font-size:13px; line-height:1.7;
+    }
+    .hero-aside strong { display:block; margin-bottom:5px; color:#fff; font-weight:500; }
+
+    .section-heading { display:grid; grid-template-columns:220px minmax(0,1fr); gap:46px; align-items:start; }
+    .section-label {
+      margin:0; padding-top:9px;
+      color:var(--muted-strong); font:11px/1.6 var(--font-mono); letter-spacing:.06em; text-transform:uppercase;
+    }
+    .section-label .num { color:var(--deep); }
+    .section-title {
+      margin:0; color:var(--fg);
+      font-size:clamp(30px,3.5vw,46px); font-weight:600; line-height:1.38; letter-spacing:0;
+      text-wrap:balance;
+    }
+    .section-lead {
+      max-width:650px; margin:24px 0 0; color:#536075; font-size:17px; line-height:1.8;
+    }
+
+    .issue-section { background:var(--bg); }
+    .issue-layout { display:grid; grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr); gap:clamp(48px,8vw,100px); align-items:end; }
+    .issue-display { margin:18px 0 0; color:var(--fg); font-size:clamp(42px,5.4vw,72px); font-weight:600; line-height:1.32; letter-spacing:0; }
+    .issue-copy { max-width:36em; margin:26px 0 0; color:#566276; font-size:17px; line-height:1.8; }
+    .signal-list { border-top:1px solid var(--border); }
+    .signal-row {
+      display:grid; grid-template-columns:34px minmax(0,1fr) minmax(160px,.8fr);
+      gap:20px; align-items:center; padding:24px 0; border-bottom:1px solid var(--border);
+    }
+    .signal-no { color:#8B95A6; font:11px/1 var(--font-mono); letter-spacing:.08em; }
+    .signal-row strong { font-size:17px; font-weight:600; line-height:1.6; }
+    .signal-row span:last-child { color:var(--muted-strong); font-size:14px; line-height:1.7; }
+    .manual-note {
+      display:flex; align-items:center; gap:14px; margin-top:22px;
+      color:var(--deep); font:12px/1.6 var(--font-mono); letter-spacing:.04em;
+    }
+    .manual-note::before { content:""; width:32px; height:1px; background:var(--blue); }
+
+    .flow-section { background:var(--surface); }
+    .flow-head { display:grid; grid-template-columns:1fr minmax(280px,400px); gap:40px; align-items:end; }
+    .flow-grid {
+      display:grid; grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:0; margin-top:62px; border-top:1px solid var(--border);
+    }
+    .flow-step { position:relative; padding:26px 26px 0 0; min-height:260px; }
+    .flow-step + .flow-step { padding-left:26px; border-left:1px solid var(--border); }
+    .flow-step::before {
+      content:""; position:absolute; top:-5px; left:0; width:9px; height:9px;
+      background:var(--surface); border:1.5px solid var(--blue); border-radius:50%;
+    }
+    .flow-step + .flow-step::before { left:26px; }
+    .step-no { color:var(--blue); font:11px/1.4 var(--font-mono); letter-spacing:.06em; }
+    .flow-step h3 { max-width:10em; margin:48px 0 14px; font-size:20px; font-weight:600; line-height:1.55; }
+    .flow-step p { margin:0; color:var(--muted); font-size:14px; line-height:1.8; }
+
+    .status-band { background:var(--deep); color:#fff; }
+    .status-layout { display:grid; grid-template-columns:minmax(0,1fr) 360px; gap:72px; align-items:end; }
+    .status-band .section-label { color:rgba(255,255,255,.72); }
+    .status-band .section-label .num { color:#fff; }
+    .status-band .section-title { color:#fff; }
+    .status-band .section-lead { max-width:560px; color:rgba(255,255,255,.72); }
+    .status-mark {
+      display:flex; align-items:center; gap:10px; margin-top:24px;
+      color:#fff; font-size:15px; font-weight:500;
+    }
+    .status-mark::before { content:""; width:8px; height:8px; border-radius:50%; background:var(--blue-soft); box-shadow:0 0 0 5px rgba(91,141,255,.14); }
+    .run-line { border-top:1px solid rgba(255,255,255,.22); }
+    .run-line__head { padding:16px 0 12px; color:rgba(255,255,255,.62); font:10px/1.5 var(--font-mono); letter-spacing:.06em; }
+    .run-line__items { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:16px 0 4px; }
+    .run-line__items span { font-size:13px; color:rgba(255,255,255,.78); white-space:nowrap; }
+    .run-line__items i { width:22px; height:1px; background:rgba(255,255,255,.24); }
+
+    .boundary-section { background:var(--surface); }
+    .boundary-list { margin-top:54px; border-top:1px solid var(--border); }
+    .boundary-item {
+      display:grid; grid-template-columns:80px minmax(260px,.8fr) minmax(0,1.2fr);
+      gap:28px; padding:30px 0 34px; border-bottom:1px solid var(--border);
+    }
+    .boundary-no { color:var(--blue); font:11px/1.8 var(--font-mono); letter-spacing:.1em; }
+    .boundary-item h3 { margin:0; font-size:22px; font-weight:600; line-height:1.55; }
+    .boundary-item p { margin:0; max-width:34em; color:var(--muted); font-size:15px; line-height:1.8; }
+
+    .next-section { background:var(--surface-soft); }
+    .next-shell {
+      display:grid; grid-template-columns:minmax(0,1fr) minmax(280px,390px);
+      gap:clamp(48px,8vw,96px); align-items:end;
+    }
+    .next-shell h2 { max-width:11em; margin:20px 0 0; font-size:clamp(34px,4.2vw,56px); font-weight:600; line-height:1.36; }
+    .next-panel { padding:26px 0 2px; border-top:1px solid #C5CFE0; }
+    .next-panel p { margin:0 0 24px; color:#526078; font-size:15px; line-height:1.8; }
+    .next-actions { display:flex; flex-wrap:wrap; gap:10px; }
+
+    .site-footer { background:var(--deep); color:#fff; padding:70px 0 26px; }
+    .footer-grid { display:grid; grid-template-columns:1.55fr .8fr .8fr 1fr; gap:52px; }
+    .footer-brand .brand { color:#fff; }
+    .footer-brand p { max-width:24em; margin:26px 0 0; color:rgba(255,255,255,.62); font-size:14px; line-height:1.8; }
+    .footer-col h3 { margin:3px 0 18px; color:rgba(255,255,255,.62); font:10px/1.5 var(--font-mono); font-weight:400; letter-spacing:.08em; text-transform:uppercase; }
+    .footer-col a { display:block; width:fit-content; margin:0 0 10px; color:rgba(255,255,255,.78); font-size:14px; line-height:1.7; transition:color .2s var(--ease-out); }
+    .footer-col a:hover { color:#fff; }
+    .footer-bottom {
+      display:flex; justify-content:space-between; gap:24px;
+      margin-top:56px; padding-top:22px; border-top:1px solid rgba(255,255,255,.16);
+      color:rgba(255,255,255,.62); font-size:12px; line-height:1.6;
+    }
+
+    dialog {
+      width:min(560px,calc(100% - 32px)); padding:0; border:0; border-radius:24px;
+      color:var(--fg); background:var(--surface); box-shadow:0 36px 120px rgba(4,14,34,.42);
+    }
+    dialog::backdrop { background:rgba(7,14,27,.64); -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); }
+    .dialog-body { padding:34px; }
+    .dialog-kicker { margin:0 0 12px; color:var(--blue); font:10px/1.5 var(--font-mono); letter-spacing:.06em; text-transform:uppercase; }
+    .dialog-body h2 { margin:0; font-size:28px; font-weight:600; line-height:1.45; }
+    .dialog-body > p { margin:16px 0 0; color:var(--muted); font-size:15px; line-height:1.8; }
+    .demo-brief { margin:24px 0 0; padding:0; list-style:none; border-top:1px solid var(--border); }
+    .demo-brief li { display:grid; grid-template-columns:30px 1fr; gap:10px; padding:14px 0; border-bottom:1px solid var(--border); font-size:14px; line-height:1.7; }
+    .demo-brief span { color:var(--blue); font:11px/1.9 var(--font-mono); }
+    .dialog-actions { display:flex; flex-wrap:wrap; justify-content:space-between; gap:12px; margin-top:26px; }
+    .dialog-status { min-height:22px; margin:12px 0 0; color:var(--deep); font-size:13px; line-height:1.6; }
+
+    .reveal { opacity:1; transform:none; }
+    .reveal-ready .reveal { opacity:0; transform:translateY(24px); }
+    .reveal-ready .reveal.is-visible { opacity:1; transform:translateY(0); transition:opacity .7s var(--ease-out), transform .7s var(--ease-out); }
+
+    @media (max-width:1050px) {
+      .nav-wrap { grid-template-columns:1fr auto; }
+      .nav-links { display:none; }
+      .nav-cta { display:none; }
+      .menu-toggle { display:inline-flex; }
+      .hero-layout { grid-template-columns:minmax(0,650px); }
+      .hero-aside { display:none; }
+      .section-heading { grid-template-columns:180px minmax(0,1fr); gap:30px; }
+      .flow-grid { grid-template-columns:repeat(2,minmax(0,1fr)); border-top:0; }
+      .flow-step { border-top:1px solid var(--border); padding-bottom:32px; }
+      .flow-step:nth-child(3) { padding-left:0; border-left:0; }
+      .flow-step:nth-child(3)::before { left:0; }
+      .status-layout { grid-template-columns:1fr; gap:44px; }
+      .run-line { max-width:560px; }
+      .footer-grid { grid-template-columns:1.4fr .8fr .8fr; }
+      .footer-col:last-child { grid-column:2 / span 2; }
+    }
+
+    @media (max-width:760px) {
+      body { font-size:16px; }
+      .site-header { height:70px; }
+      .nav-wrap { padding-inline:20px; }
+      .brand { font-size:17px; }
+      .brand-mark { width:24px; height:24px; }
+      .mobile-menu { top:70px; }
+      .hero { min-height:auto; padding:108px 0 66px; align-items:flex-start; }
+      .hero-media img { object-position:58% 54%; }
+      .hero-layout { grid-template-columns:1fr; }
+      .hero-panel { max-width:none; padding:27px 22px 25px; }
+      .breadcrumb { margin-bottom:34px; font-size:12px; }
+      .eyebrow { margin-bottom:16px; font-size:10px; line-height:1.6; }
+      .hero h1 { font-size:clamp(36px,10vw,48px); line-height:1.35; }
+      .hero-definition { margin-top:18px; font-size:16px; line-height:1.8; }
+      .platform-row { margin-top:22px; }
+      .hero-actions { margin-top:26px; }
+      .btn { min-height:48px; padding-inline:19px; font-size:14px; }
+      .section-space { padding-block:72px; }
+      .section-heading { grid-template-columns:1fr; gap:16px; }
+      .section-label { padding-top:0; }
+      .section-title { font-size:clamp(28px,8.2vw,38px); line-height:1.42; }
+      .section-lead { margin-top:18px; font-size:16px; }
+      .issue-layout { grid-template-columns:1fr; gap:46px; }
+      .issue-display { font-size:clamp(40px,12vw,58px); line-height:1.34; }
+      .signal-row { grid-template-columns:28px minmax(0,1fr); gap:14px; }
+      .signal-row span:last-child { grid-column:2; }
+      .flow-head { grid-template-columns:1fr; gap:0; }
+      .flow-grid { grid-template-columns:1fr; margin-top:40px; }
+      .flow-step, .flow-step + .flow-step { min-height:0; padding:24px 0 27px; border-left:0; border-top:1px solid var(--border); }
+      .flow-step + .flow-step::before { left:0; }
+      .flow-step h3 { margin:26px 0 10px; }
+      .status-layout { gap:36px; }
+      .run-line__items span { font-size:12px; }
+      .run-line__items i { width:12px; }
+      .boundary-list { margin-top:38px; }
+      .boundary-item { grid-template-columns:32px minmax(0,1fr); gap:12px 14px; padding:24px 0 28px; }
+      .boundary-item p { grid-column:2; }
+      .next-shell { grid-template-columns:1fr; gap:36px; }
+      .next-panel { max-width:480px; }
+      .footer-grid { grid-template-columns:1fr 1fr; gap:36px 28px; }
+      .footer-brand { grid-column:1 / -1; }
+      .footer-col:last-child { grid-column:auto; }
+      .footer-bottom { flex-direction:column; gap:8px; margin-top:44px; }
+      .dialog-body { padding:28px 22px; }
+      .dialog-actions .btn { flex:1 1 100%; }
+    }
+
+    @media (prefers-reduced-motion:reduce) {
+      html { scroll-behavior:auto; }
+      *, *::before, *::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
+      .reveal-ready .reveal { opacity:1; transform:none; }
+    }
+  </style>
+<style>
+.inline-figure{margin:56px auto;max-width:1200px;padding-inline:clamp(20px,5vw,64px);box-sizing:border-box}
+.inline-figure .fig-box{border-radius:24px;overflow:hidden;box-shadow:0 28px 70px rgba(48,58,86,.14);border:1px solid #DDE2EA}
+.inline-figure img{display:block;width:100%;height:clamp(220px,30vw,400px);object-fit:cover}
+.inline-figure figcaption{padding:14px 22px;font-size:14px;line-height:1.6;color:#6B7689;background:#fff}
+</style>
+<style>
+svg{max-width:100%;vertical-align:middle}
+.button svg,.button--primary svg,.button--glass svg,button svg,a.button svg,.hero-actions svg{width:18px;height:18px;flex:none;display:inline-block}
+</style>
+<style>
+[class*="node"] svg,[class*="icon"] svg,[class*="step"] svg,[class*="badge"] svg,[class*="mark"] svg,[class*="chip"] svg{width:44px;height:44px;flex:none;display:inline-block}
+[class*="number"] svg,[class*="num"] svg{width:32px;height:32px}
+</style>
+<style>
+[class*="hero"] img{object-fit:cover;object-position:center;max-height:96vh}
+</style>
+<style>
+[class*="scene"] img,[class*="media"] img:not(.hero-photo),[class*="shot"] img{height:auto;max-height:520px;object-fit:cover;width:100%}
+</style>
+<style>
+.hero img,section img,figure img{max-width:100%}
+</style>
+<style>
+.hero__media{overflow:hidden;width:100%}
+.hero__image{width:100%;height:100%;object-fit:cover;display:block}
+</style>
+<style>
+.hero__image{transform:none!important}
+</style>
+<style>
+.glass{position:relative;isolation:isolate;
+background:rgba(255,255,255,.10)!important;
+-webkit-backdrop-filter:blur(24px) saturate(180%)!important;
+backdrop-filter:blur(24px) saturate(180%)!important;
+border:1.5px solid rgba(255,255,255,.45)!important;border-radius:28px!important;
+box-shadow:0 28px 90px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.65)!important;
+overflow:hidden;}
+.glass::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+background:linear-gradient(148deg,rgba(255,255,255,.30) 0%,rgba(255,255,255,.06) 30%,rgba(255,255,255,0) 52%);}
+.glass::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),inset 0 24px 48px -24px rgba(255,255,255,.28);}
+.glass > *{position:relative;z-index:1}
+</style>
+</head>
+<body data-od-id="page-cap-intel">
+  <a class="skip-link" href="#main">跳到主要内容</a>
+
+  <header class="site-header" id="site-header" data-od-id="site-header">
+    <div class="nav-wrap">
+      <a class="brand" href="index.html" aria-label="Astraea Plan 首页" data-od-id="brand-home">
+        <span class="brand-mark" aria-hidden="true">AP</span>
+        <span>Astraea Plan</span>
+      </a>
+      <nav class="nav-links" aria-label="主导航">
+        <a class="nav-link" href="capabilities.html" aria-current="page" data-od-id="nav-capabilities">能力</a>
+        <a class="nav-link" href="architecture.html" data-od-id="nav-architecture">架构</a>
+        <a class="nav-link" href="cases.html" data-od-id="nav-cases">案例</a>
+        <a class="nav-link" href="pricing.html" data-od-id="nav-pricing">投入</a>
+        <a class="nav-link" href="about.html" data-od-id="nav-about">关于</a>
+      </nav>
+      <a class="nav-cta" href="#next-step" data-demo-open data-od-id="nav-demo">预约演示</a>
+      <button class="menu-toggle" type="button" aria-label="打开导航" aria-expanded="false" aria-controls="mobile-menu" data-od-id="mobile-menu-toggle">
+        <span aria-hidden="true"></span>
+      </button>
+    </div>
+  </header>
+
+  <nav class="mobile-menu" id="mobile-menu" aria-label="移动端导航" data-od-id="mobile-menu">
+    <a href="capabilities.html" aria-current="page">能力</a>
+    <a href="architecture.html">架构</a>
+    <a href="cases.html">案例</a>
+    <a href="pricing.html">投入</a>
+    <a href="about.html">关于</a>
+    <a href="#next-step" data-demo-open>预约演示</a>
+  </nav>
+
+  <main id="main">
+    <section class="hero" aria-labelledby="hero-title" data-od-id="hero-platform-intelligence">
+      <div class="hero-media" aria-hidden="true">
+        <img src="assets/kb-e.jpg" width="2000" height="2500" alt="" fetchpriority="high" />
+      </div>
+      <div class="hero-shade" aria-hidden="true"></div>
+      <div class="container hero-layout">
+        <article class="glass hero-panel" data-od-id="hero-glass-panel">
+          <nav class="breadcrumb" aria-label="面包屑" data-od-id="breadcrumb">
+            <a href="capabilities.html">能力</a>
+            <span aria-hidden="true">/</span>
+            <span class="current" aria-current="page">第三方平台情报</span>
+          </nav>
+          <p class="eyebrow">能力 02 · 第三方平台情报</p>
+          <h1 id="hero-title" data-od-id="hero-title">第三方平台情报。</h1>
+          <p class="hero-definition" data-od-id="hero-definition">别人评价你的话，系统每天替你看一遍。</p>
+          <div class="platform-row" aria-label="覆盖平台" data-od-id="platform-scope">
+            <span>美团点评</span><span>抖音</span><span>小红书</span>
+          </div>
+          <div class="hero-actions" data-od-id="hero-actions">
+            <a class="btn btn-light" href="#next-step" data-demo-open data-od-id="hero-demo">预约演示 <span class="arrow" aria-hidden="true">→</span></a>
+            <a class="btn btn-glass" href="architecture.html" data-od-id="hero-architecture">看架构 <span class="arrow" aria-hidden="true">→</span></a>
+          </div>
+        </article>
+        <aside class="hero-aside" data-od-id="hero-aside">
+          <strong>只向内部交付结论</strong>
+          原始反馈留在企业边界内，日报只整理评分变化、评论内容与关键词分类。
+        </aside>
+      </div>
+    </section>
+
+    <section class="issue-section section-space" id="signal" aria-labelledby="issue-title" data-od-id="issue-section">
+      <div class="container issue-layout">
+        <div class="reveal" data-reveal>
+          <p class="section-label"><span class="num">01</span> / 问题</p>
+          <h2 class="issue-display" id="issue-title" data-od-id="issue-title">刷不完，<br />也看不全。</h2>
+          <p class="issue-copy" data-od-id="issue-copy">美团点评的评分和评论、抖音小红书的后台数据，靠人天天刷不现实。变化一直在发生，人的注意力却不可能全天停在这些入口上。</p>
+        </div>
+        <div class="reveal" data-reveal>
+          <div class="signal-list" aria-label="人工刷新容易遗漏的信号" data-od-id="signal-list">
+            <div class="signal-row" data-od-id="signal-rating">
+              <span class="signal-no">01</span>
+              <strong>评分在变</strong>
+              <span>页面给出结果，却不会替你解释变化从哪里开始。</span>
+            </div>
+            <div class="signal-row" data-od-id="signal-review">
+              <span class="signal-no">02</span>
+              <strong>评论在长</strong>
+              <span>当天反馈很快被新内容推走，人工翻页难以形成连续记录。</span>
+            </div>
+            <div class="signal-row" data-od-id="signal-backstage">
+              <span class="signal-no">03</span>
+              <strong>后台分散</strong>
+              <span>平台不同、入口不同，最后还要重新汇总到同一份日报。</span>
+            </div>
+          </div>
+          <p class="manual-note">从“有人去看”变成“系统持续看”</p>
+        </div>
+      </div>
+    </section>
+<figure class="inline-figure"><div class="fig-box"><img src="assets/grad-1.jpg" alt="Astraea Plan 运行场景" loading="lazy"></div></figure>
+
+
+    <section class="flow-section section-space" id="workflow" aria-labelledby="workflow-title" data-od-id="workflow-section">
+      <div class="container">
+        <div class="flow-head reveal" data-reveal>
+          <div>
+            <p class="section-label"><span class="num">02</span> / 怎么做</p>
+            <h2 class="section-title" id="workflow-title" data-od-id="workflow-title">从平台信号，<br />到一份可读的日报。</h2>
+          </div>
+          <p class="section-lead" data-od-id="workflow-lead">平台入口先接进来，连续捕捉评分与评论变化，再按反馈性质归拢。每天留下的不是更多截图，而是可以直接讨论的情报。</p>
+        </div>
+        <div class="flow-grid" data-od-id="workflow-steps">
+          <article class="flow-step reveal" data-reveal data-od-id="step-platform-connect">
+            <span class="step-no">步骤 01</span>
+            <h3>对接平台数据</h3>
+            <p>把美团点评、抖音、小红书等分散入口接进同一套数据通道。</p>
+          </article>
+          <article class="flow-step reveal" data-reveal data-od-id="step-capture-signal">
+            <span class="step-no">步骤 02</span>
+            <h3>抓评分变化与评论内容</h3>
+            <p>持续读取变化，保留评分波动、评论原文与后台数据中的有效反馈。</p>
+          </article>
+          <article class="flow-step reveal" data-reveal data-od-id="step-classify-feedback">
+            <span class="step-no">步骤 03</span>
+            <h3>分类反馈性质</h3>
+            <p>区分差评、投诉与好评关键词，让真正需要处理的信号浮上来。</p>
+          </article>
+          <article class="flow-step reveal" data-reveal data-od-id="step-build-daily">
+            <span class="step-no">步骤 04</span>
+            <h3>汇总进日报</h3>
+            <p>把变化、重点评论和关键词结论整理进日报，直接进入内部协作。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+<figure class="inline-figure"><div class="fig-box"><img src="assets/light-4.jpg" alt="Astraea Plan 运行场景" loading="lazy"></div></figure>
+
+
+    <section class="status-band section-space" id="status" aria-labelledby="status-title" data-od-id="status-section">
+      <div class="container status-layout">
+        <div class="reveal" data-reveal>
+          <p class="section-label"><span class="num">03</span> / 状态</p>
+          <h2 class="section-title" id="status-title" data-od-id="status-title">技术已实现并运行。</h2>
+          <p class="section-lead" data-od-id="status-copy">这项能力已进入实际运行阶段，持续接收平台信号并沉淀为内部情报。不是概念演示，而是一套正在被维护的工作流。</p>
+          <p class="status-mark" data-od-id="status-indicator">技术已实现并运行</p>
+        </div>
+        <div class="run-line reveal" data-reveal data-od-id="runtime-path">
+          <div class="run-line__head">运行链路 / 内部数据处理</div>
+          <div class="run-line__items" aria-label="运行链路：接入、抓取、分类、日报">
+            <span>接入</span><i aria-hidden="true"></i><span>抓取</span><i aria-hidden="true"></i><span>分类</span><i aria-hidden="true"></i><span>日报</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="boundary-section section-space" id="boundary" aria-labelledby="boundary-title" data-od-id="boundary-section">
+      <div class="container">
+        <div class="section-heading reveal" data-reveal>
+          <p class="section-label"><span class="num">04</span> / 边界</p>
+          <div>
+            <h2 class="section-title" id="boundary-title" data-od-id="boundary-title">能力越深入，边界越要说清楚。</h2>
+            <p class="section-lead" data-od-id="boundary-lead">平台情报可以持续工作，但它不是一次接入就永远不变的系统。规则、接口与内容结构都需要被照看。</p>
+          </div>
+        </div>
+        <div class="boundary-list">
+          <article class="boundary-item reveal" data-reveal data-od-id="boundary-maintenance">
+            <span class="boundary-no">01</span>
+            <h3>平台规则会变，采集要持续维护。</h3>
+            <p>平台页面、接口和权限规则发生调整时，采集逻辑需要同步检查与更新。稳定运行来自持续维护，不是一次性交付。</p>
+          </article>
+          <article class="boundary-item reveal" data-reveal data-od-id="boundary-internal">
+            <span class="boundary-no">02</span>
+            <h3>数据只做内部分析。</h3>
+            <p>平台反馈进入企业内部的数据链路，仅用于经营分析与内部协作，不改变原始评价，也不对外发布平台数据。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="next-section section-space" id="next-step" aria-labelledby="next-title" data-od-id="next-step-section">
+      <div class="container next-shell">
+        <div class="reveal" data-reveal>
+          <p class="section-label"><span class="num">05</span> / 下一步</p>
+          <h2 id="next-title" data-od-id="next-title">先把平台评价，<br />接进一套可用的情报链。</h2>
+        </div>
+        <div class="next-panel reveal" data-reveal data-od-id="next-actions-panel">
+          <p>从一次具体场景开始，确认平台范围、信号类型与日报结构。演示会围绕你的门店口径展开。</p>
+          <div class="next-actions">
+            <button class="btn btn-blue" type="button" data-demo-open data-od-id="next-demo">预约演示 <span class="arrow" aria-hidden="true">→</span></button>
+            <a class="btn btn-outline" href="architecture.html" data-od-id="next-architecture">查看整体架构</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer" data-od-id="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a class="brand" href="index.html" aria-label="Astraea Plan 首页">
+            <span class="brand-mark" aria-hidden="true">AP</span>
+            <span>Astraea Plan</span>
+          </a>
+          <p>给连锁企业装一套私有化智能体团队，数据不出公司。</p>
+        </div>
+        <div class="footer-col">
+          <h3>能力</h3>
+          <a href="capabilities.html">能力总览</a>
+          <a href="cap-intel.html">第三方平台情报</a>
+          <a href="architecture.html">运行架构</a>
+        </div>
+        <div class="footer-col">
+          <h3>架构</h3>
+          <a href="architecture.html">私有化部署</a>
+          <a href="architecture.html">智能体协作</a>
+          <a href="architecture.html">数据边界</a>
+        </div>
+        <div class="footer-col">
+          <h3>联系</h3>
+          <a href="#next-step" data-demo-open>预约演示</a>
+          <a href="about.html">关于 Astraea Plan</a>
+          <a href="pricing.html">投入与场景</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 Astraea Plan · 数据不出公司</span>
+        <span>连锁企业的私有化平台情报能力</span>
+      </div>
+    </div>
+  </footer>
+
+  <dialog id="demo-dialog" aria-labelledby="demo-title" data-od-id="demo-dialog">
+    <div class="dialog-body">
+      <p class="dialog-kicker">演示提纲 / 第三方平台情报</p>
+      <h2 id="demo-title">一次演示，先把边界和产出讲清楚。</h2>
+      <p>演示围绕你关心的平台与门店范围展开，不先堆功能，也不提供虚构数据。</p>
+      <ul class="demo-brief">
+        <li><span>01</span><strong>平台接入范围</strong>：确认美团点评、抖音、小红书等入口与可用数据。</li>
+        <li><span>02</span><strong>信号分类口径</strong>：核对差评、投诉、好评关键词的内部判断方式。</li>
+        <li><span>03</span><strong>日报结构</strong>：明确每天需要交给谁、哪些内容值得进入协作。</li>
+      </ul>
+      <div class="dialog-actions">
+        <button class="btn btn-outline" type="button" id="close-dialog">返回页面</button>
+        <button class="btn btn-blue" type="button" id="copy-brief">复制演示要点 <span class="arrow" aria-hidden="true">→</span></button>
+      </div>
+      <p class="dialog-status" id="dialog-status" role="status" aria-live="polite"></p>
+    </div>
+  </dialog>
+
+  <script>
+    (function () {
+      var header = document.getElementById('site-header');
+      var menuToggle = document.querySelector('.menu-toggle');
+      var mobileMenu = document.getElementById('mobile-menu');
+      var dialog = document.getElementById('demo-dialog');
+      var closeDialog = document.getElementById('close-dialog');
+      var copyBrief = document.getElementById('copy-brief');
+      var dialogStatus = document.getElementById('dialog-status');
+
+      function syncHeader() {
+        header.classList.toggle('is-scrolled', window.scrollY > 72);
+      }
+      syncHeader();
+      window.addEventListener('scroll', syncHeader, { passive: true });
+
+      function closeMobileMenu() {
+        mobileMenu.classList.remove('is-open');
+        menuToggle.setAttribute('aria-expanded', 'false');
+        menuToggle.setAttribute('aria-label', '打开导航');
+      }
+
+      menuToggle.addEventListener('click', function () {
+        var open = menuToggle.getAttribute('aria-expanded') !== 'true';
+        mobileMenu.classList.toggle('is-open', open);
+        menuToggle.setAttribute('aria-expanded', String(open));
+        menuToggle.setAttribute('aria-label', open ? '关闭导航' : '打开导航');
+      });
+
+      mobileMenu.querySelectorAll('a').forEach(function (link) {
+        link.addEventListener('click', closeMobileMenu);
+      });
+      window.addEventListener('resize', function () {
+        if (window.innerWidth > 1050) closeMobileMenu();
+      });
+
+      document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') closeMobileMenu();
+      });
+
+      document.querySelectorAll('[data-demo-open]').forEach(function (button) {
+        button.addEventListener('click', function (event) {
+          event.preventDefault();
+          closeMobileMenu();
+          dialogStatus.textContent = '';
+          if (typeof dialog.showModal === 'function') dialog.showModal();
+          else dialog.setAttribute('open', '');
+        });
+      });
+
+      closeDialog.addEventListener('click', function () { dialog.close(); });
+      dialog.addEventListener('click', function (event) {
+        if (event.target === dialog) dialog.close();
+      });
+
+      copyBrief.addEventListener('click', async function () {
+        var text = '第三方平台情报演示要点\n1. 平台接入范围：美团点评、抖音、小红书等\n2. 信号分类口径：差评 / 投诉 / 好评关键词\n3. 日报结构：评分变化、评论内容、分类结论\n4. 数据边界：仅做内部分析，采集需持续维护';
+        try {
+          await navigator.clipboard.writeText(text);
+          dialogStatus.textContent = '演示要点已复制，可以直接带入内部沟通。';
+        } catch (_) {
+          dialogStatus.textContent = '当前环境未允许自动复制，请直接按页面要点准备沟通。';
+        }
+      });
+
+      document.querySelectorAll('[data-reveal]').forEach(function (el) { el.classList.add('reveal'); });
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window) {
+        document.documentElement.classList.add('reveal-ready');
+        var observer = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.12, rootMargin: '0px 0px -48px 0px' });
+        document.querySelectorAll('[data-reveal]').forEach(function (el) { observer.observe(el); });
+      }
+    })();
+  </script>
+</body>
+</html>

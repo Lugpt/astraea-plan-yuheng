@@ -1,0 +1,732 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Astraea Plan 投入页：试点、全公司、深度定制三档私有化部署方式，按门店规模与系统边界配置。" />
+  <title>投入｜Astraea Plan</title>
+  <script>document.documentElement.classList.add('has-js');</script>
+  <style>
+    :root {
+      --bg:#F6F7F9; --surface:#FFFFFF; --surface-soft:#F1F3F7;
+      --fg:#16233A; --muted:#6B7689; --border:#DDE2EA;
+      --accent:#FF5A1F; --blue:#2F6BFF; --blue-soft:#5B8DFF; --deep:#123A8F;
+      --font-body:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+      --font-mono:"SFMono-Regular","SF Mono",Menlo,Consolas,monospace;
+      --ease-out: cubic-bezier(0.23,1,0.32,1);
+      --muted-strong: color-mix(in oklch, var(--muted), var(--fg) 26%);
+      --blue-text: color-mix(in oklch, var(--blue), var(--fg) 22%);
+      --blue-soft-bg: color-mix(in oklch, var(--blue) 7%, var(--surface));
+      --accent-hover: color-mix(in oklch, var(--accent) 84%, var(--surface));
+      --container: 1200px;
+      --gutter: clamp(20px, 5vw, 64px);
+      --section-space: clamp(72px, 8vw, 120px);
+    }
+
+    * {box-sizing: border-box;}
+    html {scroll-behavior: smooth;}
+    html, body {max-width: 100%; overflow-x: hidden;}
+    body {margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 17px; line-height: 1.8; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;}
+    body.menu-open {overflow: hidden;}
+    a {color: inherit; text-decoration: none;}
+    button, a {-webkit-tap-highlight-color: transparent;}
+    button {font: inherit;}
+    img {display: block; max-width: 100%;}
+    ::selection {background: var(--accent); color: var(--fg);}
+
+    :focus-visible {outline: 3px solid var(--accent); outline-offset: 4px;}
+    .skip-link {position: fixed; top: 12px; left: 12px; z-index: 1200; padding: 10px 16px; border-radius: 6px; background: var(--surface); color: var(--fg); transform: translateY(-150%); transition: transform .2s var(--ease-out);}
+    .skip-link:focus {transform: translateY(0);}
+
+    .container {width: 100%; max-width: var(--container); margin-inline: auto; padding-inline: var(--gutter);}
+    .eyebrow {display: flex; align-items: center; gap: 12px; margin: 0 0 18px; color: var(--blue-text); font-family: var(--font-mono); font-size: 12px; line-height: 1.4; letter-spacing: .08em; text-transform: uppercase;}
+    .eyebrow::before {content: ""; width: 28px; height: 1px; flex: 0 0 auto; background: currentColor;}
+    .eyebrow--light {color: rgba(255,255,255,.78);}
+    .eyebrow--light::before {background: rgba(255,255,255,.68);}
+    .section-heading {max-width: 760px; margin: 0; font-size: clamp(28px, 3vw, 42px); font-weight: 600; line-height: 1.3; letter-spacing: 0;}
+    .section-lead {max-width: 65ch; margin: 18px 0 0; color: var(--muted-strong); font-size: clamp(16px, 1.4vw, 18px); line-height: 1.8;}
+
+    /* Header */
+    .site-header {position: fixed; inset: 0 0 auto; z-index: 100; height: 82px; background: rgba(12,18,32,.35); border-bottom: 1px solid rgba(255,255,255,.12); -webkit-backdrop-filter: blur(18px) saturate(150%); backdrop-filter: blur(18px) saturate(150%); color: #fff; transition: background .35s var(--ease-out), color .35s var(--ease-out), border-color .35s var(--ease-out);}
+    .site-header.is-light {background: rgba(255,255,255,.72); border-bottom-color: color-mix(in oklch, var(--border) 72%, transparent); color: var(--fg); -webkit-backdrop-filter: blur(14px) saturate(140%); backdrop-filter: blur(14px) saturate(140%);}
+    .nav-shell {width: 100%; height: 100%; max-width: var(--container); margin-inline: auto; padding-inline: var(--gutter); display: grid; grid-template-columns: minmax(140px, 1fr) auto minmax(140px, 1fr); align-items: center; gap: 24px;}
+    .brand {justify-self: start; display: inline-flex; align-items: center; min-height: 44px; font-size: 17px; font-weight: 600; letter-spacing: .01em; white-space: nowrap;}
+    .main-nav {justify-self: center; display: flex; align-items: center; gap: clamp(18px, 2.4vw, 34px);}
+    .main-nav a {position: relative; display: inline-flex; align-items: center; min-height: 44px; font-size: 14px; font-weight: 500; letter-spacing: .02em; opacity: .82; transition: opacity .2s var(--ease-out);}
+    .main-nav a:hover {opacity: 1;}
+    .main-nav a[aria-current="page"] {opacity: 1;}
+    .main-nav a[aria-current="page"]::after {content: ""; position: absolute; right: 0; bottom: 7px; left: 0; height: 2px; background: var(--accent);}
+    .header-actions {justify-self: end; display: flex; align-items: center; gap: 10px;}
+    .button {display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 48px; padding: 0 22px; border: 1px solid transparent; border-radius: 999px; font-size: 15px; font-weight: 600; line-height: 1; letter-spacing: .02em; cursor: pointer; transition: background .22s var(--ease-out), color .22s var(--ease-out), border-color .22s var(--ease-out), transform .22s var(--ease-out), opacity .22s var(--ease-out), visibility .22s var(--ease-out);}
+    .button--accent {background: var(--accent); color: var(--fg);}
+    .button--accent:hover {background: var(--accent-hover); transform: translateY(-1px);}
+    .button--accent:active {transform: translateY(0);}
+    .button--light {background: var(--surface); color: var(--deep); border-color: var(--surface);}
+    .button--light:hover {background: color-mix(in oklch, var(--surface) 88%, var(--blue)); color: var(--deep); transform: translateY(-1px);}
+    .nav-demo {min-width: 104px;}
+    .site-header.cta-in-view .nav-demo {visibility: hidden; opacity: 0; pointer-events: none; transform: translateY(-4px);}
+    .menu-toggle {display: none; position: relative; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: currentColor; cursor: pointer;}
+    .menu-toggle::before,
+    .menu-toggle::after {content: ""; position: absolute; left: 12px; width: 20px; height: 1.5px; background: currentColor; transition: transform .25s var(--ease-out), top .25s var(--ease-out);}
+    .menu-toggle::before {top: 17px;}
+    .menu-toggle::after {top: 25px;}
+    .menu-toggle[aria-expanded="true"]::before {top: 21px; transform: rotate(45deg);}
+    .menu-toggle[aria-expanded="true"]::after {top: 21px; transform: rotate(-45deg);}
+    .mobile-menu {position: fixed; top: 82px; right: 0; left: 0; z-index: 99; display: none; padding: 14px var(--gutter) 24px; background: rgba(12,18,32,.92); border-bottom: 1px solid rgba(255,255,255,.14); -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px); color: #fff;}
+    .mobile-menu.is-open {display: block;}
+    .mobile-menu a {display: flex; align-items: center; min-height: 48px; border-bottom: 1px solid rgba(255,255,255,.10); font-size: 16px;}
+    .mobile-menu a:last-child {border-bottom: 0;}
+    .mobile-menu a[aria-current="page"] {color: var(--accent);}
+
+    /* Hero */
+    .hero {position: relative; min-height: max(760px, 100svh); isolation: isolate; overflow: hidden; background: var(--fg); color: #fff;}
+    .hero-photo {position: absolute; inset: 0; z-index: -3; width: 100%; height: 100%; object-fit: cover; object-position: center 54%;}
+    .hero::before {content: ""; position: absolute; inset: 0; z-index: -2; background: linear-gradient(105deg,rgba(6,10,20,.45),rgba(6,10,20,.12) 60%,transparent);}
+    .hero-inner {min-height: max(760px, 100svh); display: flex; align-items: flex-end; padding-top: 142px; padding-bottom: clamp(56px, 8vh, 88px);}
+    .glass {
+      position:relative; isolation:isolate;
+      background:rgba(255,255,255,.10);
+      -webkit-backdrop-filter:blur(24px) saturate(180%);
+      backdrop-filter:blur(24px) saturate(180%);
+      border:1.5px solid rgba(255,255,255,.45);
+      border-radius:28px;
+      box-shadow:0 28px 90px rgba(0,0,0,.55),
+                 inset 0 1px 0 rgba(255,255,255,.65),
+                 inset 0 -1px 0 rgba(255,255,255,.10);
+      overflow:hidden;
+    }
+    .glass::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+      background:linear-gradient(148deg,rgba(255,255,255,.30) 0%,rgba(255,255,255,.06) 30%,rgba(255,255,255,0) 52%);}
+    .glass::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.12), inset 0 24px 48px -24px rgba(255,255,255,.28);}
+    .glass, .glass h1, .glass h2, .glass h3, .glass p { color:#fff; }
+    .hero-panel {width: min(770px, 100%); padding: clamp(30px, 4.2vw, 52px);}
+    .hero-panel > * {position: relative; z-index: 1;}
+    .hero-title {margin: 0; font-size: clamp(46px, 5.2vw, 64px); font-weight: 600; line-height: 1.3; letter-spacing: 0;}
+    .hero-subtitle {max-width: 24ch; margin: 18px 0 0; font-size: clamp(20px, 2.2vw, 28px); font-weight: 500; line-height: 1.55; letter-spacing: 0;}
+    .hero-copy {max-width: 55ch; margin: 20px 0 0; color: rgba(255,255,255,.82); font-size: 16px; line-height: 1.8;}
+    .hero-facts {display: flex; flex-wrap: wrap; gap: 10px 22px; margin: 28px 0 0; padding: 22px 0 0; border-top: 1px solid rgba(255,255,255,.22); list-style: none; color: rgba(255,255,255,.9); font-size: 13px; line-height: 1.5;}
+    .hero-facts li {display: inline-flex; align-items: center; gap: 9px;}
+    .hero-facts li::before {content: ""; width: 5px; height: 5px; flex: 0 0 auto; border-radius: 50%; background: rgba(255,255,255,.7);}
+    .hero-jump {display: inline-flex; align-items: center; gap: 10px; min-height: 44px; margin-top: 24px; color: #fff; font-size: 14px; font-weight: 500; text-decoration: underline; text-decoration-color: rgba(255,255,255,.48); text-underline-offset: 6px;}
+    .hero-jump svg {width: 16px; height: 16px; transition: transform .25s var(--ease-out);}
+    .hero-jump:hover svg {transform: translateY(3px);}
+
+    /* Deployment tiers */
+    .section {padding-block: var(--section-space);}
+    .section--white {background: var(--surface);}
+    .section--soft {background: var(--surface-soft);}
+    .section-intro {display: flex; align-items: flex-end; justify-content: space-between; gap: 32px; margin-bottom: clamp(34px, 5vw, 58px);}
+    .intro-aside {flex: 0 0 min(320px, 32%); margin: 0; color: var(--muted-strong); font-size: 14px; line-height: 1.8; text-align: right;}
+    .tier-grid {display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: stretch;}
+    .tier-card {display: flex; min-width: 0; flex-direction: column; padding: clamp(24px, 2.8vw, 34px); background: var(--surface); border: 1px solid var(--border); border-radius: 8px;}
+    .tier-card--deep {background: var(--deep); border-color: var(--deep); color: #fff;}
+    .tier-top {display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding-bottom: 24px; border-bottom: 1px solid var(--border);}
+    .tier-card--deep .tier-top {border-bottom-color: rgba(255,255,255,.20);}
+    .tier-number {color: var(--blue-text); font-family: var(--font-mono); font-size: 12px; line-height: 1.4; letter-spacing: .08em;}
+    .tier-card--deep .tier-number {color: rgba(255,255,255,.70);}
+    .tier-title {margin: 7px 0 0; font-size: clamp(23px, 2.2vw, 28px); font-weight: 600; line-height: 1.35; letter-spacing: 0;}
+    .tier-cycle {flex: 0 0 auto; padding: 7px 10px; border: 1px solid var(--border); border-radius: 999px; color: var(--muted-strong); font-family: var(--font-mono); font-size: 11px; line-height: 1.4; letter-spacing: .04em; white-space: nowrap;}
+    .tier-card--deep .tier-cycle {border-color: rgba(255,255,255,.26); color: rgba(255,255,255,.86);}
+    .tier-summary {min-height: 5.4em; margin: 20px 0 4px; color: var(--muted-strong); font-size: 15px; line-height: 1.8;}
+    .tier-card--deep .tier-summary {color: rgba(255,255,255,.78);}
+    .tier-details {margin: auto 0 0;}
+    .tier-details > div {display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 13px; padding: 16px 0; border-top: 1px solid var(--border);}
+    .tier-card--deep .tier-details > div {border-top-color: rgba(255,255,255,.18);}
+    .tier-details > div:first-child {border-top: 0;}
+    .tier-details dt {margin: 0; color: var(--muted-strong); font-size: 12px; line-height: 1.9; letter-spacing: .02em;}
+    .tier-card--deep .tier-details dt {color: rgba(255,255,255,.64);}
+    .tier-details dd {margin: 0; color: var(--fg); font-size: 14px; line-height: 1.85;}
+    .tier-card--deep .tier-details dd {color: #fff;}
+
+    /* Cost structure */
+    .cost-layout {display: grid; grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr); gap: clamp(36px, 6vw, 84px); align-items: start;}
+    .cost-copy {position: sticky; top: 124px;}
+    .cost-note {display: flex; gap: 12px; max-width: 480px; margin: 28px 0 0; padding-top: 24px; border-top: 1px solid var(--border); color: var(--fg); font-size: 14px; line-height: 1.8;}
+    .cost-note svg {width: 20px; height: 20px; flex: 0 0 auto; margin-top: 2px; color: var(--blue-text);}
+    .cost-panel {background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden;}
+    .cost-panel-head {display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 18px 24px; border-bottom: 1px solid var(--border); background: var(--blue-soft-bg);}
+    .cost-panel-head strong {font-size: 14px; font-weight: 600;}
+    .cost-panel-head span {color: var(--muted-strong); font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase;}
+    .cost-list {margin: 0; padding: 0; list-style: none;}
+    .cost-list li {display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 18px; padding: 28px 24px; border-top: 1px solid var(--border);}
+    .cost-list li:first-child {border-top: 0;}
+    .cost-index {color: var(--blue-text); font-family: var(--font-mono); font-size: 12px; line-height: 1.8; letter-spacing: .06em;}
+    .cost-list h3 {margin: 0; font-size: 20px; font-weight: 600; line-height: 1.45; letter-spacing: 0;}
+    .cost-list p {max-width: 54ch; margin: 7px 0 0; color: var(--muted-strong); font-size: 14px; line-height: 1.8;}
+
+    /* Comparison table */
+    .comparison-head {display: flex; align-items: flex-end; justify-content: space-between; gap: 32px; margin-bottom: 34px;}
+    .comparison-head p {flex: 0 0 min(360px, 38%); margin: 0; color: var(--muted-strong); font-size: 14px; line-height: 1.8; text-align: right;}
+    .table-shell {width: 100%; overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); scrollbar-width: thin; scrollbar-color: color-mix(in oklch, var(--blue) 32%, var(--border)) transparent;}
+    .comparison-table {width: 100%; min-width: 900px; border-collapse: collapse; font-size: 14px; line-height: 1.7;}
+    .comparison-table caption {position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;}
+    .comparison-table th,
+    .comparison-table td {padding: 19px 18px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); text-align: left; vertical-align: top;}
+    .comparison-table tr:last-child th,
+    .comparison-table tr:last-child td {border-bottom: 0;}
+    .comparison-table th:last-child,
+    .comparison-table td:last-child {border-right: 0;}
+    .comparison-table thead th {background: var(--surface-soft); color: var(--fg); font-size: 13px; font-weight: 600; line-height: 1.5;}
+    .comparison-table thead th:not(:first-child) {min-width: 205px;}
+    .comparison-table thead th:nth-child(3) {background: var(--blue-soft-bg);}
+    .comparison-table tbody th {position: sticky; left: 0; z-index: 1; width: 140px; background: var(--surface); color: var(--muted-strong); font-size: 12px; font-weight: 500; letter-spacing: .02em; white-space: nowrap;}
+    .comparison-table td {color: var(--fg);}
+    .comparison-table td:nth-child(3) {background: color-mix(in oklch, var(--blue) 3.5%, var(--surface));}
+    .table-note {margin: 16px 0 0; color: var(--muted-strong); font-size: 12px; line-height: 1.7;}
+
+    /* Final CTA */
+    .final-cta {position: relative; overflow: hidden; padding-block: clamp(84px, 10vw, 136px); background: var(--deep); color: #fff;}
+    .final-cta::before {content: ""; position: absolute; top: -80px; right: clamp(-100px, 3vw, 40px); width: min(540px, 48vw); aspect-ratio: 1; border: 1px solid rgba(255,255,255,.13); border-radius: 50%; box-shadow: 0 0 0 52px rgba(255,255,255,.025), 0 0 0 104px rgba(255,255,255,.018); pointer-events: none;}
+    .final-cta::after {content: ""; position: absolute; right: clamp(48px, 12vw, 180px); bottom: -94px; width: 1px; height: 310px; background: linear-gradient(to bottom, transparent, rgba(255,255,255,.32)); transform: rotate(28deg); pointer-events: none;}
+    .final-cta-inner {position: relative; z-index: 1;}
+    .final-cta .eyebrow {color: rgba(255,255,255,.72);}
+    .final-cta .eyebrow::before {background: rgba(255,255,255,.62);}
+    .final-cta h2 {max-width: 13ch; margin: 0; font-size: clamp(32px, 3.6vw, 42px); font-weight: 600; line-height: 1.35; letter-spacing: 0;}
+    .final-cta p {max-width: 58ch; margin: 20px 0 30px; color: rgba(255,255,255,.78); font-size: 16px; line-height: 1.8;}
+    .final-cta .button {min-height: 52px; padding-inline: 26px;}
+
+    /* Footer */
+    .site-footer {background: var(--deep); color: #fff; border-top: 1px solid rgba(255,255,255,.14);}
+    .footer-grid {display: grid; grid-template-columns: 1.35fr .8fr .9fr 1fr; gap: clamp(26px, 5vw, 72px); padding-block: 64px 52px;}
+    .footer-brand p {max-width: 30ch; margin: 0; color: rgba(255,255,255,.78); font-size: 14px; line-height: 1.8;}
+    .footer-brand strong {display: block; margin-bottom: 14px; font-size: 18px; font-weight: 600; letter-spacing: .01em;}
+    .footer-col h3 {margin: 0 0 16px; color: rgba(255,255,255,.62); font-family: var(--font-mono); font-size: 11px; font-weight: 500; line-height: 1.4; letter-spacing: .08em; text-transform: uppercase;}
+    .footer-links {display: grid; gap: 5px;}
+    .footer-links a {display: inline-flex; align-items: center; min-height: 38px; color: rgba(255,255,255,.88); font-size: 14px; line-height: 1.5; transition: color .2s var(--ease-out);}
+    .footer-links a:hover {color: #fff; text-decoration: underline; text-underline-offset: 5px;}
+    .footer-bottom {display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-block: 20px; border-top: 1px solid rgba(255,255,255,.16); color: rgba(255,255,255,.7); font-size: 12px; line-height: 1.6;}
+    .footer-bottom p {margin: 0;}
+    .footer-bottom span {font-family: var(--font-mono); letter-spacing: .04em;}
+
+    .demo-dialog {width: min(520px, calc(100vw - 32px)); padding: 0; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--fg); box-shadow: 0 28px 90px rgba(12,18,32,.28);}
+    .demo-dialog::backdrop {background: rgba(6,10,20,.58); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);}
+    .demo-dialog-inner {padding: clamp(26px, 5vw, 38px);}
+    .demo-dialog .eyebrow {margin-bottom: 14px;}
+    .demo-dialog h2 {margin: 0; font-size: clamp(26px, 4vw, 32px); font-weight: 600; line-height: 1.4; letter-spacing: 0;}
+    .demo-dialog p {margin: 16px 0 0; color: var(--muted-strong); font-size: 15px; line-height: 1.8;}
+    .demo-dialog ol {margin: 20px 0 28px; padding-left: 1.25em; color: var(--fg); font-size: 14px; line-height: 1.9;}
+    .demo-dialog .button {width: 100%;}
+    .button--outline {background: transparent; border-color: var(--border); color: var(--fg);}
+    .button--outline:hover {background: var(--surface-soft); border-color: color-mix(in oklch, var(--border), var(--fg) 14%); color: var(--fg);}
+
+    .reveal {transition: opacity .7s var(--ease-out), transform .7s var(--ease-out);}
+    .has-js .reveal:not(.is-visible) {opacity: 0; transform: translateY(20px);}
+    .reveal[data-delay="1"] {transition-delay: .08s;}
+    .reveal[data-delay="2"] {transition-delay: .16s;}
+    .reveal[data-delay="3"] {transition-delay: .24s;}
+
+    @media (max-width: 1040px) {
+      .nav-shell {grid-template-columns: 1fr auto;}
+      .main-nav {display: none;}
+      .menu-toggle {display: inline-block; order: 2;}
+      .header-actions {justify-self: end;}
+      .nav-demo {margin-right: 2px;}
+      .tier-grid {grid-template-columns: 1fr;}
+      .tier-summary {min-height: 0;}
+      .tier-details {margin-top: 8px;}
+      .cost-layout {grid-template-columns: 1fr;}
+      .cost-copy {position: static;}
+      .footer-grid {grid-template-columns: 1.2fr 1fr 1fr;}
+      .footer-brand {grid-column: 1 / -1;}
+    }
+
+    @media (max-width: 760px) {
+      body {font-size: 16px;}
+      .site-header {height: 72px;}
+      .mobile-menu {top: 72px;}
+      .nav-shell {gap: 10px;}
+      .brand {font-size: 15px;}
+      .nav-demo {min-width: 0; min-height: 44px; padding-inline: 15px; font-size: 13px;}
+      .section-intro,
+      .comparison-head {display: block;}
+      .intro-aside,
+      .comparison-head p {margin-top: 16px; text-align: left;}
+      .hero-inner {padding-top: 118px; padding-bottom: 32px;}
+      .hero-panel {padding: 28px 24px; border-radius: 24px;}
+      .hero-title {font-size: clamp(42px, 12vw, 56px); line-height: 1.3;}
+      .hero-subtitle {font-size: 20px; line-height: 1.6;}
+      .hero-copy {font-size: 15px;}
+      .hero-facts {display: grid; gap: 9px;}
+      .hero {min-height: max(720px, 100svh);}
+      .hero-photo {object-position: 56% center;}
+      .cost-list li {grid-template-columns: 34px minmax(0, 1fr); gap: 10px; padding: 24px 20px;}
+      .cost-panel-head {padding-inline: 20px;}
+      .footer-grid {grid-template-columns: 1fr 1fr; padding-block: 52px 38px;}
+      .footer-brand {grid-column: 1 / -1;}
+      .footer-bottom {display: block;}
+      .footer-bottom span {display: block; margin-top: 6px;}
+      .final-cta::before {right: -180px; width: 420px;}
+    }
+
+    @media (max-width: 520px) {
+      .brand {font-size: 14px;}
+      .nav-shell {padding-inline: 16px;}
+      .nav-demo {padding-inline: 13px;}
+      .menu-toggle {width: 44px;}
+      .footer-grid {grid-template-columns: 1fr; gap: 24px;}
+      .footer-brand {grid-column: auto;}
+      .tier-card {padding: 24px 20px;}
+      .tier-details > div {grid-template-columns: 68px minmax(0, 1fr); gap: 10px;}
+      .table-shell {border-radius: 6px;}
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {scroll-behavior: auto;}
+      *, *::before, *::after {scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important;}
+      .has-js .reveal:not(.is-visible) {opacity: 1; transform: none;}
+    }
+
+    @media print {
+      .site-header, .mobile-menu, .hero-jump, .final-cta .button {display: none !important;}
+      body {background: #fff;}
+      .hero {min-height: 600px; break-inside: avoid;}
+      .section, .final-cta {break-inside: avoid;}
+      .reveal {opacity: 1 !important; transform: none !important;}
+    }
+  </style>
+<style>
+.inline-figure{margin:56px auto;max-width:1200px;padding-inline:clamp(20px,5vw,64px);box-sizing:border-box}
+.inline-figure .fig-box{border-radius:24px;overflow:hidden;box-shadow:0 28px 70px rgba(48,58,86,.14);border:1px solid #DDE2EA}
+.inline-figure img{display:block;width:100%;height:clamp(220px,30vw,400px);object-fit:cover}
+.inline-figure figcaption{padding:14px 22px;font-size:14px;line-height:1.6;color:#6B7689;background:#fff}
+</style>
+<style>
+html,body{overflow-x:hidden;max-width:100%}
+*,*::before,*::after{box-sizing:border-box}
+img{max-width:100%;height:auto}
+</style>
+<style>
+svg{max-width:100%;vertical-align:middle}
+.button svg,.button--primary svg,.button--glass svg,button svg,a.button svg,.hero-actions svg{width:18px;height:18px;flex:none;display:inline-block}
+</style>
+<style>
+[class*="node"] svg,[class*="icon"] svg,[class*="step"] svg,[class*="badge"] svg,[class*="mark"] svg,[class*="chip"] svg{width:44px;height:44px;flex:none;display:inline-block}
+[class*="number"] svg,[class*="num"] svg{width:32px;height:32px}
+</style>
+<style>
+[class*="hero"] img{object-fit:cover;object-position:center;max-height:96vh}
+</style>
+<style>
+[class*="scene"] img,[class*="media"] img:not(.hero-photo),[class*="shot"] img{height:auto;max-height:520px;object-fit:cover;width:100%}
+</style>
+<style>
+.hero img,section img,figure img{max-width:100%}
+</style>
+<style>
+.hero__media{overflow:hidden;width:100%}
+.hero__image{width:100%;height:100%;object-fit:cover;display:block}
+</style>
+<style>
+.hero__image{transform:none!important}
+</style>
+<style>
+.glass{position:relative;isolation:isolate;
+background:rgba(255,255,255,.10)!important;
+-webkit-backdrop-filter:blur(24px) saturate(180%)!important;
+backdrop-filter:blur(24px) saturate(180%)!important;
+border:1.5px solid rgba(255,255,255,.45)!important;border-radius:28px!important;
+box-shadow:0 28px 90px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.65)!important;
+overflow:hidden;}
+.glass::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+background:linear-gradient(148deg,rgba(255,255,255,.30) 0%,rgba(255,255,255,.06) 30%,rgba(255,255,255,0) 52%);}
+.glass::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),inset 0 24px 48px -24px rgba(255,255,255,.28);}
+.glass > *{position:relative;z-index:1}
+</style>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主要内容</a>
+
+  <header class="site-header" id="site-header">
+    <div class="nav-shell">
+      <a class="brand" href="index.html" aria-label="Astraea Plan 首页">Astraea Plan</a>
+      <nav class="main-nav" aria-label="主导航">
+        <a href="capabilities.html">能力</a>
+        <a href="architecture.html">架构</a>
+        <a href="cases.html">案例</a>
+        <a href="pricing.html" aria-current="page">投入</a>
+        <a href="about.html">关于</a>
+      </nav>
+      <div class="header-actions">
+        <button class="button button--accent nav-demo" type="button" data-nav-demo data-demo-open data-od-id="nav-book-demo">预约演示</button>
+        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" aria-label="打开导航菜单"></button>
+      </div>
+    </div>
+  </header>
+
+  <nav class="mobile-menu" id="mobile-menu" aria-label="移动端导航">
+    <a href="capabilities.html">能力</a>
+    <a href="architecture.html">架构</a>
+    <a href="cases.html">案例</a>
+    <a href="pricing.html" aria-current="page">投入</a>
+    <a href="about.html">关于</a>
+  </nav>
+
+  <main id="main">
+    <section class="hero" id="top" data-od-id="pricing-hero" aria-labelledby="hero-title">
+      <img class="hero-photo" src="assets/smoke-1.jpg" width="2000" height="1333" alt="" fetchpriority="high" />
+      <div class="container hero-inner">
+        <div class="glass hero-panel" data-od-id="pricing-hero-glass">
+          <p class="eyebrow eyebrow--light">投入 / PRICING</p>
+          <h1 class="hero-title" id="hero-title" data-od-id="pricing-hero-title">投入</h1>
+          <p class="hero-subtitle">按门店规模配置，一次性部署，长期自己掌握。</p>
+          <p class="hero-copy">三档部署方式围绕实际边界展开：从一个场景验证，到多部门协同，再到接入现有 ERP / POS。范围先确认，节奏再安排。</p>
+          <ul class="hero-facts" aria-label="投入方式要点">
+            <li>私有化部署</li>
+            <li>模型调用按量</li>
+            <li>数据不出公司</li>
+          </ul>
+          <a class="hero-jump" href="#deployment" data-od-id="pricing-hero-jump">
+            查看部署方式
+            <svg aria-hidden="true" viewBox="0 0 16 16" fill="none">
+              <path d="M8 2v11M3.75 8.75 8 13l4.25-4.25" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="deployment" data-od-id="deployment-tiers" aria-labelledby="deployment-title">
+      <div class="container">
+        <div class="section-intro reveal">
+          <div>
+            <p class="eyebrow">01 / 部署方式</p>
+            <h2 class="section-heading" id="deployment-title" data-od-id="deployment-heading">三档部署方式</h2>
+            <p class="section-lead">从单个部门与单个场景开始，或直接建立全公司智能体协作体系，也可以围绕已有 ERP / POS 做系统级接入。</p>
+          </div>
+          <p class="intro-aside">不设统一的“标准包”。每一档都先明确适用边界、交付内容与参与角色。</p>
+        </div>
+
+        <div class="tier-grid">
+          <article class="tier-card reveal" data-od-id="tier-pilot">
+            <div class="tier-top">
+              <div>
+                <span class="tier-number">01 / 试点方式</span>
+                <h3 class="tier-title" data-od-id="tier-pilot-title">试点</h3>
+              </div>
+              <span class="tier-cycle">4–6 周</span>
+            </div>
+            <p class="tier-summary">先把一个部门的单场景跑通，验证流程、数据与协作方式，再决定下一步范围。</p>
+            <dl class="tier-details">
+              <div><dt>适合谁</dt><dd>希望先验证价值、控制实施边界的单部门团队</dd></div>
+              <div><dt>包含什么</dt><dd>单场景智能体、流程梳理、部署与上线验收</dd></div>
+              <div><dt>交付周期</dt><dd>4–6 周</dd></div>
+              <div><dt>谁来做</dt><dd>Astraea Plan 实施顾问与客户业务负责人</dd></div>
+            </dl>
+          </article>
+
+          <article class="tier-card tier-card--deep reveal" data-od-id="tier-company" data-delay="1">
+            <div class="tier-top">
+              <div>
+                <span class="tier-number">02 / 协同体系</span>
+                <h3 class="tier-title" data-od-id="tier-company-title">全公司</h3>
+              </div>
+              <span class="tier-cycle">8–12 周</span>
+            </div>
+            <p class="tier-summary">把多部门智能体、知识库与定时任务体系组织成一套可持续运行的日常工作机制。</p>
+            <dl class="tier-details">
+              <div><dt>适合谁</dt><dd>需要跨部门协同、统一知识入口与自动化任务的连锁企业</dd></div>
+              <div><dt>包含什么</dt><dd>多部门智能体、知识库、定时任务体系与整体部署</dd></div>
+              <div><dt>交付周期</dt><dd>8–12 周</dd></div>
+              <div><dt>谁来做</dt><dd>Astraea Plan 交付团队与客户联合项目组</dd></div>
+            </dl>
+          </article>
+
+          <article class="tier-card reveal" data-od-id="tier-custom" data-delay="2">
+            <div class="tier-top">
+              <div>
+                <span class="tier-number">03 / 系统接入</span>
+                <h3 class="tier-title" data-od-id="tier-custom-title">深度定制</h3>
+              </div>
+              <span class="tier-cycle">按需</span>
+            </div>
+            <p class="tier-summary">围绕已有 ERP / POS 和既有系统边界做定制接入，把智能体能力放进真实业务流程。</p>
+            <dl class="tier-details">
+              <div><dt>适合谁</dt><dd>已有 ERP / POS 体系、需要系统级连接的连锁企业</dd></div>
+              <div><dt>包含什么</dt><dd>全公司范围能力、ERP / POS 对接与按需定制</dd></div>
+              <div><dt>交付周期</dt><dd>按对接范围评估，按需推进</dd></div>
+              <div><dt>谁来做</dt><dd>Astraea Plan 技术团队与客户 IT / 数据负责人</dd></div>
+            </dl>
+          </article>
+        </div>
+      </div>
+    </section>
+<figure class="inline-figure"><div class="fig-box"><imassets/kb-c.jpgr-3.jpg" alt="Astraea Plan 运行场景" loading="lazy"></div></figure>
+
+
+    <section class="section section--white" id="cost" data-od-id="cost-structure" aria-labelledby="cost-title">
+      <div class="container cost-layout">
+        <div class="cost-copy reveal">
+          <p class="eyebrow">02 / 成本构成</p>
+          <h2 class="section-heading" id="cost-title" data-od-id="cost-heading">投入怎么构成</h2>
+          <p class="section-lead">系统部署在客户自己的机器上，模型调用按量发生。部署完成后，环境、数据与权限边界都留在公司内部。</p>
+          <p class="cost-note">
+            <svg aria-hidden="true" viewBox="0 0 20 20" fill="none">
+              <path d="M10 2.5 16 5v4.6c0 3.7-2.4 6.4-6 7.9-3.6-1.5-6-4.2-6-7.9V5l6-2.5Z" stroke="currentColor" stroke-width="1.35"/>
+              <path d="m7.4 9.8 1.7 1.7 3.6-3.8" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>一次性部署之后，公司可以按自己的节奏扩展智能体、知识库与任务体系。</span>
+          </p>
+        </div>
+
+        <div class="cost-panel reveal" data-od-id="cost-panel" data-delay="1">
+          <div class="cost-panel-head">
+            <strong>私有化部署边界</strong>
+            <span>客户自有环境</span>
+          </div>
+          <ol class="cost-list">
+            <li>
+              <span class="cost-index">01</span>
+              <div>
+                <h3 data-od-id="cost-private-deployment-title">私有化部署</h3>
+                <p>部署在客户自己的机器上。系统、知识库与业务数据沿着公司既有环境和权限体系运行。</p>
+              </div>
+            </li>
+            <li>
+              <span class="cost-index">02</span>
+              <div>
+                <h3 data-od-id="cost-model-usage-title">模型调用按量</h3>
+                <p>调用随实际使用量发生，按实际任务与场景计算。部署范围越明确，调用边界越容易管理。</p>
+              </div>
+            </li>
+            <li>
+              <span class="cost-index">03</span>
+              <div>
+                <h3 data-od-id="cost-data-boundary-title">数据不出公司</h3>
+                <p>数据留在公司环境内，访问与调用策略按企业要求配置。智能体围绕内部知识与任务工作。</p>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </section>
+<figure class="inline-figure"><div class="fig-box"><img src="assets/code-1.jpg" alt="Astraea Plan 运行场景" loading="lazy"></div></figure>
+
+
+    <section class="section section--soft" id="compare" data-od-id="deployment-comparison" aria-labelledby="compare-title">
+      <div class="container">
+        <div class="comparison-head reveal">
+          <div>
+            <p class="eyebrow">03 / 对比</p>
+            <h2 class="section-heading" id="compare-title" data-od-id="comparison-heading">三档部署方式对比</h2>
+          </div>
+          <p>从适用对象、能力范围、周期与参与角色看差异。最终范围以项目评估与系统边界确认为准。</p>
+        </div>
+
+        <div class="table-shell reveal" role="region" aria-label="三档部署方式对比表" tabindex="0" data-od-id="comparison-table-shell">
+          <table class="comparison-table">
+            <caption>试点、全公司、深度定制三档部署方式在适用对象、包含内容、交付周期、系统边界和参与角色上的比较</caption>
+            <thead>
+              <tr>
+                <th scope="col">维度</th>
+                <th scope="col">试点</th>
+                <th scope="col">全公司</th>
+                <th scope="col">深度定制</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">适用对象</th>
+                <td>单部门、单场景</td>
+                <td>多部门协同的连锁企业</td>
+                <td>已有 ERP / POS 的企业</td>
+              </tr>
+              <tr>
+                <th scope="row">包含内容</th>
+                <td>单场景智能体、流程梳理、部署上线</td>
+                <td>多部门智能体、知识库、定时任务体系</td>
+                <td>全公司范围能力、ERP / POS 对接与按需定制</td>
+              </tr>
+              <tr>
+                <th scope="row">交付周期</th>
+                <td>4–6 周</td>
+                <td>8–12 周</td>
+                <td>按需，随对接范围评估</td>
+              </tr>
+              <tr>
+                <th scope="row">系统边界</th>
+                <td>围绕单一场景接入</td>
+                <td>连接多部门流程与知识</td>
+                <td>对接已有 ERP / POS 与内部系统</td>
+              </tr>
+              <tr>
+                <th scope="row">参与角色</th>
+                <td>实施顾问 + 业务负责人</td>
+                <td>交付团队 + 客户联合项目组</td>
+                <td>技术团队 + 客户 IT / 数据负责人</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="table-note">表格可在窄屏内左右查看；部署环境与数据边界在三档中保持一致。</p>
+      </div>
+    </section>
+
+    <section class="final-cta" id="contact" data-od-id="final-cta" data-final-cta aria-labelledby="cta-title">
+      <div class="container final-cta-inner">
+        <p class="eyebrow">预约演示</p>
+        <h2 id="cta-title" data-od-id="final-cta-title">把部署范围定下来，再看落地节奏。</h2>
+        <p>围绕门店规模、现有系统与数据要求，梳理适合的部署方式与参与角色。先从真实边界开始。</p>
+        <button class="button button--accent" type="button" data-demo-open data-od-id="cta-book-demo">预约演示</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer" data-od-id="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <strong>Astraea Plan</strong>
+          <p>给连锁企业装一套私有化智能体团队，数据不出公司。</p>
+        </div>
+        <div class="footer-col">
+          <h3>能力</h3>
+          <div class="footer-links">
+            <a href="capabilities.html">能力总览</a>
+            <a href="cases.html">客户案例</a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h3>架构</h3>
+          <div class="footer-links">
+            <a href="architecture.html">私有化架构</a>
+            <a href="about.html">关于 Astraea Plan</a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h3>联系</h3>
+          <div class="footer-links">
+            <a href="#contact" data-demo-open>预约演示</a>
+            <a href="pricing.html">部署方式</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2026 Astraea Plan · 数据不出公司</p>
+        <span>私有化智能体团队 / 200+ 门店</span>
+      </div>
+    </div>
+  </footer>
+
+  <dialog class="demo-dialog" id="demo-dialog" aria-labelledby="demo-dialog-title">
+    <div class="demo-dialog-inner">
+      <p class="eyebrow">预约演示</p>
+      <h2 id="demo-dialog-title">在现有项目沟通群发起预约</h2>
+      <p>为避免遗漏信息，预约统一通过项目沟通群确认。发送以下三项，交付团队即可判断适合的部署方式。</p>
+      <ol>
+        <li>希望试点的部门或单场景</li>
+        <li>现有 ERP / POS 与数据边界</li>
+        <li>期望上线时间与参与角色</li>
+      </ol>
+      <form method="dialog">
+        <button class="button button--outline" type="submit">知道了</button>
+      </form>
+    </div>
+  </dialog>
+
+  <script>
+    (function () {
+      var header = document.getElementById('site-header');
+      var hero = document.querySelector('.hero');
+      var menuButton = document.querySelector('.menu-toggle');
+      var mobileMenu = document.getElementById('mobile-menu');
+      var navDemo = document.querySelector('[data-nav-demo]');
+      var finalCta = document.querySelector('[data-final-cta]');
+      var demoDialog = document.getElementById('demo-dialog');
+      var demoButtons = Array.prototype.slice.call(document.querySelectorAll('[data-demo-open]'));
+      var lastDemoTrigger = null;
+      var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      function setHeaderState() {
+        var threshold = hero ? hero.offsetTop + hero.offsetHeight : 500;
+        header.classList.toggle('is-light', window.scrollY > threshold);
+      }
+
+      function closeMenu() {
+        menuButton.setAttribute('aria-expanded', 'false');
+        menuButton.setAttribute('aria-label', '打开导航菜单');
+        mobileMenu.classList.remove('is-open');
+        document.body.classList.remove('menu-open');
+      }
+
+      menuButton.addEventListener('click', function () {
+        var open = menuButton.getAttribute('aria-expanded') === 'true';
+        menuButton.setAttribute('aria-expanded', String(!open));
+        menuButton.setAttribute('aria-label', open ? '打开导航菜单' : '关闭导航菜单');
+        mobileMenu.classList.toggle('is-open', !open);
+        document.body.classList.toggle('menu-open', !open);
+      });
+
+      mobileMenu.addEventListener('click', function (event) {
+        if (event.target.closest('a')) closeMenu();
+      });
+
+      demoButtons.forEach(function (trigger) {
+        trigger.addEventListener('click', function (event) {
+          event.preventDefault();
+          lastDemoTrigger = trigger;
+          closeMenu();
+          if (typeof demoDialog.showModal === 'function') demoDialog.showModal();
+        });
+      });
+
+      demoDialog.addEventListener('close', function () {
+        if (lastDemoTrigger) lastDemoTrigger.focus();
+      });
+
+      demoDialog.addEventListener('click', function (event) {
+        if (event.target !== demoDialog) return;
+        var rect = demoDialog.getBoundingClientRect();
+        var inside = event.clientX >= rect.left && event.clientX <= rect.right && event.clientY >= rect.top && event.clientY <= rect.bottom;
+        if (!inside) demoDialog.close();
+      });
+
+      document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && mobileMenu.classList.contains('is-open')) {
+          closeMenu();
+          menuButton.focus();
+        }
+      });
+
+      var ticking = false;
+      window.addEventListener('scroll', function () {
+        if (ticking) return;
+        ticking = true;
+        window.requestAnimationFrame(function () {
+          setHeaderState();
+          ticking = false;
+        });
+      }, { passive: true });
+      setHeaderState();
+
+      if (finalCta && navDemo && 'IntersectionObserver' in window) {
+        var ctaObserver = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            var visible = entry.isIntersecting && entry.intersectionRatio > 0.22;
+            header.classList.toggle('cta-in-view', visible);
+            navDemo.setAttribute('aria-hidden', visible ? 'true' : 'false');
+            navDemo.tabIndex = visible ? -1 : 0;
+          });
+        }, { threshold: [0, 0.22, 0.45] });
+        ctaObserver.observe(finalCta);
+      }
+
+      var revealItems = Array.prototype.slice.call(document.querySelectorAll('.reveal'));
+      if (!('IntersectionObserver' in window) || reduceMotion) {
+        revealItems.forEach(function (item) { item.classList.add('is-visible'); });
+      } else {
+        var revealObserver = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              revealObserver.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+        revealItems.forEach(function (item) { revealObserver.observe(item); });
+      }
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Astraea Plan 企业问答客服：对外回答问题，对内不碰数据。以独立设备、物理隔离和经审核的对外知识库守住企业数据边界。">
+  <title>企业问答客服｜Astraea Plan</title>
+  <link rel="stylesheet" href="assets/site-qa.css">
+<style>
+/* 苹果毛玻璃统一补丁 */
+.glass{position:relative;isolation:isolate;background:rgba(255,255,255,.10);
+-webkit-backdrop-filter:blur(24px) saturate(180%);backdrop-filter:blur(24px) saturate(180%);
+border:1.5px solid rgba(255,255,255,.45);border-radius:28px;
+box-shadow:0 28px 90px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.65),inset 0 -1px 0 rgba(255,255,255,.10);
+overflow:hidden;}
+.glass::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+background:linear-gradient(148deg,rgba(255,255,255,.30) 0%,rgba(255,255,255,.06) 30%,rgba(255,255,255,0) 52%);}
+.glass::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),inset 0 24px 48px -24px rgba(255,255,255,.28);}
+.glass,.glass h1,.glass h2,.glass h3,.glass p,.glass span,.glass nav,.glass a,.glass li{color:#fff}
+.glass a{text-decoration:none}
+.glass > *{position:relative;z-index:1}
+</style>
+<style>
+.inline-figure{margin:56px auto;max-width:1200px;padding-inline:clamp(20px,5vw,64px);box-sizing:border-box}
+.inline-figure .fig-box{border-radius:24px;overflow:hidden;box-shadow:0 28px 70px rgba(48,58,86,.14);border:1px solid #DDE2EA}
+.inline-figure img{display:block;width:100%;height:clamp(220px,30vw,400px);object-fit:cover}
+.inline-figure figcaption{padding:14px 22px;font-size:14px;line-height:1.6;color:#6B7689;background:#fff}
+</style>
+<style>
+html,body{overflow-x:hidden;max-width:100%}
+*,*::before,*::after{box-sizing:border-box}
+img{max-width:100%;height:auto}
+</style>
+<style>
+svg{max-width:100%;vertical-align:middle}
+.button svg,.button--primary svg,.button--glass svg,button svg,a.button svg,.hero-actions svg{width:18px;height:18px;flex:none;display:inline-block}
+</style>
+<style>
+[class*="node"] svg,[class*="icon"] svg,[class*="step"] svg,[class*="badge"] svg,[class*="mark"] svg,[class*="chip"] svg{width:44px;height:44px;flex:none;display:inline-block}
+[class*="number"] svg,[class*="num"] svg{width:32px;height:32px}
+</style>
+<style>
+[class*="hero"] img{object-fit:cover;object-position:center;max-height:96vh}
+</style>
+<style>
+[class*="scene"] img,[class*="media"] img:not(.hero-photo),[class*="shot"] img{height:auto;max-height:520px;object-fit:cover;width:100%}
+</style>
+<style>
+.hero img,section img,figure img{max-width:100%}
+</style>
+<style>
+.hero__media{overflow:hidden;width:100%}
+.hero__image{width:100%;height:100%;object-fit:cover;display:block}
+</style>
+<style>
+.hero__image{transform:none!important}
+</style>
+<style>
+.glass{position:relative;isolation:isolate;
+background:rgba(255,255,255,.10)!important;
+-webkit-backdrop-filter:blur(24px) saturate(180%)!important;
+backdrop-filter:blur(24px) saturate(180%)!important;
+border:1.5px solid rgba(255,255,255,.45)!important;border-radius:28px!important;
+box-shadow:0 28px 90px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.65)!important;
+overflow:hidden;}
+.glass::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+background:linear-gradient(148deg,rgba(255,255,255,.30) 0%,rgba(255,255,255,.06) 30%,rgba(255,255,255,0) 52%);}
+.glass::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),inset 0 24px 48px -24px rgba(255,255,255,.28);}
+.glass > *{position:relative;z-index:1}
+</style>
+<style>
+[class*="hero"] img{max-height:520px!important;object-fit:cover}
+.hero{min-height:auto!important}
+</style>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主要内容</a>
+
+  <header class="site-header" id="site-header" data-od-id="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="index.html" aria-label="Astraea Plan 首页" data-od-id="brand-home">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>Astraea Plan</span>
+      </a>
+      <nav class="desktop-nav" aria-label="主导航">
+        <a href="capabilities.html" aria-current="page">能力</a>
+        <a href="architecture.html">架构</a>
+        <a href="cases.html">案例</a>
+        <a href="pricing.html">投入</a>
+        <a href="about.html">关于</a>
+      </nav>
+      <div class="header-actions">
+        <a class="cta" href="pricing.html" data-od-id="header-demo-cta">预约演示</a>
+        <button class="menu-toggle" type="button" aria-label="打开导航" aria-expanded="false" aria-controls="mobile-panel" data-od-id="mobile-menu-toggle">
+          <span aria-hidden="true"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="mobile-panel" id="mobile-panel" data-od-id="mobile-nav-panel">
+    <nav aria-label="移动端主导航">
+      <a href="capabilities.html" aria-current="page">能力</a>
+      <a href="architecture.html">架构</a>
+      <a href="cases.html">案例</a>
+      <a href="pricing.html">投入</a>
+      <a href="about.html">关于</a>
+    </nav>
+    <a class="cta" href="pricing.html">预约演示</a>
+  </div>
+
+  <main id="main">
+    <section class="qa-hero" data-od-id="qa-hero">
+      <img class="qa-hero__photo" src="assets/code-5.jpg" width="2000" height="1333" alt="暗蓝色光下的机械键盘特写">
+      <div class="qa-hero__shade" aria-hidden="true"></div>
+      <div class="container qa-hero__inner">
+        <div class="glass qa-panel" data-od-id="hero-glass-panel">
+          <nav class="breadcrumb" aria-label="面包屑">
+            <a href="capabilities.html">能力</a>
+            <span class="slash" aria-hidden="true">/</span>
+            <span aria-current="page">企业问答客服</span>
+          </nav>
+          <p class="eyebrow">Capability / Isolated Q&amp;A</p>
+          <h1 data-od-id="qa-page-title">企业问答客服</h1>
+          <p class="qa-definition" data-od-id="qa-definition">对外回答问题，对内不碰数据。</p>
+          <div class="qa-meta">
+            <span class="status-line" data-od-id="qa-status-summary">已创建并独立运行</span>
+            <a class="text-link-light" href="#isolation" data-od-id="hero-jump-to-isolation">
+              查看隔离方式
+              <svg width="17" height="17" viewBox="0 0 17 17" fill="none" aria-hidden="true">
+                <path d="M3 8.5h10M9 4.5l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="question-title" data-od-id="qa-question-section">
+      <div class="container">
+        <div class="split-heading reveal">
+          <div>
+            <p class="section-kicker">01 / 问题</p>
+            <h2 id="question-title" data-od-id="question-title">客服要答得准，又不能把内部数据带出去。</h2>
+          </div>
+          <p>准确依赖可用资料，安全依赖不可绕开的边界。把两者放在办公环境里，靠权限设置兜底，风险始终存在。</p>
+        </div>
+        <div class="intro-grid">
+          <p class="plain-language reveal">企业问答客服真正要解决的，不是“让模型多知道一点”，而是让它在<strong>只该知道的范围里</strong>稳定回答。</p>
+          <div class="context-strip reveal" data-od-id="public-vs-internal">
+            <div class="context-side">
+              <span class="context-label">External / 对外</span>
+              <p>客户问题、服务话术、公开资料</p>
+              <small>可以进入问答链路，形成可追溯的回答。</small>
+            </div>
+            <div class="context-side is-inside">
+              <span class="context-label">Internal / 对内</span>
+              <p>经营数据、客户信息、内部文件</p>
+              <small>不进入这台机器，也不经过问答链路。</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+<figure class="inline-figure"><div class="fig-box"><img src="assets/bokeh-2.jpg" alt="Astraea Plan 运行场景" loading="lazy"></div></figure>
+
+
+    <section class="section how-section" id="isolation" aria-labelledby="isolation-title" data-od-id="qa-isolation-section">
+      <div class="container">
+        <div class="split-heading reveal">
+          <div>
+            <p class="section-kicker">02 / 怎么做</p>
+            <h2 id="isolation-title" data-od-id="isolation-title">一台单独的机器，一道不能绕开的边界。</h2>
+          </div>
+          <p>不把隔离寄托在账号、权限或使用习惯上。独立设备与物理隔离，先从环境上断开，再谈回答。</p>
+        </div>
+
+        <div class="isolation-layout">
+          <figure class="machine-figure reveal" data-od-id="isolation-diagram">
+            <div class="machine-figure__meta">
+              <span>Isolated device</span>
+              <span>No office path</span>
+            </div>
+            <div class="machine" aria-hidden="true"></div>
+            <div class="separation" aria-hidden="true"><span>PHYSICAL ISOLATION</span></div>
+            <figcaption class="office-zone">
+              <strong>办公环境</strong>
+              <span>内部数据、办公网络与业务系统不进入问答客服的可用范围。</span>
+            </figcaption>
+          </figure>
+
+          <div class="method-list" data-od-id="isolation-methods">
+            <article class="method-item reveal" data-od-id="method-standalone-device">
+              <span class="method-index">01</span>
+              <div>
+                <h3>单独一台机器运行</h3>
+                <p>企业问答客服拥有自己的运行设备，不依赖办公终端，也不与日常办公环境共用入口。</p>
+              </div>
+            </article>
+            <article class="method-item reveal" data-od-id="method-physical-isolation">
+              <span class="method-index">02</span>
+              <div>
+                <h3>与办公环境物理隔离</h3>
+                <p>隔离发生在环境层，而不是只做一次配置。问答链路从源头就没有通往内部数据的路径。</p>
+              </div>
+            </article>
+            <article class="method-item reveal" data-od-id="method-public-knowledge">
+              <span class="method-index">03</span>
+              <div>
+                <h3>知识库只放允许对外的内容</h3>
+                <p>可进入知识库的，只有允许对外的话术与资料。范围之外的内容，不靠模型自行判断。</p>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <div class="knowledge-panel reveal" data-od-id="knowledge-boundary">
+          <div class="knowledge-head">
+            <h3>知识边界在进入之前就已确定。</h3>
+            <p>切换查看允许进入与绝不接入的内容。两者不是同一份资料的权限高低，而是是否进入这条链路。</p>
+          </div>
+          <div class="knowledge-switcher">
+            <div class="knowledge-tabs" role="tablist" aria-label="知识库边界">
+              <button class="knowledge-tab" id="tab-allowed" type="button" role="tab" aria-selected="true" aria-controls="panel-allowed" tabindex="0" data-od-id="knowledge-tab-allowed">允许进入</button>
+              <button class="knowledge-tab" id="tab-blocked" type="button" role="tab" aria-selected="false" aria-controls="panel-blocked" tabindex="-1" data-od-id="knowledge-tab-blocked">绝不接入</button>
+            </div>
+            <div class="knowledge-list" id="panel-allowed" role="tabpanel" aria-labelledby="tab-allowed">
+              <p class="knowledge-list-title">Approved for external use</p>
+              <ul>
+                <li><span class="list-mark">+</span><span>已审核的对外服务话术</span></li>
+                <li><span class="list-mark">+</span><span>允许公开的产品与门店资料</span></li>
+                <li><span class="list-mark">+</span><span>已经确认可对外的常见问题</span></li>
+                <li><span class="list-mark">+</span><span>对外使用的服务规则与说明</span></li>
+              </ul>
+            </div>
+            <div class="knowledge-list is-blocked" id="panel-blocked" role="tabpanel" aria-labelledby="tab-blocked" hidden>
+              <p class="knowledge-list-title">Never connected</p>
+              <ul>
+                <li><span class="list-mark">×</span><span>企业内部经营数据</span></li>
+                <li><span class="list-mark">×</span><span>客户与员工的个人信息</span></li>
+                <li><span class="list-mark">×</span><span>未经审核的内部文档</span></li>
+                <li><span class="list-mark">×</span><span>办公网络中的业务系统数据</span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+<figure class="inline-figure"><div class="fig-box"><img src="assets/bluesmoke-1.jpg" alt="Astraea Plan 运行场景" loading="lazy"></div></figure>
+
+
+    <section class="section status-section" aria-labelledby="status-title" data-od-id="qa-status-section">
+      <div class="container">
+        <div class="split-heading reveal">
+          <div>
+            <p class="section-kicker">03 / 状态</p>
+            <h2 id="status-title">它已经在自己的边界内运行。</h2>
+          </div>
+          <p>当前状态是已创建并独立运行。设备、运行环境和知识范围分别成立，不依赖办公环境临时开放通道。</p>
+        </div>
+        <div class="status-shell">
+          <div class="status-state reveal" data-od-id="status-created-running">
+            <span class="status-state__label">Current state</span>
+            <strong>已创建<br>独立运行</strong>
+            <p>以独立实例对外提供问答服务。</p>
+          </div>
+          <dl class="status-details reveal" data-od-id="status-detail-list">
+            <div class="status-row">
+              <dt>运行位置</dt>
+              <dd>单独设备，不依附办公终端</dd>
+            </div>
+            <div class="status-row">
+              <dt>连接边界</dt>
+              <dd>与办公环境物理隔离</dd>
+            </div>
+            <div class="status-row">
+              <dt>知识范围</dt>
+              <dd>仅允许对外的话术与资料</dd>
+            </div>
+            <div class="status-row">
+              <dt>当前状态</dt>
+              <dd><span>已创建并独立运行</span></dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <section class="boundary-section" aria-labelledby="boundary-title" data-od-id="qa-boundary-section">
+      <div class="container boundary-grid">
+        <div class="reveal">
+          <p class="section-kicker">04 / 边界</p>
+          <h2 id="boundary-title" data-od-id="boundary-title">宁可答不了，<span>也不越界。</span></h2>
+        </div>
+        <div class="boundary-copy reveal">
+          <p>隔离是硬约束，不是可以为了回答率临时放宽的选项。资料不在允许范围内，就明确答不了；内部数据没有进入链路的必要，也没有进入链路的通道。</p>
+          <div class="hard-rule">
+            <strong>边界优先于覆盖率</strong>
+            <p>能回答的范围保持清晰，不能回答的问题交给人工或后续补充对外资料，不用内部数据临时补位。</p>
+          </div>
+          <div class="boundary-diagram" role="img" aria-label="企业问答客服的外部问题与对外回答之间由隔离设备承接，办公环境不接入">
+            <div class="boundary-node">外部问题<small>Customer input</small></div>
+            <div class="boundary-wall" aria-hidden="true">ISOLATED</div>
+            <div class="boundary-node">对外回答<small>Approved output</small></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section related-section" aria-labelledby="related-title" data-od-id="qa-related-section">
+      <div class="container">
+        <p class="section-kicker reveal">相关能力</p>
+        <a class="related-link reveal" id="related-memory" href="capabilities.html#long-term-memory" data-od-id="related-long-term-memory">
+          <div class="related-link__lead">
+            <div>
+              <small>Related capability</small>
+              <h3 id="related-title">长期记忆</h3>
+            </div>
+            <p>需要连续上下文的会话，可按场景沿用既有上下文；记忆范围与启用条件另行界定。</p>
+          </div>
+          <span class="related-arrow" aria-hidden="true">
+            <svg width="19" height="19" viewBox="0 0 19 19" fill="none">
+              <path d="M3 9.5h12M10 4.5l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer" data-od-id="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a class="brand" href="index.html" aria-label="Astraea Plan 首页">
+            <span class="brand-mark" aria-hidden="true"></span>
+            <span>Astraea Plan</span>
+          </a>
+          <p>给连锁企业装一套私有化智能体团队，数据不出公司。</p>
+        </div>
+        <div class="footer-column">
+          <h3>能力</h3>
+          <ul>
+            <li><a href="capabilities.html">能力总览</a></li>
+            <li><a href="cap-qa.html">企业问答客服</a></li>
+            <li><a href="capabilities.html#long-term-memory">长期记忆</a></li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h3>架构</h3>
+          <ul>
+            <li><a href="architecture.html">运行架构</a></li>
+            <li><a href="architecture.html#isolation">隔离原则</a></li>
+            <li><a href="cases.html">客户案例</a></li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h3>联系</h3>
+          <ul>
+            <li><a href="pricing.html">预约演示</a></li>
+            <li><a href="about.html">关于 Astraea Plan</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 Astraea Plan · 数据不出公司</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      const header = document.getElementById('site-header');
+      const toggle = document.querySelector('.menu-toggle');
+      const panel = document.getElementById('mobile-panel');
+      const hero = document.querySelector('.qa-hero');
+
+      function paintHeader() {
+        const threshold = Math.max(72, (hero?.offsetHeight || window.innerHeight) - 120);
+        header.classList.toggle('is-solid', window.scrollY > threshold);
+      }
+
+      function closeMenu() {
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.setAttribute('aria-label', '打开导航');
+        panel.classList.remove('is-open');
+        document.body.classList.remove('menu-open');
+      }
+
+      toggle.addEventListener('click', function () {
+        const open = toggle.getAttribute('aria-expanded') === 'true';
+        if (open) {
+          closeMenu();
+          return;
+        }
+        toggle.setAttribute('aria-expanded', 'true');
+        toggle.setAttribute('aria-label', '关闭导航');
+        panel.classList.add('is-open');
+        document.body.classList.add('menu-open');
+      });
+
+      panel.querySelectorAll('a').forEach(function (link) {
+        link.addEventListener('click', closeMenu);
+      });
+
+      document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') closeMenu();
+      });
+
+      window.addEventListener('resize', function () {
+        if (window.innerWidth > 980) closeMenu();
+        paintHeader();
+      });
+      window.addEventListener('scroll', paintHeader, { passive: true });
+      paintHeader();
+
+      const tabs = Array.from(document.querySelectorAll('.knowledge-tab'));
+      const panels = {
+        'tab-allowed': document.getElementById('panel-allowed'),
+        'tab-blocked': document.getElementById('panel-blocked')
+      };
+
+      function activateTab(tab, moveFocus) {
+        tabs.forEach(function (item) {
+          const selected = item === tab;
+          item.setAttribute('aria-selected', String(selected));
+          item.tabIndex = selected ? 0 : -1;
+          panels[item.id].hidden = !selected;
+        });
+        if (moveFocus) tab.focus();
+      }
+
+      tabs.forEach(function (tab, index) {
+        tab.addEventListener('click', function () { activateTab(tab, false); });
+        tab.addEventListener('keydown', function (event) {
+          if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+          event.preventDefault();
+          const nextIndex = event.key === 'ArrowRight'
+            ? (index + 1) % tabs.length
+            : (index - 1 + tabs.length) % tabs.length;
+          activateTab(tabs[nextIndex], true);
+        });
+      });
+
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const revealItems = document.querySelectorAll('.reveal');
+      if (reducedMotion || !('IntersectionObserver' in window)) {
+        revealItems.forEach(function (item) { item.classList.add('is-visible'); });
+      } else {
+        const observer = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          });
+        }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+        revealItems.forEach(function (item) { observer.observe(item); });
+      }
+    })();
+  </script>
+</body>
+</html>

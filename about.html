@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Astraea Plan 关于页：企业需要的不是更聪明的对话框，而是能自己跑完一件事的私有化智能体角色。">
+  <title>关于｜Astraea Plan</title>
+  <script>document.documentElement.classList.add('js');</script>
+  <link rel="stylesheet" href="site-base.css">
+  <link rel="stylesheet" href="site-content.css">
+  <link rel="stylesheet" href="site-responsive.css">
+<style>
+/* 苹果毛玻璃统一补丁 */
+.glass{position:relative;isolation:isolate;background:rgba(255,255,255,.10);
+-webkit-backdrop-filter:blur(24px) saturate(180%);backdrop-filter:blur(24px) saturate(180%);
+border:1.5px solid rgba(255,255,255,.45);border-radius:28px;
+box-shadow:0 28px 90px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.65),inset 0 -1px 0 rgba(255,255,255,.10);
+overflow:hidden;}
+.glass::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+background:linear-gradient(148deg,rgba(255,255,255,.30) 0%,rgba(255,255,255,.06) 30%,rgba(255,255,255,0) 52%);}
+.glass::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),inset 0 24px 48px -24px rgba(255,255,255,.28);}
+.glass,.glass h1,.glass h2,.glass h3,.glass p,.glass span,.glass nav,.glass a,.glass li{color:#fff}
+.glass a{text-decoration:none}
+.glass > *{position:relative;z-index:1}
+</style>
+<style>
+.inline-figure{margin:56px auto;max-width:1200px;padding-inline:clamp(20px,5vw,64px);box-sizing:border-box}
+.inline-figure .fig-box{border-radius:24px;overflow:hidden;box-shadow:0 28px 70px rgba(48,58,86,.14);border:1px solid #DDE2EA}
+.inline-figure img{display:block;width:100%;height:clamp(220px,30vw,400px);object-fit:cover}
+.inline-figure figcaption{padding:14px 22px;font-size:14px;line-height:1.6;color:#6B7689;background:#fff}
+</style>
+<style>
+html,body{overflow-x:hidden;max-width:100%}
+*,*::before,*::after{box-sizing:border-box}
+img{max-width:100%;height:auto}
+</style>
+<style>
+svg{max-width:100%;vertical-align:middle}
+.button svg,.button--primary svg,.button--glass svg,button svg,a.button svg,.hero-actions svg{width:18px;height:18px;flex:none;display:inline-block}
+</style>
+<style>
+[class*="node"] svg,[class*="icon"] svg,[class*="step"] svg,[class*="badge"] svg,[class*="mark"] svg,[class*="chip"] svg{width:44px;height:44px;flex:none;display:inline-block}
+[class*="number"] svg,[class*="num"] svg{width:32px;height:32px}
+</style>
+<style>
+[class*="hero"] img{object-fit:cover;object-position:center;max-height:96vh}
+</style>
+<style>
+[class*="scene"] img,[class*="media"] img:not(.hero-photo),[class*="shot"] img{height:auto;max-height:520px;object-fit:cover;width:100%}
+</style>
+<style>
+.hero img,section img,figure img{max-width:100%}
+</style>
+<style>
+.hero__media{overflow:hidden;width:100%}
+.hero__image{width:100%;height:100%;object-fit:cover;display:block}
+</style>
+<style>
+.hero__image{transform:none!important}
+</style>
+<style>
+.glass{position:relative;isolation:isolate;
+background:rgba(255,255,255,.10)!important;
+-webkit-backdrop-filter:blur(24px) saturate(180%)!important;
+backdrop-filter:blur(24px) saturate(180%)!important;
+border:1.5px solid rgba(255,255,255,.45)!important;border-radius:28px!important;
+box-shadow:0 28px 90px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.65)!important;
+overflow:hidden;}
+.glass::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+background:linear-gradient(148deg,rgba(255,255,255,.30) 0%,rgba(255,255,255,.06) 30%,rgba(255,255,255,0) 52%);}
+.glass::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),inset 0 24px 48px -24px rgba(255,255,255,.28);}
+.glass > *{position:relative;z-index:1}
+</style>
+</head>
+<body class="page-about">
+  <a class="skip-link" href="#main">跳到主要内容</a>
+
+  <header class="site-header" data-od-id="site-header">
+    <div class="header-inner">
+      <a class="brand" href="index.html" aria-label="Astraea Plan 首页" data-od-id="brand-home">
+        <span class="brand-mark" aria-hidden="true"></span>
+        Astraea Plan
+      </a>
+
+      <nav class="desktop-nav" aria-label="主导航" data-od-id="desktop-navigation">
+        <a class="nav-link" href="capabilities.html">能力</a>
+        <a class="nav-link" href="architecture.html">架构</a>
+        <a class="nav-link" href="cases.html">案例</a>
+        <a class="nav-link" href="pricing.html">投入</a>
+        <a class="nav-link" href="about.html" aria-current="page">关于</a>
+      </nav>
+
+      <div class="header-actions">
+        <a class="button button--primary" href="pricing.html#demo" data-od-id="header-demo-cta">预约演示</a>
+        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-nav" aria-label="打开导航" data-od-id="mobile-menu-toggle">
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+        </button>
+      </div>
+    </div>
+
+    <nav class="mobile-nav" id="mobile-nav" aria-label="移动端导航" aria-hidden="true" data-od-id="mobile-navigation">
+      <a class="nav-link" href="capabilities.html">能力</a>
+      <a class="nav-link" href="architecture.html">架构</a>
+      <a class="nav-link" href="cases.html">案例</a>
+      <a class="nav-link" href="pricing.html">投入</a>
+      <a class="nav-link" href="about.html" aria-current="page">关于</a>
+      <a class="button button--primary" href="pricing.html#demo">预约演示</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="hero" aria-labelledby="about-title" data-od-id="about-hero">
+      <img class="hero-media" src="assets/kb-c.jpg" width="2000" height="1333" alt="暗色机械键盘的蓝色背光按键特写">
+      <div class="hero-shade" aria-hidden="true"></div>
+      <div class="container hero-inner hero-inner--end">
+        <div class="glass glass-panel">
+          <p class="eyebrow">Astraea Plan / About</p>
+          <h1 class="hero-title" id="about-title">关于</h1>
+          <p class="hero-subtitle">我们做的不是聊天机器人，是能干活的编制。</p>
+          <div class="glass-meta" aria-label="产品定位">
+            <span>PRIVATE AGENT TEAM</span>
+            <span>数据不出公司</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="belief" aria-labelledby="belief-title" data-od-id="belief-section">
+      <div class="container">
+        <div class="section-head reveal">
+          <div>
+            <span class="section-no">01 / BELIEF</span>
+            <h2 class="section-title" id="belief-title">我们相信什么</h2>
+          </div>
+          <div class="belief-body">
+            <p class="belief-statement">企业需要的不是更聪明的<em>对话框</em>，是能自己跑完一件事的<em>角色</em>。</p>
+            <p class="section-lead">角色意味着明确职责、可用数据、执行步骤和可核对的结果。数据必须留在企业自己的网里，能力才真正属于企业。</p>
+          </div>
+        </div>
+
+        <div class="principle-grid reveal" data-delay="1" data-od-id="belief-principles">
+          <article class="principle-item" data-od-id="belief-role">
+            <span class="principle-no">01</span>
+            <h3 class="principle-title">以角色交付，不以回答交付</h3>
+            <p class="principle-copy">每个智能体有清晰岗位、输入来源、执行步骤和责任边界，工作能追踪到结果。</p>
+          </article>
+          <article class="principle-item" data-od-id="belief-data">
+            <span class="principle-no">02</span>
+            <h3 class="principle-title">先有数据边界，再谈智能</h3>
+            <p class="principle-copy">经营数据在企业自己的网络里流转，权限、知识库与审计留在客户手中。</p>
+          </article>
+          <article class="principle-item" data-od-id="belief-result">
+            <span class="principle-no">03</span>
+            <h3 class="principle-title">结果可验证，能力才成立</h3>
+            <p class="principle-copy">能被复核、被接管、被继续扩展的系统，才会成为组织长期使用的生产工具。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+<figure class="inline-figure"><div class="fig-box"><img src="assets/smoke-1.jpg" alt="Astraea Plan 运行场景" loading="lazy"></div></figure>
+
+
+    <section class="section section--soft" id="origin" aria-labelledby="origin-title" data-od-id="origin-section">
+      <div class="container origin-grid">
+        <div class="origin-copy reveal">
+          <span class="section-no">02 / ORIGIN</span>
+          <h2 class="section-title" id="origin-title">这套系统从哪来</h2>
+          <p>从连锁书店运营里长出来的，先自己用，再交付。系统不是先做出一套概念，再去寻找场景；它是在门店、部门和日常任务里被反复使用之后，才成为今天的样子。</p>
+        </div>
+
+        <div class="metric-grid reveal" data-delay="1" aria-label="真实运行体量" data-od-id="origin-metrics">
+          <div class="metric-item">
+            <div class="metric-value">200<sup>+</sup></div>
+            <span class="metric-label">门店</span>
+          </div>
+          <div class="metric-item">
+            <div class="metric-value">49</div>
+            <span class="metric-label">城市</span>
+          </div>
+          <div class="metric-item">
+            <div class="metric-value">10</div>
+            <span class="metric-label">部门</span>
+          </div>
+          <div class="metric-item">
+            <div class="metric-value">14</div>
+            <span class="metric-label">智能体</span>
+          </div>
+          <div class="metric-item">
+            <div class="metric-value">182</div>
+            <span class="metric-label">定时任务</span>
+          </div>
+          <div class="metric-item">
+            <div class="metric-value">7</div>
+            <span class="metric-label">个月真实运行</span>
+          </div>
+        </div>
+      </div>
+    </section>
+<figure class="inline-figure"><div class="fig-box"><imasseassets/kb-e.jpgjpg" alt="Astraea Plan 运行场景" loading="lazy"></div></figure>
+
+
+    <section class="section" id="delivery" aria-labelledby="delivery-title" data-od-id="delivery-section">
+      <div class="container">
+        <div class="delivery-layout">
+          <div class="delivery-copy reveal">
+            <span class="section-no">03 / DELIVERY</span>
+            <h2 class="section-title" id="delivery-title">怎么交付</h2>
+            <p class="section-lead section-lead--spaced">系统进入企业自己的边界，而不是把企业的经营现场搬进外部平台。总部运营智能体可直连门店读帧；门店端不部署智能体。</p>
+          </div>
+
+          <div class="delivery-list reveal" data-delay="1" data-od-id="delivery-boundaries">
+            <article class="delivery-item">
+              <span class="delivery-no">01</span>
+              <div>
+                <h3>私有化部署</h3>
+                <p>部署在企业自己的网络与资源里，运行边界由客户掌握。</p>
+              </div>
+            </article>
+            <article class="delivery-item">
+              <span class="delivery-no">02</span>
+              <div>
+                <h3>数据不出公司</h3>
+                <p>业务数据只在公司网内流转，不把经营现场交给外部账号。</p>
+              </div>
+            </article>
+            <article class="delivery-item">
+              <span class="delivery-no">03</span>
+              <div>
+                <h3>知识库属于客户</h3>
+                <p>知识库与权限体系可迁移、可审阅、可继续维护，不形成供应商锁定。</p>
+              </div>
+            </article>
+            <article class="delivery-item">
+              <span class="delivery-no">04</span>
+              <div>
+                <h3>可随时接管和扩展</h3>
+                <p>接口、角色与任务都可接管；需要新能力时，在同一套数据边界内扩展。</p>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <div class="section-body reveal">
+          <div class="network-map" role="img" aria-label="企业内网中的任务编排层连接业务数据与系统、企业知识库、智能体角色、审计与权限">
+            <div class="network-title">CLIENT NETWORK / 企业自己的网</div>
+            <div class="network-grid">
+              <div class="network-node network-node--core">
+                <strong>任务编排层</strong>
+                <span>角色分工、状态追踪、失败原因</span>
+              </div>
+              <div class="network-node">
+                <strong>业务数据与系统</strong>
+                <span>授权访问，保留数据来源</span>
+              </div>
+              <div class="network-node">
+                <strong>企业知识库</strong>
+                <span>客户所有，权限可控</span>
+              </div>
+              <div class="network-node">
+                <strong>智能体角色</strong>
+                <span>按岗位执行，结果可复核</span>
+              </div>
+              <div class="network-node">
+                <strong>审计与权限</strong>
+                <span>操作记录与访问边界</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section boundary-section" id="boundary" aria-labelledby="boundary-title" data-od-id="boundary-section">
+      <div class="container boundary-layout">
+        <div class="reveal">
+          <span class="section-no">04 / BOUNDARY</span>
+          <h2 class="boundary-quote" id="boundary-title">不承诺全能，只做能验证的事。</h2>
+          <p class="boundary-intro" data-od-id="boundary-statement">不能自动化的流程，会明确说不能；需要人判断的地方，会明确交回。</p>
+        </div>
+
+        <div class="boundary-lists reveal" data-delay="1">
+          <div class="boundary-list">
+            <h3>我们做</h3>
+            <ul>
+              <li>把目标拆成可核对、可追踪的步骤</li>
+              <li>对异常、失败和不确定结果明确上报</li>
+              <li>把知识来源、编辑权限与运行边界交还客户</li>
+            </ul>
+          </div>
+          <div class="boundary-list">
+            <h3>我们不做</h3>
+            <ul>
+              <li>把不能自动化的流程说成能自动化</li>
+              <li>在未经授权的数据上执行任务</li>
+              <li>用一个万能答案覆盖业务差异</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="closing-band" aria-labelledby="closing-title" data-od-id="about-closing">
+      <div class="container closing-inner reveal">
+        <div class="closing-copy">
+          <h2 id="closing-title">先把一件事验证清楚，再谈全面铺开。</h2>
+          <p>从一个明确的业务任务开始，看它能否在企业的数据边界内稳定完成。</p>
+        </div>
+        <a class="button button--outline" href="pricing.html#demo" data-od-id="closing-demo-cta">预约演示</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer" data-od-id="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a class="brand" href="index.html" aria-label="Astraea Plan 首页">
+            <span class="brand-mark" aria-hidden="true"></span>
+            Astraea Plan
+          </a>
+          <p>给连锁企业装一套私有化智能体团队，数据不出公司。</p>
+        </div>
+
+        <div>
+          <h3 class="footer-heading">能力</h3>
+          <nav class="footer-links" aria-label="能力页脚导航">
+            <a href="capabilities.html">能力总览</a>
+            <a href="capabilities.html#operations">门店运营</a>
+            <a href="capabilities.html#orchestration">任务编排</a>
+          </nav>
+        </div>
+
+        <div>
+          <h3 class="footer-heading">架构</h3>
+          <nav class="footer-links" aria-label="架构页脚导航">
+            <a href="architecture.html">私有化架构</a>
+            <a href="architecture.html#knowledge">知识库归属</a>
+            <a href="architecture.html#security">数据边界</a>
+          </nav>
+        </div>
+
+        <div>
+          <h3 class="footer-heading">联系</h3>
+          <nav class="footer-links" aria-label="联系与交付导航">
+            <a href="pricing.html#demo">预约演示</a>
+            <a href="about.html#delivery">交付说明</a>
+            <a href="capabilities.html#boundaries">能力边界</a>
+          </nav>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>© 2026 Astraea Plan · 数据不出公司</span>
+        <span>PRIVATE AGENT TEAM FOR CHAIN ENTERPRISES</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="site.js" defer></script>
+</body>
+</html>

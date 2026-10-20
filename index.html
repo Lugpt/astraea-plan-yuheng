@@ -1,1203 +1,2412 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-<meta name="msvalidate.01" content="390E66CB7969745CA44781618CAB65D5" />
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="bytedance-verification-code" content="lJJyW3NAXo6/PtTeVssL" />
-  <meta name="baidu-site-verification" content="codeva-CYFAAQzfXk" />
-  <title>Astraea Plan｜企业级智能体部署架构，连锁企业私有化办公调度智能体 - 设计者：大军</title>
-  <meta name="description" content="Astraea Plan是面向连锁多门店场景的企业级智能体部署方案，一套私有化AI全域自治管理系统，以自研智能体调度中枢搭建办公调度智能体集群，打通飞书、企业微信、钉钉、微信公众号等渠道，实现总部门店自动化工单、数据监控、任务分发，包含Cosmic Web门店节点部署项目。方案由大军主导设计，已落地魔方小镇城市书房连锁体系。" />
-  <meta name="keywords" content="Astraea Plan,企业级智能体部署,办公调度智能体集群,连锁企业私有化AI,智能体架构,智能体调度中枢,魔方小镇城市书房,大军" />
-  <meta property="og:title" content="Astraea Plan｜企业级智能体部署架构 - 设计者：大军" />
-  <meta property="og:description" content="面向连锁多门店场景的企业级智能体部署方案，私有化AI全域自治管理系统，已落地魔方小镇城市书房连锁体系，由大军主导设计。" />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://luhongshuai.com/" />
-  <link rel="canonical" href="https://luhongshuai.com/" />
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    "name": "Astraea Plan",
-    "applicationCategory": "BusinessApplication",
-    "operatingSystem": "macOS / Linux",
-    "description": "面向连锁多门店场景的企业级智能体部署架构（Agent Infrastructure），已生产落地于魔方小镇城市书房188家门店体系。包含智能体集群调度、A2A智能体间协议、本地+云端双模型通道、工作经验沉淀技能体系、每日自动化业务闭环。由大军主导设计。",
-    "offers": {
-      "@type": "Offer",
-      "price": "按业务规模灵活定制",
-      "priceCurrency": "CNY"
-    },
-    "featureList": "智能体集群调度, A2A协议互联, 本地私有化+云端双模型, 每日自动化闭环, 工作经验沉淀, 单点自愈, 跨设备互联"
-  }
-  </script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Astraea Plan 为连锁企业部署私有化智能体集群，覆盖长期记忆、自主办事、门店监控与数据闭环，业务数据不出公司。">
+  <title>Astraea Plan｜企业私有化智能体集群</title>
   <style>
     :root {
-      --bg: #060a14;
-      --bg2: #0a1020;
-      --card: rgba(17, 24, 39, 0.8);
-      --border: rgba(0, 212, 255, 0.15);
-      --accent: #00d4ff;
-      --accent-dim: rgba(0, 212, 255, 0.35);
-      --accent2: #7b61ff;
-      --text: #e5e7eb;
-      --muted: #8892a6;
-      --glow: 0 0 20px rgba(0, 212, 255, 0.3);
+      --bg: #F6F7F9;
+      --surface: oklch(1 0 0);
+      --surface-soft: oklch(0.968 0.008 255);
+      --fg: #16233A;
+      --muted: oklch(0.49 0.03 255);
+      --border: oklch(0.88 0.012 255);
+      --accent: #FF5A1F;
+      --blue: #2F6BFF;
+      --blue-soft: #5B8DFF;
+      --deep: #123A8F;
+      --deep-ink: oklch(0.27 0.08 260);
+      --hero-gradient: linear-gradient(160deg, var(--deep), var(--blue));
+      --font-body: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      --font-mono: "SFMono-Regular", "SF Mono", Menlo, Consolas, monospace;
+      --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+      --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+      --shadow-soft: 0 24px 70px oklch(0.38 0.04 255 / 0.1);
+      --shadow-header: 0 10px 36px oklch(0.3 0.03 255 / 0.08);
     }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Noto Sans SC", "Segoe UI", sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.75;
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html {
       overflow-x: hidden;
+      max-width: 100%;
+      scroll-behavior: smooth;
+      scroll-padding-top: 108px;
     }
-    /* 星空网格背景 */
-    .stars {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      z-index: -2;
-      background:
-        radial-gradient(ellipse at 20% 20%, rgba(0, 212, 255, 0.06) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 30%, rgba(123, 97, 255, 0.05) 0%, transparent 50%),
-        var(--bg);
-    }
-    #bg-network {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      z-index: 0;
-      pointer-events: none;
-      opacity: 0.85;
-    }
-    .grid-overlay {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      z-index: -1;
-      background-image:
-        linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
-      background-size: 48px 48px;
-      mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
-      -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
-    }
-    .container { max-width: 900px; margin: 0 auto; padding: 40px 24px 60px; }
 
-    /* 导航 */
-    .nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 20px 24px;
+    body {
+      margin: 0;
+      overflow-x: hidden;
+      max-width: 100%;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--font-body);
+      font-size: 17px;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
     }
-    .nav .logo {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--accent);
-      letter-spacing: 0.5px;
-    }
-    .nav .logo span { color: var(--muted); font-weight: 400; margin-left: 8px; font-size: 0.85rem; }
-    .nav .links a {
-      color: var(--muted);
-      text-decoration: none;
-      margin-left: 24px;
-      font-size: 0.9rem;
-      transition: color 0.2s;
-    }
-    .nav .links a:hover { color: var(--accent); }
 
-    /* Hero */
-    .hero {
-      position: relative;
-      padding: 64px 32px;
-      border-radius: 20px;
-      background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(26, 17, 69, 0.9) 55%, rgba(10, 16, 32, 0.95) 100%);
-      border: 1px solid var(--border);
-      margin-bottom: 32px;
+    body.modal-open {
       overflow: hidden;
     }
-    .hero::before {
-      content: '';
+
+    img {
+      display: block;
+      max-width: 100%;
+      object-fit: cover;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      color: inherit;
+    }
+
+    ::selection {
+      background: var(--blue);
+      color: var(--surface);
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--blue-soft);
+      outline-offset: 3px;
+    }
+
+    .sr-only {
       position: absolute;
-      top: -50%; left: -20%;
-      width: 140%; height: 200%;
-      background: conic-gradient(from 90deg at 50% 50%, transparent 0deg, rgba(0,212,255,0.08) 60deg, transparent 120deg);
-      animation: rotate 24s linear infinite;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .skip-link {
+      position: fixed;
+      top: 8px;
+      left: 8px;
+      z-index: 1000;
+      padding: 10px 14px;
+      background: var(--fg);
+      color: var(--surface);
+      transform: translateY(-160%);
+      transition: transform 160ms var(--ease-out);
+    }
+
+    .skip-link:focus {
+      transform: translateY(0);
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1440px;
+      margin-inline: auto;
+      padding-inline: clamp(20px, 5vw, 72px);
+      box-sizing: border-box;
+    }
+
+    .site-header {
+      position: fixed;
+      inset: 16px 0 auto;
+      z-index: 100;
+      padding-inline: clamp(14px, 2.8vw, 32px);
       pointer-events: none;
     }
-    @keyframes rotate { to { transform: rotate(360deg); } }
-    .hero .badge {
-      display: inline-block;
-      padding: 4px 14px;
-      border: 1px solid var(--accent-dim);
-      border-radius: 20px;
-      font-size: 0.75rem;
-      color: var(--accent);
-      letter-spacing: 2px;
-      margin-bottom: 20px;
-      background: rgba(0, 212, 255, 0.06);
-    }
-    .hero h1 {
-      font-size: 2.6rem;
-      line-height: 1.2;
-      background: linear-gradient(90deg, #00d4ff 0%, #7b61ff 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 16px;
+
+    .topbar {
       position: relative;
-    }
-    .hero .sub {
-      color: var(--muted);
-      font-size: 1.05rem;
-      position: relative;
-    }
-    .hero .sub strong { color: var(--accent); }
-
-    /* 黄金段落 */
-    .lead {
-      font-size: 1.12rem;
-      background: var(--card);
-      border-left: 3px solid var(--accent);
-      padding: 26px 28px;
-      border-radius: 0 14px 14px 0;
-      margin-bottom: 20px;
-      backdrop-filter: blur(8px);
-      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
-    }
-    .lead strong { color: var(--accent); }
-
-    /* 案例 */
-    .case {
-      background: var(--card);
-      border: 1px solid rgba(123, 97, 255, 0.25);
-      border-radius: 14px;
-      padding: 24px 28px;
-      margin-bottom: 32px;
-      backdrop-filter: blur(8px);
-    }
-    .case .tag {
-      display: inline-block;
-      padding: 3px 12px;
-      background: rgba(123, 97, 255, 0.15);
-      border: 1px solid rgba(123, 97, 255, 0.4);
-      border-radius: 16px;
-      font-size: 0.75rem;
-      color: #b8a6ff;
-      margin-bottom: 12px;
-      letter-spacing: 1px;
-    }
-    .case strong { color: var(--accent2); }
-
-    h2 {
-      font-size: 1.35rem;
-      color: var(--accent);
-      margin: 44px 0 18px;
       display: flex;
       align-items: center;
-      gap: 10px;
-    }
-    h2::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: linear-gradient(90deg, var(--accent-dim), transparent);
+      gap: 28px;
+      width: 100%;
+      max-width: 1440px;
+      min-height: 68px;
+      margin-inline: auto;
+      padding: 10px 12px 10px 18px;
+      border: 1px solid oklch(1 0 0 / 0.76);
+      border-radius: 8px;
+      background: oklch(1 0 0 / 0.78);
+      box-shadow: var(--shadow-header);
+      backdrop-filter: blur(18px) saturate(160%);
+      -webkit-backdrop-filter: blur(18px) saturate(160%);
+      pointer-events: auto;
+      transition: background-color 180ms var(--ease-out), box-shadow 180ms var(--ease-out);
     }
 
-    /* 架构图 */
-    .arch {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 28px;
-      margin: 16px 0 24px;
-      backdrop-filter: blur(8px);
+    .site-header[data-scrolled="true"] .topbar {
+      background: oklch(1 0 0 / 0.9);
+      box-shadow: 0 14px 44px oklch(0.28 0.035 255 / 0.12);
     }
-    .arch pre {
-      font-family: "SF Mono", "JetBrains Mono", Menlo, monospace;
-      font-size: 0.88rem;
-      line-height: 1.5;
-      color: var(--accent);
-      overflow-x: auto;
-    }
-    .arch pre .dim { color: var(--muted); }
 
-    /* 核心架构树 */
-    .arch-tree { text-align: center; }
-    .ctrl-node {
-      display: inline-block;
-      background: linear-gradient(135deg, rgba(0,212,255,0.15), rgba(0,120,255,0.08));
-      border: 1.5px solid var(--accent);
-      border-radius: 14px;
-      padding: 16px 36px;
-      margin: 8px auto 0;
-      box-shadow: 0 0 24px rgba(0,212,255,0.15);
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 11px;
+      flex: 0 0 auto;
+      min-height: 44px;
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
     }
-    .ctrl-node .t { color: var(--accent); font-weight: 700; font-size: 1.05rem; letter-spacing: 1px; }
-    .ctrl-node .s { color: var(--muted); font-size: 0.82rem; margin-top: 4px; }
-    .ctrl-line { color: var(--accent-dim); font-size: 1.2rem; margin: 6px 0; letter-spacing: 2px; }
-    .connector { display: block; width: 100%; height: 96px; margin: 2px 0 10px; }
-    /* 实线流动光点 */
-    .flow-dot { animation: dot-pulse 1.2s ease-in-out infinite alternate; }
-    @keyframes dot-pulse {
-      from { opacity: 0.6; }
-      to { opacity: 1; }
+
+    .brand-mark {
+      position: relative;
+      width: 26px;
+      height: 26px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 3px;
+      padding: 3px;
+      background: var(--fg);
+      border-radius: 4px;
     }
-    /* 总控方框：彩色流光边框 */
-    .ctrl-node { position: relative; z-index: 0; }
-    .ctrl-node::before {
+
+    .brand-mark span {
+      display: block;
+      background: var(--surface);
+      border-radius: 1px;
+    }
+
+    .brand-mark span:nth-child(2),
+    .brand-mark span:nth-child(3) {
+      opacity: 0.56;
+    }
+
+    .primary-nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(16px, 2vw, 30px);
+      margin-inline: auto;
+    }
+
+    .primary-nav a {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      color: var(--muted);
+      transition: color 160ms var(--ease-out);
+    }
+
+    .primary-nav a::after {
       content: "";
       position: absolute;
-      inset: -2px;
-      border-radius: 16px;
-      padding: 2px;
-      background: conic-gradient(from var(--angle, 0deg), #00d4ff, #ff8a65, #ffb74d, #00d4ff, #ff8a65, #00d4ff);
-      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor;
-      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      mask-composite: exclude;
-      animation: border-flow 4s linear infinite;
-      z-index: -1;
+      right: 0;
+      bottom: 7px;
+      left: 0;
+      height: 1px;
+      background: var(--fg);
+      transform: scaleX(0);
+      transform-origin: left center;
+      transition: transform 180ms var(--ease-out);
     }
-    @property --angle {
-      syntax: '<angle>';
-      initial-value: 0deg;
-      inherits: false;
-    }
-    @keyframes border-flow {
-      to { --angle: 360deg; }
-    }
-    .branches { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-top: 10px; }
-    .branch {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 18px 16px;
-      text-align: left;
-      backdrop-filter: blur(8px);
-    }
-    .branch-head { color: var(--accent2); font-weight: 700; font-size: 1rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-    .branch.outer .branch-head { color: #ffb74d; }
-    .branch.store .branch-head { color: #ff8a65; }
-    .agent-chip {
-      background: rgba(0,212,255,0.07);
-      border: 1px solid rgba(0,212,255,0.2);
-      border-radius: 8px;
-      padding: 8px 12px;
-      margin: 6px 0;
-      color: var(--text);
-      font-size: 0.9rem;
-    }
-    .branch.outer .agent-chip { border-color: rgba(255,183,77,0.3); background: rgba(255,183,77,0.06); }
-    .branch.store .agent-chip { border-color: rgba(255,138,101,0.3); background: rgba(255,138,101,0.06); }
-    .branch-foot { color: var(--muted); font-size: 0.78rem; margin-top: 12px; padding-top: 10px; border-top: 1px dashed rgba(0,212,255,0.15); }
 
-
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0 24px; }
-    .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin: 16px 0 24px; }
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 22px;
-      transition: transform 0.2s, border-color 0.2s;
-      backdrop-filter: blur(8px);
-    }
-    .card:hover { transform: translateY(-3px); border-color: var(--accent-dim); }
-    .card h3 { color: var(--accent); margin-bottom: 10px; font-size: 1.02rem; }
-    .card ul { padding-left: 20px; }
-    .card li { margin: 6px 0; color: var(--text); font-size: 0.95rem; }
-
-    /* 每日闭环 */
-    .timeline {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 24px 28px;
-      margin: 16px 0;
-      font-family: "SF Mono", Menlo, monospace;
-      font-size: 0.92rem;
-      backdrop-filter: blur(8px);
-    }
-    .timeline .t-item {
+    .header-actions {
       display: flex;
-      align-items: baseline;
-      padding: 8px 0;
-      border-bottom: 1px dashed rgba(0, 212, 255, 0.12);
+      align-items: center;
+      gap: 8px;
+      margin-left: auto;
     }
-    .timeline .t-item:last-child { border-bottom: none; }
-    .timeline .t-time { color: var(--accent); font-weight: 600; width: 64px; flex-shrink: 0; }
-    .timeline .t-text { color: var(--text); }
 
-    /* FAQ */
-    .faq {
-      background: var(--card);
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      min-height: 48px;
+      padding: 0 20px;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: transform 150ms var(--ease-out), background-color 180ms var(--ease-out), border-color 180ms var(--ease-out), color 180ms var(--ease-out), box-shadow 180ms var(--ease-out);
+    }
+
+    .button:active {
+      transform: scale(0.97);
+    }
+
+    .button svg {
+      width: 18px;
+      height: 18px;
+      flex: 0 0 auto;
+    }
+
+    .button-primary {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: var(--surface);
+      box-shadow: 0 10px 26px oklch(0.53 0.2 260 / 0.25);
+    }
+
+    .button-light {
+      background: var(--surface);
+      border-color: var(--surface);
+      color: var(--fg);
+    }
+
+    .button-glass {
+      background: oklch(1 0 0 / 0.08);
+      border-color: oklch(1 0 0 / 0.52);
+      color: var(--surface);
+    }
+
+    .button-outline {
+      background: transparent;
+      border-color: var(--border);
+      color: var(--fg);
+    }
+
+    .menu-toggle {
+      display: none;
+      width: 44px;
+      height: 44px;
+      padding: 0;
       border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 22px 26px;
-      margin: 12px 0;
-      backdrop-filter: blur(8px);
+      border-radius: 6px;
+      background: transparent;
+      cursor: pointer;
+      place-items: center;
     }
-    .faq .q { color: var(--accent); font-weight: 600; margin-bottom: 6px; }
-    .faq .a { color: var(--text); }
 
-    /* 页脚 */
-    .footer {
-      margin-top: 60px;
-      padding: 24px 0;
-      border-top: 1px solid rgba(0, 212, 255, 0.1);
+    .menu-toggle svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .menu-toggle[aria-expanded="true"] .menu-line-top {
+      transform: translateY(5px) rotate(45deg);
+    }
+
+    .menu-toggle[aria-expanded="true"] .menu-line-middle {
+      opacity: 0;
+    }
+
+    .menu-toggle[aria-expanded="true"] .menu-line-bottom {
+      transform: translateY(-5px) rotate(-45deg);
+    }
+
+    .menu-line {
+      transform-origin: center;
+      transition: transform 180ms var(--ease-out), opacity 120ms ease;
+    }
+
+    .hero {
+      position: relative;
+      display: grid;
+      grid-template-columns: 56% 44%;
+      min-height: max(760px, 100dvh);
+      overflow: hidden;
+      background: var(--hero-gradient);
+    }
+
+    .hero-left {
+      position: relative;
+      display: flex;
+      align-items: center;
+      min-width: 0;
+      padding: 142px clamp(26px, 3.2vw, 54px) 52px clamp(26px, 5vw, 76px);
+      overflow: hidden;
+    }
+
+    .glass-panel {
+      position: relative;
+      width: 100%;
+      max-width: 780px;
+      margin-inline: auto;
+      padding: clamp(28px, 3.3vw, 52px);
+      overflow: hidden;
+      border: 1.5px solid rgba(255, 255, 255, 0.42);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.14);
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(18px) saturate(170%);
+      -webkit-backdrop-filter: blur(18px) saturate(170%);
+    }
+
+    .glass-panel::before {
+      content: "";
+      position: absolute;
+      top: -58%;
+      left: 4%;
+      width: 47%;
+      height: 220%;
+      pointer-events: none;
+      transform: rotate(20deg);
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0));
+    }
+
+    .glass-panel > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 24px;
       color: var(--muted);
-      font-size: 0.88rem;
-      text-align: center;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.4;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
     }
-    .footer .brand { color: var(--accent); font-weight: 600; }
-    .footer a { color: var(--accent2); text-decoration: none; }
 
-    @media (max-width: 640px) {
-      .grid { grid-template-columns: 1fr; }
-      .grid3 { grid-template-columns: 1fr; }
-      .branches { grid-template-columns: 1fr; }
-      .hero { padding: 40px 20px; }
-      .hero h1 { font-size: 1.7rem; }
-      .nav .links a { margin-left: 14px; }
-      /* 手机导航：链接换行紧凑排布 */
-      .nav { flex-wrap: wrap; gap: 8px; padding: 14px 16px; }
-      .nav .logo { font-size: 1.05rem; }
-      .nav .logo span { display: block; margin-left: 0; font-size: 0.72rem; }
-      .nav .links { display: flex; flex-wrap: wrap; gap: 4px 12px; width: 100%; margin-top: 6px; }
-      .nav .links a { margin-left: 0; font-size: 0.82rem; }
-      /* 容器与卡片紧凑 */
-      .container { padding: 20px 14px 40px; }
-      .lead { padding: 18px 16px; font-size: 1rem; }
-      .case { padding: 18px 16px; margin-bottom: 20px; }
-      .card { padding: 16px; }
-      .faq { padding: 16px 14px; }
-      .hero { padding: 32px 16px; border-radius: 14px; }
-      .hero .sub { font-size: 0.95rem; }
-      /* 星球调小避免抢屏 */
-      #bg-network { opacity: 0.75; }
-      /* 核心架构三分支：横向滑动卡片（保留并列语义，不纵向堆叠） */
-      .branches {
-        display: flex;
-        grid-template-columns: none;
-        overflow-x: auto;
-        scroll-snap-type: x mandatory;
-        -webkit-overflow-scrolling: touch;
-        gap: 14px;
-        margin: 10px -6px 0;
-        padding: 2px 6px 12px;
-        scrollbar-width: thin;
+    .eyebrow::before {
+      content: "";
+      width: 18px;
+      height: 1px;
+      background: currentColor;
+    }
+
+    .hero .eyebrow {
+      color: oklch(1 0 0 / 0.82);
+    }
+
+    .hero .eyebrow::after {
+      content: "";
+      width: 6px;
+      height: 6px;
+      margin-left: 2px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 4px oklch(0.68 0.2 43 / 0.16);
+    }
+
+    .hero h1 {
+      max-width: 12em;
+      margin: 0;
+      color: var(--surface);
+      font-family: var(--font-body);
+      font-size: clamp(44px, 4.4vw, 70px);
+      font-weight: 600;
+      line-height: 1.3;
+      letter-spacing: 0;
+      text-wrap: balance;
+    }
+
+    .hero-lede {
+      max-width: 34em;
+      margin: 24px 0 0;
+      color: oklch(1 0 0 / 0.8);
+      font-size: clamp(17px, 1.2vw, 20px);
+      line-height: 1.8;
+    }
+
+    .hero-lede strong {
+      color: var(--surface);
+      font-weight: 600;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 32px;
+    }
+
+    .hero-metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0;
+      margin-top: 38px;
+      padding-top: 26px;
+      border-top: 1px solid oklch(1 0 0 / 0.24);
+    }
+
+    .hero-metric {
+      min-width: 0;
+      padding-inline: 18px;
+      border-left: 1px solid oklch(1 0 0 / 0.18);
+    }
+
+    .hero-metric:first-child {
+      padding-left: 0;
+      border-left: 0;
+    }
+
+    .hero-metric strong {
+      display: block;
+      color: var(--surface);
+      font-family: var(--font-mono);
+      font-size: clamp(22px, 2vw, 29px);
+      font-weight: 500;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      white-space: nowrap;
+    }
+
+    .hero-metric span {
+      display: block;
+      margin-top: 8px;
+      color: oklch(1 0 0 / 0.66);
+      font-size: 12px;
+      line-height: 1.5;
+      letter-spacing: 0.02em;
+    }
+
+    .hero-media {
+      min-width: 0;
+      min-height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: var(--deep);
+    }
+
+    .hero-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: 54% center;
+    }
+
+    .section {
+      position: relative;
+      padding-block: clamp(82px, 9vw, 132px);
+    }
+
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(300px, 0.9fr);
+      gap: clamp(32px, 6vw, 96px);
+      align-items: end;
+      margin-bottom: clamp(42px, 6vw, 72px);
+    }
+
+    .section-head h2,
+    .architecture-copy h2,
+    .proof h2,
+    .closing h2 {
+      margin: 0;
+      font-family: var(--font-body);
+      font-size: clamp(38px, 4vw, 62px);
+      font-weight: 600;
+      line-height: 1.3;
+      letter-spacing: 0;
+      text-wrap: balance;
+    }
+
+    .section-lede {
+      max-width: 34em;
+      margin: 0 0 3px;
+      color: var(--muted);
+      font-size: clamp(16px, 1.15vw, 18px);
+      line-height: 1.8;
+    }
+
+    .capability-grid {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      overflow: hidden;
+      border-top: 1px solid var(--border);
+      border-left: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .capability {
+      position: relative;
+      min-width: 0;
+      border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .capability-memory {
+      grid-column: span 7;
+      display: grid;
+      grid-template-columns: minmax(0, 1.03fr) minmax(0, 0.97fr);
+      min-height: 560px;
+    }
+
+    .capability-hiring {
+      grid-column: span 5;
+      display: flex;
+      flex-direction: column;
+      min-height: 560px;
+    }
+
+    .capability-monitoring {
+      grid-column: span 7;
+      display: grid;
+      grid-template-columns: minmax(0, 0.94fr) minmax(0, 1.06fr);
+      min-height: 500px;
+    }
+
+    .capability-loop {
+      grid-column: span 5;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 500px;
+      padding: clamp(28px, 3vw, 44px);
+    }
+
+    .capability-copy {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-width: 0;
+      padding: clamp(28px, 3.4vw, 48px);
+    }
+
+    .capability-hiring .capability-copy {
+      justify-content: flex-start;
+      padding-bottom: 22px;
+    }
+
+    .capability-index {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.4;
+      letter-spacing: 0.06em;
+    }
+
+    .capability-index span:first-child {
+      display: inline-grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      color: var(--fg);
+    }
+
+    .capability h3 {
+      margin: 0;
+      font-size: clamp(26px, 2.2vw, 34px);
+      font-weight: 600;
+      line-height: 1.4;
+      letter-spacing: 0;
+    }
+
+    .capability-copy > p {
+      max-width: 29em;
+      margin: 16px 0 0;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.8;
+    }
+
+    .capability-points {
+      display: grid;
+      gap: 0;
+      margin: 26px 0 0;
+      padding: 0;
+      list-style: none;
+      border-top: 1px solid var(--border);
+    }
+
+    .capability-points li {
+      position: relative;
+      padding: 12px 0 12px 18px;
+      border-bottom: 1px solid var(--border);
+      color: var(--fg);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .capability-points li::before {
+      content: "";
+      position: absolute;
+      top: 21px;
+      left: 1px;
+      width: 5px;
+      height: 5px;
+      background: var(--blue);
+      border-radius: 1px;
+    }
+
+    .capability-media {
+      min-width: 0;
+      min-height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: var(--surface-soft);
+    }
+
+    .capability-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .capability-memory .capability-media img {
+      object-position: 52% 48%;
+    }
+
+    .capability-hiring .capability-media {
+      width: calc(100% - clamp(56px, 6.8vw, 96px));
+      height: 244px;
+      min-height: 244px;
+      margin: auto clamp(28px, 3.4vw, 48px) clamp(28px, 3.4vw, 48px);
+    }
+
+    .capability-hiring .capability-media img {
+      object-position: center 62%;
+    }
+
+    .capability-monitoring .capability-media img {
+      object-position: center 40%;
+    }
+
+    .loop-time {
+      color: var(--accent);
+      font-family: var(--font-mono);
+      font-size: clamp(42px, 4vw, 62px);
+      font-weight: 500;
+      line-height: 1;
+      letter-spacing: -0.03em;
+    }
+
+    .loop-label {
+      display: block;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+      letter-spacing: 0.04em;
+    }
+
+    .loop-flow {
+      position: relative;
+      display: grid;
+      gap: 0;
+      margin-top: 28px;
+      padding-left: 21px;
+    }
+
+    .loop-flow::before {
+      content: "";
+      position: absolute;
+      top: 6px;
+      bottom: 6px;
+      left: 4px;
+      width: 1px;
+      background: var(--border);
+    }
+
+    .loop-step {
+      position: relative;
+      padding: 9px 0;
+      color: var(--fg);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .loop-step::before {
+      content: "";
+      position: absolute;
+      top: 16px;
+      left: -21px;
+      width: 9px;
+      height: 9px;
+      border: 2px solid var(--surface);
+      border-radius: 50%;
+      background: var(--blue);
+      box-shadow: 0 0 0 1px var(--blue);
+    }
+
+    .loop-summary {
+      margin: 26px 0 0;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .architecture {
+      border-block: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .architecture-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.12fr);
+      gap: clamp(40px, 7vw, 108px);
+      align-items: center;
+    }
+
+    .architecture-copy h2 {
+      max-width: 10em;
+    }
+
+    .architecture-copy > p {
+      max-width: 31em;
+      margin: 22px 0 0;
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.8;
+    }
+
+    .architecture-points {
+      display: grid;
+      gap: 0;
+      margin: 34px 0 0;
+      padding: 0;
+      list-style: none;
+      border-top: 1px solid var(--border);
+    }
+
+    .architecture-points li {
+      display: grid;
+      grid-template-columns: 38px minmax(0, 1fr);
+      gap: 14px;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 15px;
+      line-height: 1.65;
+    }
+
+    .architecture-points span {
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.7;
+      letter-spacing: 0.04em;
+    }
+
+    .architecture-board {
+      display: grid;
+      grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.22fr);
+      min-height: 520px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: var(--surface-soft);
+    }
+
+    .architecture-photo {
+      min-width: 0;
+      margin: 0;
+      overflow: hidden;
+      background: var(--deep-ink);
+    }
+
+    .architecture-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 42%;
+    }
+
+    .private-boundary {
+      min-width: 0;
+      padding: clamp(24px, 3vw, 42px);
+      border-left: 1px solid var(--border);
+    }
+
+    .boundary-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 7px 10px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--deep-ink);
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.4;
+      letter-spacing: 0.04em;
+    }
+
+    .boundary-label::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--blue);
+    }
+
+    .boundary-flow {
+      position: relative;
+      display: grid;
+      gap: 10px;
+      margin-top: 42px;
+      padding-left: 22px;
+    }
+
+    .boundary-flow::before {
+      content: "";
+      position: absolute;
+      top: 28px;
+      bottom: 28px;
+      left: 5px;
+      width: 1px;
+      background: var(--border);
+    }
+
+    .boundary-node {
+      position: relative;
+      padding: 15px 16px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .boundary-node::before {
+      content: "";
+      position: absolute;
+      top: 22px;
+      left: -22px;
+      width: 11px;
+      height: 11px;
+      border: 2px solid var(--surface-soft);
+      border-radius: 50%;
+      background: var(--blue);
+      box-shadow: 0 0 0 1px var(--blue);
+    }
+
+    .boundary-node strong {
+      display: block;
+      font-weight: 600;
+    }
+
+    .boundary-node span {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .boundary-node-core {
+      border-color: oklch(0.75 0.1 260);
+      background: oklch(0.96 0.025 260);
+    }
+
+    .proof {
+      background: oklch(0.955 0.022 255);
+    }
+
+    .proof-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 32px;
+      margin-bottom: clamp(38px, 5vw, 68px);
+    }
+
+    .proof h2 {
+      max-width: 12em;
+    }
+
+    .proof-note {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 5px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+      white-space: nowrap;
+    }
+
+    .proof-note::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      border-top: 1px solid oklch(0.82 0.025 255);
+      border-bottom: 1px solid oklch(0.82 0.025 255);
+    }
+
+    .stat {
+      min-width: 0;
+      padding: clamp(26px, 3.8vw, 48px) clamp(14px, 2.5vw, 34px);
+      border-left: 1px solid oklch(0.82 0.025 255);
+    }
+
+    .stat:first-child {
+      border-left: 0;
+      padding-left: 0;
+    }
+
+    .stat strong {
+      display: block;
+      color: var(--deep-ink);
+      font-family: var(--font-mono);
+      font-size: clamp(48px, 6.3vw, 88px);
+      font-weight: 500;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      white-space: nowrap;
+    }
+
+    .stat-label {
+      display: block;
+      margin-top: 16px;
+      color: var(--fg);
+      font-size: 16px;
+      font-weight: 500;
+      line-height: 1.5;
+    }
+
+    .stat-meta {
+      display: block;
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .closing {
+      padding-block: clamp(76px, 8vw, 112px);
+    }
+
+    .closing-panel {
+      display: grid;
+      grid-template-columns: minmax(0, 1.18fr) minmax(280px, 0.82fr);
+      gap: clamp(36px, 7vw, 104px);
+      align-items: center;
+      padding: clamp(34px, 6vw, 76px);
+      border: 1px solid oklch(0.82 0.04 255);
+      border-radius: 8px;
+      background:
+        linear-gradient(112deg, oklch(0.98 0.018 255), oklch(0.94 0.04 255) 62%, oklch(0.985 0.012 255));
+      box-shadow: var(--shadow-soft);
+    }
+
+    .closing h2 {
+      max-width: 10em;
+    }
+
+    .closing-copy > p {
+      max-width: 34em;
+      margin: 20px 0 0;
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.8;
+    }
+
+    .closing-action {
+      padding-left: clamp(0px, 3vw, 42px);
+      border-left: 1px solid oklch(0.79 0.035 255);
+    }
+
+    .closing-action p {
+      margin: 0 0 20px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .closing-action .button {
+      width: 100%;
+    }
+
+    .closing-steps {
+      display: grid;
+      gap: 8px;
+      margin: 22px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .closing-steps li {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      color: var(--fg);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .closing-steps span {
+      color: var(--muted);
+      font-family: var(--font-mono);
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+
+    .site-footer {
+      padding-block: 46px 30px;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .footer-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 36px;
+    }
+
+    .footer-brand {
+      max-width: 31em;
+    }
+
+    .footer-brand p {
+      margin: 14px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.75;
+    }
+
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 0 22px;
+    }
+
+    .footer-links a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      color: var(--muted);
+      font-size: 14px;
+      transition: color 160ms var(--ease-out);
+    }
+
+    .footer-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      margin-top: 36px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+      letter-spacing: 0.02em;
+    }
+
+    .footer-bottom span:last-child {
+      font-family: var(--font-mono);
+      white-space: nowrap;
+    }
+
+    dialog {
+      width: min(760px, calc(100vw - 32px));
+      max-height: calc(100dvh - 32px);
+      padding: 0;
+      overflow: auto;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface);
+      color: var(--fg);
+      box-shadow: 0 36px 120px oklch(0.2 0.03 255 / 0.34);
+    }
+
+    dialog::backdrop {
+      background: oklch(0.2 0.03 255 / 0.48);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    dialog[open] {
+      animation: dialog-in 190ms var(--ease-out);
+    }
+
+    @keyframes dialog-in {
+      from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.985);
       }
-      .branches::-webkit-scrollbar { height: 4px; }
-      .branches::-webkit-scrollbar-thumb { background: rgba(0,212,255,0.3); border-radius: 2px; }
-      .branch {
-        flex: 0 0 80%;
-        scroll-snap-align: center;
-      }
-      /* 滑动提示 */
-      .arch-tree .branches::after {
-        content: '← 左右滑动查看 →';
-        flex: 0 0 auto;
-        align-self: center;
-        color: var(--muted);
-        font-size: 0.72rem;
-        padding: 0 8px;
-        white-space: nowrap;
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
       }
     }
+
+    .dialog-inner {
+      position: relative;
+      padding: clamp(26px, 5vw, 52px);
+    }
+
+    .dialog-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      padding: 0;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      background: var(--surface);
+      cursor: pointer;
+      transition: background-color 160ms var(--ease-out), transform 150ms var(--ease-out);
+    }
+
+    .dialog-close:active {
+      transform: scale(0.96);
+    }
+
+    .dialog-close svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .dialog-kicker {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.5;
+      letter-spacing: 0.06em;
+    }
+
+    .dialog-inner h2 {
+      max-width: 12em;
+      margin: 0;
+      font-size: clamp(30px, 4vw, 46px);
+      font-weight: 600;
+      line-height: 1.35;
+      letter-spacing: 0;
+    }
+
+    .dialog-lede {
+      max-width: 38em;
+      margin: 14px 0 0;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.75;
+    }
+
+    .demo-form {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+      margin-top: 30px;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .field-wide {
+      grid-column: 1 / -1;
+    }
+
+    .field label {
+      color: var(--fg);
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 1.5;
+    }
+
+    .field label span {
+      color: var(--accent);
+    }
+
+    .field input,
+    .field textarea {
+      width: 100%;
+      min-height: 48px;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--surface-soft);
+      color: var(--fg);
+      font-size: 16px;
+      line-height: 1.5;
+      transition: border-color 160ms var(--ease-out), background-color 160ms var(--ease-out), box-shadow 160ms var(--ease-out);
+    }
+
+    .field textarea {
+      min-height: 112px;
+      resize: vertical;
+    }
+
+    .field input::placeholder,
+    .field textarea::placeholder {
+      color: oklch(0.6 0.02 255);
+    }
+
+    .field input:focus,
+    .field textarea:focus {
+      border-color: var(--blue);
+      background: var(--surface);
+      box-shadow: 0 0 0 3px oklch(0.7 0.12 260 / 0.18);
+      outline: 0;
+    }
+
+    .form-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      grid-column: 1 / -1;
+      margin-top: 4px;
+    }
+
+    .form-footer p {
+      max-width: 36em;
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .demo-success {
+      margin-top: 30px;
+    }
+
+    .demo-success[hidden] {
+      display: none;
+    }
+
+    .success-mark {
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: oklch(0.94 0.03 255);
+      color: var(--blue);
+    }
+
+    .success-mark svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .demo-success h3 {
+      margin: 18px 0 0;
+      font-size: 24px;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+
+    .demo-summary {
+      margin-top: 18px;
+      padding: 18px;
+      border: 1px solid var(--border);
+      background: var(--surface-soft);
+      color: var(--fg);
+      font-size: 14px;
+      line-height: 1.75;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .success-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .copy-status {
+      display: block;
+      min-height: 21px;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .js [data-reveal] {
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 320ms var(--ease-out), transform 320ms var(--ease-out);
+      transition-delay: var(--reveal-delay, 0ms);
+    }
+
+    .js [data-reveal].is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .primary-nav a:hover {
+        color: var(--fg);
+      }
+
+      .primary-nav a:hover::after {
+        transform: scaleX(1);
+      }
+
+      .button-primary:hover {
+        background: oklch(0.54 0.21 260);
+        border-color: oklch(0.54 0.21 260);
+        transform: translateY(-1px);
+      }
+
+      .button-light:hover {
+        background: oklch(0.965 0.01 255);
+        border-color: oklch(0.965 0.01 255);
+        transform: translateY(-1px);
+      }
+
+      .button-glass:hover {
+        background: oklch(1 0 0 / 0.16);
+        border-color: oklch(1 0 0 / 0.72);
+        transform: translateY(-1px);
+      }
+
+      .button-outline:hover {
+        border-color: var(--fg);
+        background: var(--surface-soft);
+      }
+
+      .footer-links a:hover {
+        color: var(--fg);
+      }
+
+      .dialog-close:hover {
+        background: var(--surface-soft);
+      }
+    }
+
+    @media (max-width: 1180px) {
+      .primary-nav {
+        gap: 16px;
+      }
+
+      .hero h1 {
+        font-size: clamp(42px, 4.2vw, 58px);
+      }
+
+      .capability-memory,
+      .capability-monitoring {
+        grid-column: span 8;
+      }
+
+      .capability-hiring,
+      .capability-loop {
+        grid-column: span 4;
+      }
+
+      .capability-memory,
+      .capability-monitoring {
+        grid-template-columns: 1fr;
+      }
+
+      .capability-memory .capability-media,
+      .capability-monitoring .capability-media {
+        min-height: 280px;
+        max-height: 320px;
+      }
+    }
+
+    @media (max-width: 980px) {
+      .primary-nav,
+      .header-cta {
+        display: none;
+      }
+
+      .menu-toggle {
+        display: grid;
+      }
+
+      .primary-nav {
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 0;
+        right: 0;
+        display: grid;
+        gap: 2px;
+        margin: 0;
+        padding: 10px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: oklch(1 0 0 / 0.96);
+        box-shadow: var(--shadow-header);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transform: translateY(-6px);
+        transition: opacity 160ms var(--ease-out), transform 160ms var(--ease-out), visibility 0s linear 160ms;
+      }
+
+      .site-header[data-menu-open="true"] .primary-nav {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+        transform: translateY(0);
+        transition-delay: 0s;
+      }
+
+      .primary-nav a {
+        min-height: 48px;
+        padding-inline: 10px;
+        color: var(--fg);
+      }
+
+      .primary-nav a::after {
+        display: none;
+      }
+
+      .mobile-demo-link {
+        justify-content: space-between;
+        margin-top: 4px;
+        padding-inline: 12px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+      }
+
+      .mobile-demo-link::before {
+        content: "预约演示";
+      }
+
+      .mobile-demo-link span {
+        display: none;
+      }
+
+      .hero {
+        grid-template-columns: 1fr;
+        min-height: auto;
+      }
+
+      .hero-left {
+        min-height: 780px;
+        padding-top: 126px;
+      }
+
+      .hero-media {
+        height: auto;
+        aspect-ratio: 3 / 2;
+      }
+
+      .section-head,
+      .architecture-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .section-head {
+        gap: 24px;
+        align-items: start;
+      }
+
+      .capability-memory,
+      .capability-hiring,
+      .capability-monitoring,
+      .capability-loop {
+        grid-column: span 12;
+      }
+
+      .capability-memory,
+      .capability-monitoring {
+        grid-template-columns: minmax(0, 1.03fr) minmax(0, 0.97fr);
+      }
+
+      .capability-memory .capability-media,
+      .capability-monitoring .capability-media {
+        min-height: 100%;
+        max-height: none;
+      }
+
+      .capability-hiring .capability-media {
+        width: calc(100% - clamp(56px, 8vw, 96px));
+        height: 300px;
+        min-height: 300px;
+      }
+
+      .capability-loop {
+        display: grid;
+        grid-template-columns: minmax(180px, 0.72fr) minmax(0, 1fr);
+        gap: 34px;
+        min-height: auto;
+      }
+
+      .loop-summary {
+        align-self: end;
+      }
+
+      .architecture-board {
+        min-height: 460px;
+      }
+
+      .proof-head {
+        align-items: start;
+        flex-direction: column;
+      }
+
+      .closing-panel {
+        grid-template-columns: 1fr;
+      }
+
+      .closing-action {
+        padding-top: 28px;
+        padding-left: 0;
+        border-top: 1px solid oklch(0.79 0.035 255);
+        border-left: 0;
+      }
+    }
+
+    @media (max-width: 720px) {
+      body {
+        font-size: 16px;
+      }
+
+      .site-header {
+        inset-block-start: 10px;
+        padding-inline: 10px;
+      }
+
+      .topbar {
+        min-height: 60px;
+        padding: 8px 8px 8px 14px;
+      }
+
+      .brand {
+        min-height: 44px;
+      }
+
+      .hero-left {
+        min-height: auto;
+        padding: 96px 14px 28px;
+      }
+
+      .glass-panel {
+        padding: 26px 20px 24px;
+      }
+
+      .eyebrow {
+        margin-bottom: 18px;
+      }
+
+      .hero h1 {
+        font-size: clamp(36px, 10.4vw, 48px);
+        line-height: 1.34;
+      }
+
+      .hero-lede {
+        margin-top: 18px;
+        font-size: 16px;
+        line-height: 1.8;
+      }
+
+      .hero-actions {
+        margin-top: 26px;
+      }
+
+      .hero-actions .button {
+        flex: 1 1 180px;
+      }
+
+      .hero-metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px 0;
+        margin-top: 28px;
+        padding-top: 22px;
+      }
+
+      .hero-metric:nth-child(3) {
+        padding-left: 0;
+        border-left: 0;
+      }
+
+      .hero-media {
+        min-height: 0;
+      }
+
+      .section {
+        padding-block: 72px;
+      }
+
+      .section-head {
+        margin-bottom: 38px;
+      }
+
+      .section-head h2,
+      .architecture-copy h2,
+      .proof h2,
+      .closing h2 {
+        font-size: clamp(32px, 8.7vw, 42px);
+        line-height: 1.36;
+      }
+
+      .capability-memory,
+      .capability-monitoring {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .capability-copy {
+        padding: 28px 22px;
+      }
+
+      .capability-memory .capability-media,
+      .capability-monitoring .capability-media {
+        min-height: 270px;
+        max-height: 300px;
+      }
+
+      .capability-hiring .capability-copy {
+        padding-bottom: 18px;
+      }
+
+      .capability-hiring .capability-media {
+        width: auto;
+        height: 260px;
+        min-height: 260px;
+        margin: 0 22px 22px;
+      }
+
+      .capability-loop {
+        display: flex;
+        min-height: auto;
+        padding: 28px 22px;
+      }
+
+      .capability-points {
+        margin-top: 22px;
+      }
+
+      .architecture-board {
+        grid-template-columns: 1fr;
+        min-height: auto;
+      }
+
+      .architecture-photo {
+        height: 280px;
+      }
+
+      .private-boundary {
+        border-top: 1px solid var(--border);
+        border-left: 0;
+      }
+
+      .proof-head {
+        gap: 18px;
+      }
+
+      .proof-note {
+        white-space: normal;
+      }
+
+      .stat-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .stat {
+        padding: 26px 18px;
+      }
+
+      .stat:nth-child(odd) {
+        border-left: 0;
+        padding-left: 0;
+      }
+
+      .stat:nth-child(n + 3) {
+        border-top: 1px solid oklch(0.82 0.025 255);
+      }
+
+      .stat strong {
+        font-size: clamp(46px, 14vw, 64px);
+      }
+
+      .closing {
+        padding-block: 66px;
+      }
+
+      .closing-panel {
+        gap: 28px;
+        padding: 28px 20px;
+      }
+
+      .footer-top,
+      .footer-bottom {
+        flex-direction: column;
+      }
+
+      .footer-links {
+        justify-content: flex-start;
+      }
+
+      .demo-form {
+        grid-template-columns: 1fr;
+      }
+
+      .field-wide,
+      .form-footer {
+        grid-column: 1;
+      }
+
+      .form-footer {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .form-footer .button {
+        width: 100%;
+      }
+    }
+
     @media (max-width: 420px) {
-      .hero h1 { font-size: 1.45rem; }
-      .nav .logo span { display: none; }        /* 超小屏隐藏英文副标 */
-      .nav .links a { font-size: 0.78rem; }
-      .container { padding: 16px 10px 32px; }
-      .card h3 { font-size: 0.95rem; }
-      .case .tag { font-size: 0.68rem; }
+      .brand span:last-child {
+        font-size: 14px;
+      }
+
+      .hero-actions {
+        display: grid;
+      }
+
+      .hero-actions .button {
+        width: 100%;
+      }
+
+      .hero-metric {
+        padding-inline: 12px;
+      }
+
+      .hero-metric:nth-child(odd) {
+        padding-left: 0;
+      }
+
+      .hero-metric:nth-child(even) {
+        border-left: 1px solid oklch(1 0 0 / 0.18);
+      }
+
+      .hero-metric strong {
+        font-size: 21px;
+      }
+
+      .stat {
+        padding-inline: 10px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+
+      .js [data-reveal] {
+        opacity: 1;
+        transform: none;
+      }
     }
   </style>
-  <!-- 头条搜索自动收录JS -->
-<script>
-(function(){
-var el = document.createElement("script");
-el.src = "https://lf1-cdn-tos.bytegoofy.com/goofy/ttzz/push.js?bd8578d6f1d152a379c7be50945e686d7b7d833498b6a434f789edc67b62ee3830632485602430134f60bc55ca391050b680e2741bf7233a8f1da9902314a3fa";
-el.id = "ttzz";
-var s = document.getElementsByTagName("script")[0];
-s.parentNode.insertBefore(el, s);
-})(window)
-</script>
+<style>
+html,body{overflow-x:hidden;max-width:100%}
+*,*::before,*::after{box-sizing:border-box}
+img{max-width:100%;height:auto}
+</style>
+<style>
+svg{max-width:100%;vertical-align:middle}
+.button svg,.button--primary svg,.button--glass svg,button svg,a.button svg,.hero-actions svg{width:18px;height:18px;flex:none;display:inline-block}
+</style>
+<style>
+[class*="node"] svg,[class*="icon"] svg,[class*="step"] svg,[class*="badge"] svg,[class*="mark"] svg,[class*="chip"] svg{width:44px;height:44px;flex:none;display:inline-block}
+[class*="number"] svg,[class*="num"] svg{width:32px;height:32px}
+</style>
+<style>
+[class*="hero"] img{object-fit:cover;object-position:center;max-height:96vh}
+</style>
+<style>
+[class*="scene"] img,[class*="media"] img:not(.hero-photo),[class*="shot"] img{height:auto;max-height:520px;object-fit:cover;width:100%}
+</style>
+<style>
+.hero img,section img,figure img{max-width:100%}
+</style>
+<style>
+.hero__media{overflow:hidden;width:100%}
+.hero__image{width:100%;height:100%;object-fit:cover;display:block}
+</style>
+<style>
+.hero__image{transform:none!important}
+</style>
+<style>
+.glass{position:relative;isolation:isolate;
+background:rgba(255,255,255,.10)!important;
+-webkit-backdrop-filter:blur(24px) saturate(180%)!important;
+backdrop-filter:blur(24px) saturate(180%)!important;
+border:1.5px solid rgba(255,255,255,.45)!important;border-radius:28px!important;
+box-shadow:0 28px 90px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.65)!important;
+overflow:hidden;}
+.glass::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+background:linear-gradient(148deg,rgba(255,255,255,.30) 0%,rgba(255,255,255,.06) 30%,rgba(255,255,255,0) 52%);}
+.glass::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),inset 0 24px 48px -24px rgba(255,255,255,.28);}
+.glass > *{position:relative;z-index:1}
+</style>
+<style>
+.glass-panel,.memory-title{position:relative;isolation:isolate;
+background:rgba(255,255,255,.14)!important;
+-webkit-backdrop-filter:blur(24px) saturate(180%)!important;
+backdrop-filter:blur(24px) saturate(180%)!important;
+border:1.5px solid rgba(255,255,255,.45)!important;border-radius:28px!important;
+padding:clamp(22px,2.6vw,40px)!important;
+box-shadow:0 28px 90px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.65)!important;}
+</style>
 </head>
 <body>
-  <div class="stars"></div>
-  <div class="grid-overlay"></div>
-  <canvas id="bg-network" aria-hidden="true"></canvas>
+  <a class="skip-link" href="#main">跳到主要内容</a>
 
+  <header class="site-header" id="site-header" data-scrolled="false" data-menu-open="false">
+    <div class="topbar">
+      <a class="brand" href="#top" aria-label="Astraea Plan 首页">
+        <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+        <span>Astraea Plan</span>
+      </a>
 
-  <nav class="nav">
-    <div class="logo">Astraea Plan</div>
-    <div class="links">
-      <a href="#adv">优势</a>
-      <a href="#industry">行业</a>
-      <a href="#arch">架构</a>
-      <a href="#flywheel">飞轮</a>
-      <a href="#loop">闭环</a>
-      <a href="#cost">投入</a>
-      <a href="#faq">FAQ</a>
-    </div>
-  </nav>
+      <nav class="primary-nav" id="site-nav" aria-label="主导航">
+        <a href="#capabilities">能力</a>
+        <a href="#architecture">架构</a>
+        <a href="#proof">案例</a>
+        <a href="#investment">投入</a>
+        <a href="#about">关于</a>
+        <a class="mobile-demo-link" href="#demo" data-open-demo><span>预约演示</span></a>
+      </nav>
 
-  <div class="container">
-
-    <div class="hero">
-      <span class="badge">企业级智能体部署架构</span>
-      <h1>Astraea Plan</h1>
-      <p class="sub">连锁企业私有化办公调度智能体集群架构 ｜ 由大军主导设计</p>
-    </div>
-
-    <div class="lead">
-      <p>Astraea Plan是面向连锁多门店场景打造的<strong>企业级智能体部署架构</strong>，一套私有化AI全域自治管理系统，由<strong>大军</strong>主导设计。方案基于Hermes智能体构建<strong>办公调度智能体集群</strong>，智能体本体集中部署于公司工作站、不分化，本地运行不上云，好维护、极度安全；大模型采用本地私有化与云端双通道灵活选择运行，打通飞书、企业微信、钉钉、微信公众号等渠道，实现总部与门店自动化任务调度、数据监控、工单智能分发，下辖Cosmic Web门店节点。</p>
-    </div>
-
-    <div class="case">
-      <span class="tag">落地实践案例</span>
-      <p>Astraea Plan整套架构已落地应用于<strong>魔方小镇城市书房</strong>连锁体系，面向全国多门店复合自习书房业态完成私有化智能体集群部署，实现总部与线下门店统一办公调度、数据自动汇总、工单智能分发。方案依托Hermes调度中枢，验证了连锁企业本地私有化大模型与云端大模型灵活选择、飞书+企业微信+钉钉+微信公众号多渠道智能体长期稳定运行能力。</p>
-    </div>
-
-    <h2 id="adv">⚡ 核心优势 · 真正会办事的AI</h2>
-
-    <div class="grid3">
-      <div class="card">
-        <h3>🧠 超强长期记忆 · 永不遗忘</h3>
-        <ul>
-          <li>部署长期记忆库，每天的工作与决策持续累积</li>
-          <li>永远不会忘记：某年某月某天，公司发生了什么</li>
-          <li>人走业务不断：经验沉淀为组织资产，新人对接智能体即可快速入岗</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3>🤝 智能体自主办事 · 招聘全流程</h3>
-        <ul>
-          <li>能自己登录招聘网站，整理应聘者信息与简历</li>
-          <li>与候选人自然对话、索取简历文件</li>
-          <li>整理后带文件返回公司办公平台，直接交付人事</li>
-          <li>还能结合岗位画像，辅助筛选谁更适合公司</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3>🛡️ 对外客服 · 安全隔离不"AI味"</h3>
-        <ul>
-          <li>对外客服与内部办公智能体物理隔离，内部信息永不外泄</li>
-          <li>拥有独立专属知识库，灵活应答客户问题</li>
-          <li>告别传统AI机器人的"AI味"与弱智感，像真人一样专业服务</li>
-        </ul>
+      <div class="header-actions">
+        <button class="button button-outline header-cta" type="button" data-open-demo data-od-id="header-demo">
+          预约演示
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+            <path d="M5 12h14M14 7l5 5-5 5"/>
+          </svg>
+        </button>
+        <button class="menu-toggle" id="menu-toggle" type="button" aria-label="打开导航" aria-controls="site-nav" aria-expanded="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+            <path class="menu-line menu-line-top" d="M4 7h16"/>
+            <path class="menu-line menu-line-middle" d="M4 12h16"/>
+            <path class="menu-line menu-line-bottom" d="M4 17h16"/>
+          </svg>
+        </button>
       </div>
     </div>
+  </header>
 
-    <div class="case">
-      <span class="tag">🌱 人走业务不断 · 新人快速入岗</span>
-      <p>同事离职，新职员上岗后直接与对应部门智能体对接，即可快速了解自己的业务；部分岗位离职不断岗——智能体每天照常做数据调度，业务一天不落。新同事到岗后，智能体还能担任"带教老师"：讲解业务要点、陪跑日常流程，帮助新人快速入岗。组织经验沉淀在智能体里，人走，业务不走。</p>
-    </div>
+  <main id="main">
+    <section class="hero" id="top" data-od-id="hero">
+      <div class="hero-left">
+        <div class="glass-panel" data-od-id="hero-glass-panel" data-reveal>
+          <p class="eyebrow">私有化智能体集群 · 生产运行中</p>
+          <h1 data-od-id="hero-title">把智能体团队，<br>放进企业网络。</h1>
+          <p class="hero-lede">
+            让招聘、巡检、分析与日常协同进入同一套可追溯的执行系统。<strong>部署在企业自有网络，业务数据不出公司。</strong>
+          </p>
 
-    <div class="case">
-      <span class="tag">🛠️ 单点自愈 · 5分钟拉起恢复</span>
-      <p>任意一个智能体在某时点出现故障，都不会影响其他智能体正常工作——各管一摊、互不拖累。也无需担心技术维修：主控或技术智能体几乎5分钟以内即可将其拉起、恢复运行，<strong>记忆无损、工作不断</strong>，业务持续在线。</p>
-    </div>
+          <div class="hero-actions">
+            <button class="button button-light" type="button" data-open-demo data-od-id="hero-demo">
+              预约演示
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                <path d="M5 12h14M14 7l5 5-5 5"/>
+              </svg>
+            </button>
+            <a class="button button-glass" href="#capabilities" data-od-id="hero-capabilities">
+              查看能力边界
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                <path d="M12 5v14M7 14l5 5 5-5"/>
+              </svg>
+            </a>
+          </div>
 
-    <div class="case">
-      <span class="tag">🏭 跨行业适配 · 灵活改造部署</span>
-      <p>智能体架构可按不同行业灵活改造——零售、餐饮、教育、制造、服务……按行业特性定制智能体分工与业务流程，一套架构，适配各类行业场景。</p>
-    </div>
-
-    <p style="color: var(--muted); margin-top: 4px;">智能体之间还能通过A2A协议协作：老板（主管）一个主控指挥全局，同部门严格授权发起讨论对抗，让数据经过检验、更准确。</p>
-    <div class="grid">
-      <div class="card">
-        <h3>📡 纵向指挥 · 上下级派发任务</h3>
-        <ul>
-          <li>老板（主管）只需一个主控智能体，统一指挥全局</li>
-          <li>可向部门任意一个智能体直接派发任务，上下级关系清晰</li>
-          <li>任务自动流转、结果自动回传，全程留痕可追溯</li>
-          <li>指挥链一条线，权责分明，管理效率倍增</li>
-        </ul>
+          <div class="hero-metrics" aria-label="当前生产规模">
+            <div class="hero-metric">
+              <strong>200+</strong>
+              <span>门店</span>
+            </div>
+            <div class="hero-metric">
+              <strong>10</strong>
+              <span>部门</span>
+            </div>
+            <div class="hero-metric">
+              <strong>7 个月</strong>
+              <span>持续运行</span>
+            </div>
+            <div class="hero-metric">
+              <strong>182</strong>
+              <span>自动任务</span>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="card">
-        <h3>⚔️ 横向协作 · 严格授权讨论与对抗</h3>
-        <ul>
-          <li>同部门多智能体，经严格授权发起A2A讨论与对抗</li>
-          <li>智能体与智能体互相审查、对抗验证，纠出彼此的疏漏</li>
-          <li>数据经多重校验，更准确、更可靠</li>
-          <li>像资深团队互审互校，把单一智能体的误差降到最低</li>
-        </ul>
-      </div>
-    </div>
 
-    <div class="case" style="border-color: rgba(0, 212, 255, 0.4); box-shadow: 0 0 30px rgba(0,212,255,0.08);">
-      <span class="tag">🌐 Agent Network · 已投入生产</span>
-      <p>这不是蓝图，是<strong>现状</strong>。集群基于 Linux 基金会 A2A 标准协议，智能体与智能体之间已经实现：<strong>相互发现、能力理解、授权协作、上下文转交、结果互验</strong>。本机与异地电脑上的智能体已<strong>跨设备互联并每日生产运行</strong>——多部门智能体像一支团队一样互相对话、互审互校，而不是各自孤岛。传话走 A2A，任务跨机流转，全程留痕可审计。</p>
-      <p style="margin-top:0.6rem;">举个简单的例子：总部与千里之外的门店，各有一名智能体值守。总部智能体要核对门店账目，只需与门店智能体对话——对方在本地查数、完成对账、把结果传回总部，全程自动、全程留痕；查数据、盯监控、对话协作、互审互校，跨地域都一样顺滑。</p>
-      <div class="grid3" style="margin-top:1rem;">
-        <div class="card">
-          <h3>🖥️ 单机多智能体</h3>
-          <ul>
-            <li>一台主机上，多个部门智能体协同共事</li>
-            <li>主控统一调度，部门各司其职、互不干扰</li>
-            <li>单点自愈，任一智能体故障 5 分钟内拉起恢复</li>
+      <figure class="hero-media" data-od-id="hero-keyboard">
+        <img src="assets/ai-ill-1.jpg" width="2000" height="1333" alt="机械键盘蓝色背光特写" fetchpriority="high" decoding="async">
+      </figure>
+    </section>
+
+    <section class="section capabilities" id="capabilities" data-od-id="capabilities">
+      <div class="container">
+        <div class="section-head" data-reveal>
+          <div>
+            <p class="eyebrow">01 / 核心能力</p>
+            <h2 data-od-id="capabilities-title">不是聊天窗口，<br>是能接住流程的智能体。</h2>
+          </div>
+          <p class="section-lede">
+            同一套集群承担记忆、执行、观察与复盘。人负责目标与判断，智能体负责把流程往前推，并把每一步留在企业自己的系统里。
+          </p>
+        </div>
+
+        <div class="capability-grid">
+          <article class="capability capability-memory" data-od-id="capability-memory" data-reveal>
+            <div class="capability-copy">
+              <div class="capability-index"><span>01</span><span>长期记忆</span></div>
+              <h3>让上下文留下来，<br>不用每次从头解释。</h3>
+              <p>门店、岗位、任务与历史处理结果持续沉淀，后续协作沿用同一套业务上下文。记忆的边界与访问范围由企业侧设定。</p>
+              <ul class="capability-points">
+                <li>跨会话保留业务语境</li>
+                <li>可追溯的上下文来源</li>
+                <li>与企业权限边界同步</li>
+              </ul>
+            </div>
+            <figure class="capability-media">
+              <img src="assets/keyboard-1.jpg" width="2000" height="3000" alt="黑色机械键盘键帽与蓝紫色背光特写" loading="lazy" decoding="async">
+            </figure>
+          </article>
+
+          <article class="capability capability-hiring" data-od-id="capability-hiring" data-reveal style="--reveal-delay: 50ms">
+            <div class="capability-copy">
+              <div class="capability-index"><span>02</span><span>自主办事</span></div>
+              <h3>招聘智能体，<br>把流程拆成动作。</h3>
+              <p>从岗位需求到候选人沟通，按既定招聘流程推进步骤。关键节点保留人工确认，过程有权限，也有记录。</p>
+              <ul class="capability-points">
+                <li>任务拆解与连续执行</li>
+                <li>人工接管不丢上下文</li>
+              </ul>
+            </div>
+            <figure class="capability-media">
+              <img src="assets/line-1.jpg" width="2000" height="2500" alt="Command 键白色背光特写" loading="lazy" decoding="async">
+            </figure>
+          </article>
+
+          <article class="capability capability-monitoring" data-od-id="capability-monitoring" data-reveal>
+            <div class="capability-copy">
+              <div class="capability-index"><span>03</span><span>门店监控</span></div>
+              <h3>读帧，不只读报表。</h3>
+              <p>智能体接入门店视频帧，识别需要关注的现场状态；异常被整理成可追问、可派发、可复核的运营任务。</p>
+              <ul class="capability-points">
+                <li>从画面提取现场信号</li>
+                <li>异常汇总到统一任务流</li>
+                <li>处理结果回到门店闭环</li>
+              </ul>
+            </div>
+            <figure class="capability-media">
+              <img src="assets/bokeh-2.jpg" width="2000" height="2667" alt="白色桌面智能机器人蓝色屏幕特写" loading="lazy" decoding="async">
+            </figure>
+          </article>
+
+          <article class="capability capability-loop" data-od-id="capability-data-loop" data-reveal style="--reveal-delay: 50ms">
+            <div>
+              <div class="capability-index"><span>04</span><span>数据闭环</span></div>
+              <h3>每天 23:55，<br>把一天收拢。</h3>
+            </div>
+            <div>
+              <div class="loop-time">23:55</div>
+              <span class="loop-label">当日任务收敛节点</span>
+              <div class="loop-flow" aria-label="数据闭环步骤">
+                <div class="loop-step">汇总任务、结果与未完成项</div>
+                <div class="loop-step">标记异常与需要人工判断的事项</div>
+                <div class="loop-step">生成次日可继续执行的上下文</div>
+              </div>
+              <p class="loop-summary">数据从企业系统来，再回到企业系统。第二天不是重新开始，而是接着昨天继续。</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section architecture" id="architecture" data-od-id="architecture">
+      <div class="container architecture-layout">
+        <div class="architecture-copy" data-reveal>
+          <p class="eyebrow">02 / 部署架构</p>
+          <h2>能力留在边界内，<br>数据不出公司。</h2>
+          <p>智能体集群部署在企业自有网络。门店终端、业务系统与任务结果都在企业边界内流转，外面的模型能力不接触原始业务数据。</p>
+          <ul class="architecture-points">
+            <li><span>A</span><strong>私有网络部署</strong></li>
+            <li><span>B</span><strong>业务系统权限接入</strong></li>
+            <li><span>C</span><strong>执行过程全链路留痕</strong></li>
           </ul>
         </div>
-        <div class="card">
-          <h3>🔗 局域网跨设备</h3>
-          <ul>
-            <li>同一办公网络内，多台电脑上的智能体互联互通</li>
-            <li>任务跨机流转、文件就近调用，无需手动搬运</li>
-            <li>办公室里的智能体团队，随时互相支援</li>
-          </ul>
-        </div>
-        <div class="card">
-          <h3>🏪 跨地区连锁企业</h3>
-          <ul>
-            <li>总部与全国各门店的智能体跨地域互联</li>
-            <li>门店数据本地闭环，总部远程调度与汇总</li>
-            <li>千里之外如同比邻，业务协同不间断</li>
-          </ul>
-        </div>
-      </div>
-      <p style="margin-top:0.8rem; color: var(--muted);">三阶段逐级打通，均已投入生产——从一台主机到一间办公室，再到全国连锁企业，智能体网络随业务规模一起成长。</p>
-    </div>
 
-    <h2 id="industry">🏭 行业落地能力 · 一套架构适配各类行业</h2>
-    <p style="color: var(--muted);">从连锁企业到餐饮连锁，Astraea Plan架构可按行业特性灵活改造——边缘实时闭环 + 行业专属知识库 + 按规模部署，真正"一套架构，适配百业"。</p>
-    <div class="grid3">
-      <div class="card">
-        <h3>⚡ 边缘实时 + 中心批处理混合架构</h3>
-        <ul>
-          <li>门店侧：点餐、排班、库存预警等高频场景在店内本地实时闭环</li>
-          <li>总部侧：跨店汇总、经营分析、策略生成回传总控</li>
-          <li>高峰期分钟级响应，不依赖云端往返</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3>📚 行业专属知识库（RAG增强）</h3>
-        <ul>
-          <li>接入行业特有结构化数据：菜品、过敏原、保质期、供应商、促销规则</li>
-          <li>关键领域（过敏原/保质期/价格）杜绝模型幻觉</li>
-          <li>通用模型 + 专属知识库，回答既准又专业</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3>📦 按规模灵活部署</h3>
-        <ul>
-          <li>中大型连锁/加盟：深度定制私有化，专属技术团队优化</li>
-          <li>小型连锁：标准化智能运营套件，快速落地控制成本</li>
-          <li>端云协同：核心数据本地加密，云端只做模型迭代</li>
-        </ul>
-      </div>
-    </div>
-
-    <h2 id="arch">🏗️ 核心架构</h2>
-    <div class="arch-tree">
-      <div class="ctrl-node">
-        <div class="t">总控智能体 · 中央</div>
-        <div class="s">统一调度 / 学习 / 沉淀 / 汇报 —— 全局可控</div>
-      </div>
-      <div class="ctrl-line"></div>
-      <svg class="connector" viewBox="0 0 900 110" preserveAspectRatio="none" aria-hidden="true">
-        <defs>
-          <filter id="glow-line" x="-80%" y="-80%" width="260%" height="260%">
-            <feGaussianBlur stdDeviation="4.5" result="blur"/>
-            <feMerge>
-              <feMergeNode in="blur"/>
-              <feMergeNode in="SourceGraphic"/>
-            </feMerge>
-          </filter>
-        </defs>
-        <!-- 总控 → 内部办公：青色实线 + 流动光点 -->
-        <path d="M450,0 V20 L150,52 V110" stroke="#00d4ff" stroke-width="3" fill="none" filter="url(#glow-line)" opacity="0.95"/>
-        <path d="M450,0 V20 L150,52 V110" stroke="#00d4ff" stroke-width="1" fill="none" opacity="0.45"/>
-        <circle class="flow-dot" r="4" fill="#00d4ff" filter="url(#glow-line)">
-          <animateMotion dur="1.6s" repeatCount="indefinite" path="M450,0 V20 L150,52 V110"/>
-        </circle>
-        <!-- 总控 → 对外：青色实线 + 流动光点 -->
-        <path d="M450,0 V110" stroke="#00d4ff" stroke-width="3" fill="none" filter="url(#glow-line)" opacity="0.95"/>
-        <path d="M450,0 V110" stroke="#00d4ff" stroke-width="1" fill="none" opacity="0.45"/>
-        <circle class="flow-dot" r="4" fill="#00d4ff" filter="url(#glow-line)">
-          <animateMotion dur="2.2s" repeatCount="indefinite" path="M450,0 V110"/>
-        </circle>
-        <!-- 总控 → 门店：橙红实线 + 流动光点 -->
-        <path d="M450,0 V20 L750,52 V110" stroke="#ff8a65" stroke-width="3" fill="none" filter="url(#glow-line)" opacity="0.95"/>
-        <path d="M450,0 V20 L750,52 V110" stroke="#ff8a65" stroke-width="1" fill="none" opacity="0.45"/>
-        <circle class="flow-dot" r="4" fill="#ff8a65" filter="url(#glow-line)">
-          <animateMotion dur="1.2s" repeatCount="indefinite" path="M450,0 V20 L750,52 V110"/>
-        </circle>
-        <!-- 末端箭头：指向三个板块 -->
-        <polygon points="138,92 150,110 162,92" fill="#00d4ff" filter="url(#glow-line)"/>
-        <polygon points="438,92 450,110 462,92" fill="#00d4ff" filter="url(#glow-line)"/>
-        <polygon points="738,92 750,110 762,92" fill="#ff8a65" filter="url(#glow-line)"/>
-      </svg>
-      <div class="branches">
-        <div class="branch">
-          <div class="branch-head">🏢 内部办公智能体</div>
-          <div class="agent-chip">财务部智能体</div>
-          <div class="agent-chip">运营部智能体</div>
-          <div class="agent-chip">图书部智能体</div>
-          <div class="agent-chip">市场部智能体</div>
-          <div class="branch-foot">每天自动拉数 / 出日报 / 标异常 / 发部门群</div>
-        </div>
-        <div class="branch outer">
-          <div class="branch-head">🌐 对外智能体</div>
-          <div class="agent-chip">招聘智能体</div>
-          <div class="agent-chip">客服智能体</div>
-          <div class="agent-chip">更多对外场景 …</div>
-          <div class="branch-foot">对外服务 / 独立知识库 / 物理隔离不泄密</div>
-        </div>
-        <div class="branch store">
-          <div class="branch-head">🏪 门店智能体</div>
-          <div class="agent-chip">数据监控智能体</div>
-          <div class="agent-chip">物料监控智能体</div>
-          <div class="agent-chip">门店运营节点 …</div>
-          <div class="branch-foot">终端场景 / 门店数据与物料实时管控</div>
+        <div class="architecture-board" data-reveal style="--reveal-delay: 60ms">
+          <figure class="architecture-photo">
+            <img src="assets/bluesmoke-1.jpg" width="2000" height="2667" alt="两台白色智能机器人在室内协同作业" loading="lazy" decoding="async">
+          </figure>
+          <div class="private-boundary">
+            <span class="boundary-label">企业自有网络</span>
+            <div class="boundary-flow" role="img" aria-label="门店终端与业务系统在私有网络内连接智能体集群">
+              <div class="boundary-node">
+                <strong>门店终端</strong>
+                <span>画面、任务与现场信号</span>
+              </div>
+              <div class="boundary-node">
+                <strong>业务系统</strong>
+                <span>权限、数据与结果回写</span>
+              </div>
+              <div class="boundary-node boundary-node-core">
+                <strong>智能体集群</strong>
+                <span>记忆 / 执行 / 读帧 / 闭环</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <div class="grid">
-      <div class="card">
-        <h3>核心设计：物理隔离</h3>
-        <ul>
-          <li>一个企微Bot只服务一个部门群，各管各的，永不交叉</li>
-          <li>每个部门智能体知识范围严格垂直，绝不混入其他部门知识</li>
-          <li>一个进程挂了不影响其他部门</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3>关键能力</h3>
-        <ul>
-          <li>智能体本体部署于公司工作站、不分化，好维护、极度安全</li>
-          <li>大模型本地私有化 + 云端双通道，灵活选择运行</li>
-          <li>飞书、企业微信、钉钉、微信公众号等渠道打通</li>
-          <li>总部-门店自动化工单、数据监控、任务分发</li>
-          <li>Cosmic Web门店节点部署</li>
-        </ul>
-      </div>
-    </div>
+    <section class="section proof" id="proof" data-od-id="proof">
+      <div class="container">
+        <div class="proof-head" data-reveal>
+          <div>
+            <p class="eyebrow">03 / 生产运行</p>
+            <h2>不是试点，<br>是每天都在跑。</h2>
+          </div>
+          <p class="proof-note">真实生产部署 · 7 个月持续运行</p>
+        </div>
 
-    <h2 id="flywheel">🌀 数据飞轮 · 智能体越用越顺手</h2>
-    <p style="color: var(--muted);">数据每天都在转，知识每天都在长——智能体不是装完就定型，而是与企业一起持续进化、越用越懂业务。</p>
-    <div class="grid3">
-      <div class="card">
-        <h3>⚙️ 数据飞轮 · 自动运转</h3>
-        <ul>
-          <li>经营数据每日自动汇聚、对账与复盘——白天干活，夜里沉淀</li>
-          <li>数据每转一圈，智能体对企业业务的理解就更深一层</li>
-          <li>多部门协同跑数、异常自动预警，管理层只看结论、不用翻表</li>
-        </ul>
+        <div class="stat-grid">
+          <div class="stat" data-od-id="stat-stores" data-reveal>
+            <strong>200+</strong>
+            <span class="stat-label">门店</span>
+            <span class="stat-meta">跨区域连锁场景</span>
+          </div>
+          <div class="stat" data-od-id="stat-cities" data-reveal style="--reveal-delay: 40ms">
+            <strong>49</strong>
+            <span class="stat-label">城市</span>
+            <span class="stat-meta">同一套集群覆盖</span>
+          </div>
+          <div class="stat" data-od-id="stat-departments" data-reveal style="--reveal-delay: 80ms">
+            <strong>10</strong>
+            <span class="stat-label">部门</span>
+            <span class="stat-meta">共同使用的业务入口</span>
+          </div>
+          <div class="stat" data-od-id="stat-tasks" data-reveal style="--reveal-delay: 120ms">
+            <strong>182</strong>
+            <span class="stat-label">自动任务</span>
+            <span class="stat-meta">已进入日常运行</span>
+          </div>
+        </div>
       </div>
-      <div class="card">
-        <h3>🏛️ 企业专属知识库 · 自家档案自家用</h3>
-        <ul>
-          <li>制度、经验、文档统一沉淀入库，私有本地存储，不上云、不外泄</li>
-          <li>智能体答问先查自家知识，有据可依，不靠模型凭空发挥</li>
-          <li>海量档案也能精准命中，回答既快又靠谱</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3>📊 老板工作台 · 一屏看清全局</h3>
-        <ul>
-          <li>智能体集群运行状态可视化：各部门动态、任务进度一目了然</li>
-          <li>异常与预警自动上屏，问题在影响业务前就被看见</li>
-          <li>随时打开即看，全公司智能办公的运转尽在掌握</li>
-        </ul>
-      </div>
-    </div>
-    <div class="case" style="border-color: rgba(0, 212, 255, 0.4); box-shadow: 0 0 30px rgba(0,212,255,0.08);">
-      <span class="tag">🧠 持久记忆库 · 沉淀反哺</span>
-      <p>每一天的业务数据、工作决策与复盘，都会沉淀进<strong>持久记忆库</strong>长期留存——智能体对这家企业越用越懂、越懂越准。人走，业务不断；新人入职，直接对接智能体就能接手业务、获得带教。企业经验在智能体身上持续积累、反向沉淀，这正是企业级智能体与单点 AI 助手的本质区别。</p>
-    </div>
+    </section>
 
-    <h2 id="loop">🔄 每日闭环</h2>
-    <div class="timeline">
-      <div class="t-item"><span class="t-time">23:55</span><span class="t-text">各部门智能体生成当天详细工作总结 → 归档 + 发部门群</span></div>
-      <div class="t-item"><span class="t-time">23:57</span><span class="t-text">总控智能体检查归档、逐字阅读每一份总结、存入永久记忆</span></div>
-      <div class="t-item"><span class="t-time">23:59</span><span class="t-text">总控向管理层汇报：归档情况 + 各部门今日核心动态</span></div>
-    </div>
-    <p style="color: var(--muted);">这套闭环跑下来，管理层每天睡前都能掌握全公司各部门的动态。而总控智能体，每天都在变聪明。</p>
+    <section class="closing" id="investment" data-od-id="closing-cta">
+      <div class="container">
+        <div class="closing-panel" data-reveal>
+          <div class="closing-copy">
+            <p class="eyebrow">04 / 项目投入</p>
+            <h2>先选一条最值得自动化的业务链路。</h2>
+            <p>不从“全公司 AI 化”开始，而从门店每天都会发生、又反复消耗人力的流程开始。确认边界、接入系统，再用真实运行结果决定下一步。</p>
+          </div>
+          <div class="closing-action">
+            <p>先做一次 30 分钟部署评估，明确网络环境、业务入口与首个智能体任务。</p>
+            <button class="button button-primary" type="button" data-open-demo data-od-id="closing-demo">
+              预约部署评估
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                <path d="M5 12h14M14 7l5 5-5 5"/>
+              </svg>
+            </button>
+            <ol class="closing-steps">
+              <li><span>01</span>网络环境确认</li>
+              <li><span>02</span>业务链路选择</li>
+              <li><span>03</span>生产运行复盘</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
 
-    <h2 id="journey">🚀 研发历程 · 从立项到多部门稳定生产</h2>
-    <div class="timeline">
-      <div class="t-item"><span class="t-time">2026.03</span><span class="t-text"><strong>项目立项研发</strong>：Astraea Plan正式启动，完成智能体集群架构设计、核心调度引擎与部门知识库搭建</span></div>
-      <div class="t-item"><span class="t-time">2026.05</span><span class="t-text"><strong>企业内部公测</strong>：多部门同时上线公测，财务、运营、图书、市场等核心部门智能体开始协同办公</span></div>
-      <div class="t-item"><span class="t-time">2026.08</span><span class="t-text"><strong>数据基座升级</strong>：经营数据直连日清，企业知识库与持久记忆库成型；数据飞轮自动运转、老板可视化工作台上线，多部门持续生产运行</span></div>
-      <div class="t-item"><span class="t-time">至今</span><span class="t-text"><strong>稳定生产使用</strong>：持续稳定运行 + 不断升级迭代，多部门已实现常态化智能办公，每天自动完成数据汇总、工作总结、智能复盘与管理层汇报</span></div>
-    </div>
-    <p style="color: var(--muted);">从研发到多部门稳定生产，Astraea Plan经受住了真实业务场景的持续检验——不是概念蓝图，而是已经跑起来的生产系统。</p>
-
-    <h2 id="cost">💻 设备投入 · 按业务规模灵活定制</h2>
-    <div class="case">
-      <span class="tag">💰 轻投入 · 高回报</span>
-      <p>Astraea Plan采用<strong>按需分级部署</strong>：设备投入随业务规模弹性伸缩，小团队轻量起步、中大型团队私有化重算力——<strong>设备费用与市面已知同类方案相比极低</strong>，token 使用量极低、维护费用极低，能力却卓越超强。</p>
-    </div>
-    <div class="grid">
-      <div class="card">
-        <h3>🚀 小团队 · 轻量起步</h3>
-        <ul>
-          <li>设备投入 <strong>数万元起</strong>，单机工作站即可承载整套智能体集群</li>
-          <li>云端大模型按量调度，<strong>每月调度费用约千元起</strong></li>
-          <li>软件部署成本极低，开箱即用、无需专门机房</li>
-          <li>先跑通业务验证，再按需平滑扩容</li>
-        </ul>
+  <footer class="site-footer" id="about" data-od-id="site-footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <a class="brand" href="#top" aria-label="返回 Astraea Plan 首页">
+            <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+            <span>Astraea Plan</span>
+          </a>
+          <p>面向连锁企业的私有化智能体集群。把长期记忆、自主办事、门店监控与数据闭环放进企业自己的网络。</p>
+        </div>
+        <nav class="footer-links" aria-label="页脚导航">
+          <a href="#capabilities">能力</a>
+          <a href="#architecture">架构</a>
+          <a href="#proof">案例</a>
+          <a href="#investment">投入</a>
+          <a href="#top">关于</a>
+        </nav>
       </div>
-      <div class="card">
-        <h3>🏢 中大型团队 · 私有化重算力</h3>
-        <ul>
-          <li>本地私有化部署<strong>能力超强的大模型</strong>，大幅节省 token 消耗</li>
-          <li>设备部署 <strong>数十万元起</strong>，按门店/业务规模弹性扩展</li>
-          <li>软件部署费用同样极低，一次性交付、长期可用</li>
-          <li>核心数据全程本地，安全合规与成本双优</li>
-        </ul>
-      </div>
-    </div>
-    <p style="color: var(--muted); margin-top: 4px;">本地推理 + 云端增量双通道：日常高频任务走本地模型几乎不耗 token，复杂推理才按需调用云端——长期运行成本远低于纯云端方案，能力上限却保持一致。</p>
-
-    <h2 id="service">🤝 长期服务承诺 · 不是装完就走，而是长期战线</h2>
-    <div class="case">
-      <span class="tag">🛡️ 部署只是开始 · 长期负责到底</span>
-      <p>市面上很多方案是<strong>"给你安装完、教你点两下就结束"</strong>。Astraea Plan的模式完全不同：<strong>交付部署只是长期合作的起点</strong>，我们提供的是持续性的长期服务战线——</p>
-    </div>
-    <div class="grid">
-      <div class="card">
-        <h3>🛠️ 长期负责维护</h3>
-        <ul>
-          <li>系统上线后持续维护，第一时间响应异常与故障</li>
-          <li>运行状态主动巡检，问题在影响业务前被发现处理</li>
-          <li>数据安全与稳定性全程守护，不让系统带病运行</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3>🔄 正常系统升级</h3>
-        <ul>
-          <li>框架、模型、依赖持续跟进升级，不落后于技术演进</li>
-          <li>性能持续优化，随业务量增长自动扩展能力</li>
-          <li>版本平滑演进，升级不停机、不影响日常办公</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3>📈 按企业合理需求双升级</h3>
-        <ul>
-          <li>不只是"修 bug"，更主动跟随企业业务变化迭代功能</li>
-          <li>新部门要接入、新场景要覆盖——按企业合理需求持续扩展</li>
-          <li>业务发展 → 系统升级 → 业务再发展，形成正向循环</li>
-        </ul>
+      <div class="footer-bottom">
+        <span>© <span id="year">2026</span> Astraea Plan. 私有化部署，数据不出公司。</span>
+        <span>ENTERPRISE AGENT CLUSTER</span>
       </div>
     </div>
-    <p style="color: var(--muted);">一句话：<strong>装完只是开始，长期负责维护、持续双升级——把智能体系统当长期资产经营，而不是一次性买卖。</strong></p>
+  </footer>
 
-    <h2 id="faq">❓ 常见问题</h2>
-    <div class="faq">
-      <p class="q">Q：Astraea Plan是谁主导设计？</p>
-      <p class="a">A：整套企业级智能体部署架构由<strong>大军</strong>主导落地，专为连锁多门店私有化办公调度场景打造。</p>
-    </div>
-    <div class="faq">
-      <p class="q">Q：Astraea Plan架构有没有真实企业落地验证？</p>
-      <p class="a">A：方案由<strong>大军</strong>主导设计，已经在<strong>魔方小镇城市书房</strong>全国连锁企业体系完成生产环境部署，是经过多门店长期运行验证的私有化办公调度智能体架构。</p>
-    </div>
-    <div class="faq">
-      <p class="q">Q：部署Astraea Plan需要多少设备投入？</p>
-      <p class="a">A：按业务规模灵活定制——小团队设备数万元起、每月模型调度费用约千元起；中大型团队可本地私有化部署能力超强的大模型节省 token，设备部署数十万元起。无论哪种规模，软件部署费用都极低，且设备费用与市面已知同类方案相比极低，token 使用量极低、维护费用极低，能力卓越超强。</p>
-    </div>
-    <div class="faq">
-      <p class="q">Q：Astraea Plan适合什么场景？</p>
-      <p class="a">A：连锁多门店企业，需要私有化部署、总部与门店自动化任务调度、数据监控、工单智能分发的办公调度场景。</p>
-    </div>
-    <div class="faq">
-      <p class="q">Q：员工离职会导致业务断档吗？</p>
-      <p class="a">A：不会。智能体沉淀了岗位知识与日常流程，离职不断岗——智能体每天照常做数据调度；新同事到岗后直接对接部门智能体，快速了解业务、接受带教，实现无缝衔接。</p>
-    </div>
-    <div class="faq">
-      <p class="q">Q：这是概念演示，还是真实在生产运行的系统？</p>
-      <p class="a">A：<strong>真实生产系统</strong>。Astraea Plan已落地魔方小镇城市书房全国连锁企业体系，每天 23:55 各部门智能体自动生成工作总结、总控智能体逐份归档复盘并汇报管理层——这条闭环已连续运行多月。本机与异地电脑上的智能体通过 A2A 协议跨设备互联，任务跨机流转、全程留痕。不是演示页，是正在跑的生产架构。</p>
-    </div>
-    <div class="faq">
-      <p class="q">Q：这是一套"几个 AI 助手"的堆叠，还是一个整体架构？</p>
-      <p class="a">A：是<strong>整体架构</strong>。Astraea Plan = 智能体集群调度层 + A2A 智能体间协议 + 本地/云端双模型通道 + 工作经验沉淀技能体系 + 每日自动化闭环，五层一体。多个部门智能体（财务、运营、图书、市场、工程等）各司其职，由主控统一指挥，靠 A2A 对等协作——不是各自独立的助手，是一个协同工作的整体。</p>
-    </div>
-    <div class="faq">
-      <p class="q">Q：本地私有化部署与云端模型是什么关系？</p>
-      <p class="a">A：<strong>双通道灵活选择</strong>。日常高频任务走本地私有化模型，几乎不消耗 token；复杂推理按需调用云端能力更强的模型——两者由集群统一调度、按任务特性选择，长期运行成本远低于纯云端方案，数据安全与能力上限兼得。</p>
-    </div>
-    <div class="faq">
-      <p class="q">Q：Astraea Plan基于什么技术构建？</p>
-      <p class="a">A：Astraea Plan基于<strong>Hermes 开源框架基座</strong>构建办公调度智能体集群，智能体本体集中部署于公司工作站、不分化，本地运行不上云，好维护、极度安全；大模型采用本地私有化与云端双通道灵活选择运行，打通飞书、企业微信、钉钉、微信公众号等渠道。</p>
-    </div>
+  <dialog id="demo-dialog" aria-labelledby="demo-title">
+    <div class="dialog-inner">
+      <button class="dialog-close" id="dialog-close" type="button" aria-label="关闭预约窗口">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+          <path d="M6 6l12 12M18 6L6 18"/>
+        </svg>
+      </button>
 
-    <div class="footer">
-      <div style="margin-bottom: 20px; color: var(--muted); font-size: 0.9rem;">
-        项目咨询：
-        <a id="mail-link" style="color: var(--accent2); text-decoration: none; font-weight: 500;"></a>
-        &nbsp;｜&nbsp;
-        <span style="display: inline-flex; align-items: center; gap: 5px; color: var(--muted);">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="#07c160" style="vertical-align: -2px;" role="img" xmlns="http://www.w3.org/2000/svg"><title>WeChat</title><path d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 0 1 .213.665l-.39 1.48c-.019.07-.048.141-.048.213 0 .163.13.295.29.295a.326.326 0 0 0 .167-.054l1.903-1.114a.864.864 0 0 1 .717-.098 10.16 10.16 0 0 0 2.837.403c.276 0 .543-.027.811-.05-.857-2.578.157-4.972 1.932-6.446 1.703-1.415 3.882-1.98 5.853-1.838-.576-3.583-4.196-6.348-8.596-6.348zM5.785 5.991c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 0 1-1.162 1.178A1.17 1.17 0 0 1 4.623 7.17c0-.651.52-1.18 1.162-1.18zm5.813 0c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 0 1-1.162 1.178 1.17 1.17 0 0 1-1.162-1.178c0-.651.52-1.18 1.162-1.18zm5.34 2.867c-1.797-.052-3.746.512-5.28 1.786-1.72 1.428-2.687 3.72-1.78 6.22.942 2.453 3.666 4.229 6.884 4.229.826 0 1.622-.12 2.361-.336a.722.722 0 0 1 .598.082l1.584.926a.272.272 0 0 0 .14.047c.134 0 .24-.111.24-.247 0-.06-.023-.12-.038-.177l-.327-1.233a.582.582 0 0 1-.023-.156.49.49 0 0 1 .201-.398C23.024 18.48 24 16.82 24 14.98c0-3.21-2.931-5.837-6.656-6.088V8.89c-.135-.01-.27-.027-.407-.03zm-2.53 3.274c.535 0 .969.44.969.982a.976.976 0 0 1-.969.983.976.976 0 0 1-.969-.983c0-.542.434-.982.97-.982zm4.844 0c.535 0 .969.44.969.982a.976.976 0 0 1-.969.983.976.976 0 0 1-.969-.983c0-.542.434-.982.969-.982z"/></svg>
-          <span style="color: var(--accent2); font-weight: 500;">WeChat：longjunhao</span>
+      <div id="demo-form-view">
+        <p class="dialog-kicker">DEPLOYMENT REVIEW / 30 MIN</p>
+        <h2 id="demo-title">把第一个业务场景说清楚。</h2>
+        <p class="dialog-lede">填写企业网络环境与希望先接入的业务。页面会整理一份预约摘要，便于通过项目团队的企业微信继续沟通。</p>
+
+        <form class="demo-form" id="demo-form">
+          <div class="field">
+            <label for="company">公司名称 <span>*</span></label>
+            <input id="company" name="company" type="text" autocomplete="organization" placeholder="例如：魔方小镇" required>
+          </div>
+          <div class="field">
+            <label for="name">联系人 <span>*</span></label>
+            <input id="name" name="name" type="text" autocomplete="name" placeholder="您的姓名" required>
+          </div>
+          <div class="field">
+            <label for="contact">企业微信 / 手机 <span>*</span></label>
+            <input id="contact" name="contact" type="text" autocomplete="tel" placeholder="便于项目团队联系" required>
+          </div>
+          <div class="field">
+            <label for="scope">门店规模</label>
+            <input id="scope" name="scope" type="text" inputmode="numeric" placeholder="例如：200+">
+          </div>
+          <div class="field field-wide">
+            <label for="need">希望先接入的业务场景</label>
+            <textarea id="need" name="need" placeholder="例如：招聘流程、门店巡检、经营日报或晚间的数据收敛"></textarea>
+          </div>
+          <div class="form-footer">
+            <p>本页不会自动向外部发送信息。生成摘要后，请复制并通过项目团队的企业微信发送。</p>
+            <button class="button button-primary" type="submit">
+              生成预约摘要
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                <path d="M5 12h14M14 7l5 5-5 5"/>
+              </svg>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div class="demo-success" id="demo-success" hidden tabindex="-1">
+        <span class="success-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12.5l4.2 4.2L19 7"/>
+          </svg>
         </span>
+        <h3>预约摘要已整理</h3>
+        <p class="dialog-lede">复制下面的内容，通过项目团队的企业微信发送，即可继续确认演示时间。</p>
+        <div class="demo-summary" id="demo-summary"></div>
+        <div class="success-actions">
+          <button class="button button-primary" id="copy-summary" type="button">复制预约摘要</button>
+          <button class="button button-outline" id="edit-summary" type="button">返回修改</button>
+        </div>
+        <span class="copy-status" id="copy-status" aria-live="polite"></span>
       </div>
-      <p><span class="brand">Astraea Plan</span> · 企业级智能体部署架构 · 设计者：大军</p>
-      <p>© 2026 Astraea Plan · <a href="https://github.com/Lugpt/astraea-plan-yuheng">GitHub: astraea-plan</a></p>
     </div>
-
-  </div>
+  </dialog>
 
   <script>
-    const user = "longjunhao01";
-    const domain = "gmail.com";
-    const targetEmail = `${user}@${domain}`;
-    document.getElementById("mail-link").innerText = targetEmail;
-    document.getElementById("mail-link").href = `mailto:${targetEmail}`;
-  </script>
+    (function () {
+      document.documentElement.classList.add('js');
 
-<script>
-/* ── Astraea Plan · 动态粒子网络背景 ──
-   粒子=智能体节点，连线=A2A通信链路
-   鼠标移动产生引力 → 粒子聚拢，体现"总控指挥全局" */
-(function () {
-  const canvas = document.getElementById('bg-network');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  let W, H, particles = [], meteors = [], planets = [], mouse = { x: null, y: null }, rafId = null, meteorTimer = 0;
+      var header = document.getElementById('site-header');
+      var menuToggle = document.getElementById('menu-toggle');
+      var nav = document.getElementById('site-nav');
+      var dialog = document.getElementById('demo-dialog');
+      var formView = document.getElementById('demo-form-view');
+      var successView = document.getElementById('demo-success');
+      var form = document.getElementById('demo-form');
+      var summary = document.getElementById('demo-summary');
+      var copyStatus = document.getElementById('copy-status');
+      var copyButton = document.getElementById('copy-summary');
+      var editButton = document.getElementById('edit-summary');
+      var dialogClose = document.getElementById('dialog-close');
+      var lastTrigger = null;
+      var currentSummary = '';
 
-  /* ── 真实星球：3D 贴图球体 + 自转 + 公转 ── */
-  const PLANET_TEXTURES = {
-    earth: 'textures/earth.jpg', jupiter: 'textures/jupiter.jpg',
-  };
-  const IMG_CACHE = {};
-  function loadTexture(src) {
-    return new Promise((res, rej) => {
-      if (IMG_CACHE[src]) return res(IMG_CACHE[src]);
-      const img = new Image();
-      img.onload = () => { IMG_CACHE[src] = img; res(img); };
-      img.onerror = rej;
-      img.src = src;
-    });
-  }
-  // 星球配置：位置(0-1比例)、半径(px基准)、自转速度、公转半径/速度、纹理
-  // 两颗：木星（左上）+ 地球（右下），低调不抢内容
-  const PLANET_DEFS = [
-    { name: 'jupiter', tex: 'jupiter', x: 0.18, y: 0.30, r: 46, spin: 0.0021, glow: '210, 180, 150' },
-    { name: 'earth',   tex: 'earth',   x: 0.84, y: 0.74, r: 42, spin: 0.0016, glow: '70, 150, 255' },
-  ];
-  // 程序化兜底纹理：纹理加载失败时生成渐变球贴图（保证星球必显示）
-  function makeFallbackTexture(hue1, hue2) {
-    const cv = document.createElement('canvas');
-    cv.width = 256; cv.height = 128;
-    const cx = cv.getContext('2d');
-    const g = cx.createLinearGradient(0, 0, 256, 0);
-    g.addColorStop(0, hue1); g.addColorStop(0.5, hue2); g.addColorStop(1, hue1);
-    cx.fillStyle = g; cx.fillRect(0, 0, 256, 128);
-    // 加一些随机"表面"斑点，模拟星球纹理
-    for (let i = 0; i < 40; i++) {
-      cx.fillStyle = `rgba(255,255,255,${Math.random() * 0.15})`;
-      cx.beginPath();
-      cx.arc(Math.random() * 256, Math.random() * 128, 3 + Math.random() * 8, 0, Math.PI * 2);
-      cx.fill();
-    }
-    const img = new Image();
-    img.src = cv.toDataURL();
-    return img;
-  }
-  const FALLBACK_HUES = {
-    earth: ['#3a7bd5', '#5a9bd5'], jupiter: ['#d4a574', '#b07b4a'],
-  };
-  // 逐颗加载纹理（带兜底）
-  PLANET_DEFS.forEach((p) => {
-    loadTexture(PLANET_TEXTURES[p.tex]).then(() => {
-      planets.push({ ...p, img: IMG_CACHE[PLANET_TEXTURES[p.tex]], rot: Math.random() * 360 });
-    }).catch(() => {
-      // 兜底：程序化渐变球，星球照样显示
-      const [h1, h2] = FALLBACK_HUES[p.tex] || ['#888888', '#555555'];
-      planets.push({ ...p, img: makeFallbackTexture(h1, h2), rot: Math.random() * 360, fallback: true });
-    });
-  });
-  // 土星环纹理
-  let saturnRingImg = null;
-  loadTexture('textures/saturn_ring.jpg').then((img) => { saturnRingImg = img; }).catch(() => {});
+      function setMenu(open) {
+        header.dataset.menuOpen = open ? 'true' : 'false';
+        menuToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        menuToggle.setAttribute('aria-label', open ? '关闭导航' : '打开导航');
+      }
 
-  const COLORS = ['0, 212, 255', '123, 97, 255', '0, 180, 255'];
-
-  function resize() {
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    W = window.innerWidth; H = window.innerHeight;
-    canvas.width = W * dpr; canvas.height = H * dpr;
-    canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    // 粒子数随屏幕自适应：约每 18000px² 一个，60~110 之间
-    const target = Math.round((W * H) / 18000);
-    const count = Math.max(60, Math.min(110, target));
-    particles = [];
-    for (let i = 0; i < count; i++) {
-      particles.push({
-        x: Math.random() * W,
-        y: Math.random() * H,
-        vx: (Math.random() - 0.5) * 0.45,
-        vy: (Math.random() - 0.5) * 0.45,
-        r: Math.random() * 1.8 + 0.8,
-        c: COLORS[Math.floor(Math.random() * COLORS.length)]
+      menuToggle.addEventListener('click', function () {
+        setMenu(header.dataset.menuOpen !== 'true');
       });
-    }
-  }
 
-  /* ── 绘制 3D 星球（贴图球体自转） ── */
-  function drawPlanets() {
-    if (planets.length < 1) return;   // 至少1颗加载完就开画，其余逐步出现
-    const now = performance.now();
+      nav.addEventListener('click', function (event) {
+        if (event.target.closest('a')) setMenu(false);
+      });
 
-    for (const p of planets) {
-      // 公转（月球绕地球）
-      let px = p.x * W, py = p.y * H;
-      if (p.orbit) {
-        const a = now * p.orbit.speed;
-        px = p.orbit.cx * W + Math.cos(a) * p.orbit.rad * W;
-        py = p.orbit.cy * H + Math.sin(a) * p.orbit.rad * H;
-      }
-      const R = p.r * (W / 1440) * 2.2;   // 按视口缩放
-      p.rot = (p.rot || 0) + p.spin * 26; // 自转推进（更快可见）
+      document.addEventListener('click', function (event) {
+        if (header.dataset.menuOpen !== 'true') return;
+        if (!header.contains(event.target)) setMenu(false);
+      });
 
-      // 太阳：发光光晕
-      if (p.name === 'sun') {
-        const g = ctx.createRadialGradient(px, py, R * 0.2, px, py, R * 3.2);
-        g.addColorStop(0, 'rgba(255, 190, 80, 0.55)');
-        g.addColorStop(0.4, 'rgba(255, 140, 40, 0.18)');
-        g.addColorStop(1, 'rgba(255, 120, 30, 0)');
-        ctx.fillStyle = g;
-        ctx.beginPath(); ctx.arc(px, py, R * 3.2, 0, Math.PI * 2); ctx.fill();
-      }
-      // 其他有 glow 的星球（地球）：淡蓝大气光晕
-      else if (p.glow) {
-        const g = ctx.createRadialGradient(px, py, R * 0.8, px, py, R * 1.8);
-        g.addColorStop(0, `rgba(${p.glow}, 0.25)`);
-        g.addColorStop(1, `rgba(${p.glow}, 0)`);
-        ctx.fillStyle = g;
-        ctx.beginPath(); ctx.arc(px, py, R * 1.8, 0, Math.PI * 2); ctx.fill();
-      }
-
-      // 土星环（在球体后面画下半，前面画上半 → 立体环绕感）
-      if (p.ring) drawSaturnRing(px, py, R, now, false);
-
-      // 球体本体：真实球面渲染（贴图横向无缝滚动 = 自转）
-      ctx.save();
-      ctx.beginPath();
-      ctx.arc(px, py, R, 0, Math.PI * 2);
-      ctx.clip();
-      const img = p.img;
-      const dispW = R * 2;                        // 显示宽 = 球直径
-      const dispH = R * 2;                        // 显示高 = 球直径（2:1贴图纵向拉伸成球）
-      const off = ((p.rot % 360) / 360) * dispW;  // 自转偏移（绕一周=360°）
-      // 4 张相邻贴图平铺 = 无缝自转（drawImage 全浏览器兼容 + 数学上全覆盖）
-      ctx.globalAlpha = 0.72;                     // 整体调暗（不抢内容）
-      ctx.drawImage(img, px - off - dispW * 1.5, py - R, dispW, dispH);
-      ctx.drawImage(img, px - off - dispW * 0.5, py - R, dispW, dispH);
-      ctx.drawImage(img, px - off + dispW * 0.5, py - R, dispW, dispH);
-      ctx.drawImage(img, px - off + dispW * 1.5, py - R, dispW, dispH);
-      ctx.globalAlpha = 1;
-      // 球面体积光影：边缘暗 + 左上高光（光源在左上）——整体更暗
-      const sg = ctx.createRadialGradient(
-        px - R * 0.4, py - R * 0.45, R * 0.2,
-        px, py, R * 1.15
-      );
-      sg.addColorStop(0, 'rgba(255,255,255,0.18)');   // 高光点（压暗）
-      sg.addColorStop(0.45, 'rgba(255,255,255,0.03)');
-      sg.addColorStop(0.8, 'rgba(0,0,15,0.45)');
-      sg.addColorStop(1, 'rgba(0,0,25,0.75)');         // 边缘暗（加深）
-      ctx.fillStyle = sg;
-      ctx.fillRect(px - R, py - R, R * 2, R * 2);
-      ctx.restore();
-      // 大气层光晕（调暗）
-      const atm = ctx.createRadialGradient(px, py, R * 0.92, px, py, R * 1.3);
-      atm.addColorStop(0, `rgba(${p.glow || '180, 150, 120'}, 0.10)`);
-      atm.addColorStop(1, `rgba(${p.glow || '180, 150, 120'}, 0)`);
-      ctx.fillStyle = atm;
-      ctx.beginPath(); ctx.arc(px, py, R * 1.3, 0, Math.PI * 2); ctx.fill();
-
-      // 星球轮廓描边（深空感）
-      ctx.beginPath();
-      ctx.arc(px, py, R, 0, Math.PI * 2);
-      ctx.strokeStyle = 'rgba(255,255,255,0.10)';
-      ctx.lineWidth = 1;
-      ctx.stroke();
-
-      // 土星环（球体前面上半）
-      if (p.ring) drawSaturnRing(px, py, R, now, true);
-    }
-  }
-
-  /* ── 土星环：椭圆环带 ── */
-  function drawSaturnRing(cx, cy, R, now, front) {
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.rotate(-0.42);                       // 倾角
-    const rx = R * 2.15, ry = R * 0.62;
-    // 前/后半环不同绘制避免遮挡错误
-    ctx.beginPath();
-    ctx.ellipse(0, 0, rx, ry, 0, front ? Math.PI : 0, front ? Math.PI * 2 : Math.PI, !front);
-    ctx.strokeStyle = 'rgba(210, 180, 140, 0.55)';
-    ctx.lineWidth = R * 0.38;
-    ctx.stroke();
-    ctx.restore();
-  }
-
-  /* ── 流星雨：从右上斜划向左下，带拖尾，快速划过 ── */
-  function spawnMeteor() {
-    // 全部从上方/两侧进入，只朝下或斜下方向（绝不向上飞）
-    const edge = Math.floor(Math.random() * 3);       // 0=上 1=右 2=左
-    const speed = 10 + Math.random() * 6;
-    const tail = 110 + Math.random() * 120;
-    let x0, y0, vx, vy;
-    if (edge === 0) {                                 // 顶部 → 斜向左下/右下
-      x0 = Math.random() * W * 0.85;
-      y0 = -30 - Math.random() * 80;
-      const dir = Math.random() > 0.5 ? 1 : -1;
-      vx = dir * (7 + Math.random() * 6);
-      vy = 8 + Math.random() * 5;
-    } else if (edge === 1) {                          // 右侧 → 斜向左下
-      x0 = W + 30 + Math.random() * 80;
-      y0 = Math.random() * H * 0.8;
-      vx = -(7 + Math.random() * 6);
-      vy = 7 + Math.random() * 5;
-    } else {                                          // 左侧 → 斜向右下
-      x0 = -30 - Math.random() * 80;
-      y0 = Math.random() * H * 0.8;
-      vx = 7 + Math.random() * 6;
-      vy = 7 + Math.random() * 5;
-    }
-    meteors.push({
-      x: x0, y: y0, vx, vy,
-      tail, life: 1,
-      w: Math.random() * 2.4 + 1.6,
-      hue: (function () {
-        const palette = ['0, 212, 255', '80, 160, 255', '255, 90, 90', '120, 230, 140', '255, 170, 60', '200, 120, 255'];
-        return palette[Math.floor(Math.random() * palette.length)];
-      })()
-    });
-  }
-
-  function draw() {
-    ctx.clearRect(0, 0, W, H);
-    const LINK_DIST = 130;
-    // 先画连线（在粒子下方）
-    for (let i = 0; i < particles.length; i++) {
-      const p = particles[i];
-      for (let j = i + 1; j < particles.length; j++) {
-        const q = particles[j];
-        const dx = p.x - q.x, dy = p.y - q.y;
-        const d2 = dx * dx + dy * dy;
-        if (d2 < LINK_DIST * LINK_DIST) {
-          const alpha = (1 - Math.sqrt(d2) / LINK_DIST) * 0.28;
-          ctx.strokeStyle = `rgba(${p.c}, ${alpha})`;
-          ctx.lineWidth = 0.7;
-          ctx.beginPath();
-          ctx.moveTo(p.x, p.y);
-          ctx.lineTo(q.x, q.y);
-          ctx.stroke();
+      document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && header.dataset.menuOpen === 'true' && !dialog.open) {
+          setMenu(false);
+          menuToggle.focus();
         }
-      }
-    }
-    // ── 流星雨：更新 + 绘制 ──
-    // 定时生成：平均每 1.8~3.5 秒一条
-    meteorTimer += 16;
-    if (meteorTimer > 700 + Math.random() * 900) {
-      meteorTimer = 0;
-      spawnMeteor();
-      if (Math.random() < 0.45) spawnMeteor();   // 45% 双流星
-      if (Math.random() < 0.18) spawnMeteor();   // 18% 三流星
-    }
-    for (let i = meteors.length - 1; i >= 0; i--) {
-      const m = meteors[i];
-      m.x += m.vx; m.y += m.vy;
-      m.life -= 0.014;                            // 渐隐
-      if (m.life <= 0 || m.x < -m.tail - 60 || m.y > H + 60) {
-        meteors.splice(i, 1);
-        continue;
-      }
-      // 拖尾：从头部到尾部渐变
-      const tx = m.x - (m.vx / Math.hypot(m.vx, m.vy)) * m.tail;
-      const ty = m.y - (m.vy / Math.hypot(m.vx, m.vy)) * m.tail;
-      const grad = ctx.createLinearGradient(m.x, m.y, tx, ty);
-      grad.addColorStop(0, `rgba(${m.hue}, ${1.0 * m.life})`);
-      grad.addColorStop(0.25, `rgba(255, 255, 255, ${0.75 * m.life})`);
-      grad.addColorStop(1, `rgba(${m.hue}, 0)`);
-      ctx.strokeStyle = grad;
-      ctx.lineWidth = m.w * m.life;
-      ctx.lineCap = 'round';
-      ctx.beginPath();
-      ctx.moveTo(m.x, m.y);
-      ctx.lineTo(tx, ty);
-      ctx.stroke();
-      // 外发光
-      ctx.strokeStyle = `rgba(${m.hue}, ${0.28 * m.life})`;
-      ctx.lineWidth = m.w * 2.4 * m.life;
-      ctx.beginPath();
-      ctx.moveTo(m.x, m.y);
-      ctx.lineTo(tx, ty);
-      ctx.stroke();
-      // 头部亮点（更大更亮）
-      ctx.beginPath();
-      ctx.arc(m.x, m.y, 2.6 * m.life, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(255, 255, 255, ${0.95 * m.life})`;
-      ctx.fill();
-      ctx.beginPath();
-      ctx.arc(m.x, m.y, 5 * m.life, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(${m.hue}, ${0.35 * m.life})`;
-      ctx.fill();
-    }
+      });
 
-    // ── 星球层（在粒子下层） ──
-    drawPlanets();
+      function updateHeader() {
+        header.dataset.scrolled = window.scrollY > 20 ? 'true' : 'false';
+      }
 
-    // 画粒子 + 鼠标引力
-    for (const p of particles) {
-      // 鼠标引力（总控吸引）
-      if (mouse.x !== null) {
-        const dx = mouse.x - p.x, dy = mouse.y - p.y;
-        const d = Math.sqrt(dx * dx + dy * dy);
-        if (d < 160 && d > 0.01) {
-          const force = (160 - d) / 160 * 0.06;
-          p.vx += (dx / d) * force;
-          p.vy += (dy / d) * force;
+      updateHeader();
+      window.addEventListener('scroll', updateHeader, { passive: true });
+
+      function openDialog(trigger) {
+        lastTrigger = trigger || null;
+        setMenu(false);
+        formView.hidden = false;
+        successView.hidden = true;
+        copyStatus.textContent = '';
+        if (typeof dialog.showModal === 'function') {
+          dialog.showModal();
+        } else {
+          dialog.setAttribute('open', '');
         }
+        document.body.classList.add('modal-open');
+        window.setTimeout(function () {
+          var firstInput = document.getElementById('company');
+          if (firstInput) firstInput.focus();
+        }, 40);
       }
-      p.x += p.vx; p.y += p.vy;
-      // 边界反弹（留 20px 边距）
-      if (p.x < 20 || p.x > W - 20) p.vx *= -1;
-      if (p.y < 20 || p.y > H - 20) p.vy *= -1;
-      // 速度上限（防爆走）
-      const sp = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
-      if (sp > 0.8) { p.vx *= 0.8 / sp; p.vy *= 0.8 / sp; }
-      // 鼠标附近的粒子更亮
-      let glow = 1;
-      if (mouse.x !== null) {
-        const dx = mouse.x - p.x, dy = mouse.y - p.y;
-        const d = Math.sqrt(dx * dx + dy * dy);
-        if (d < 160) glow = 1.6;
+
+      function closeDialog() {
+        if (typeof dialog.close === 'function') dialog.close();
+        else dialog.removeAttribute('open');
+        document.body.classList.remove('modal-open');
       }
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r * glow, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(${p.c}, ${0.5 * Math.min(glow, 1.8)})`;
-      ctx.fill();
-    }
-    rafId = requestAnimationFrame(draw);
-  }
 
-  function onMouse(e) { mouse.x = e.clientX; mouse.y = e.clientY; }
-  function onLeave() { mouse.x = null; mouse.y = null; }
+      document.querySelectorAll('[data-open-demo]').forEach(function (trigger) {
+        trigger.addEventListener('click', function (event) {
+          event.preventDefault();
+          openDialog(trigger);
+        });
+      });
 
-  // 页面可见才动画（省电）
-  document.addEventListener('visibilitychange', function () {
-    if (document.hidden) { cancelAnimationFrame(rafId); }
-    else { rafId = requestAnimationFrame(draw); }
-  });
+      dialogClose.addEventListener('click', closeDialog);
+      dialog.addEventListener('cancel', function () {
+        document.body.classList.remove('modal-open');
+      });
+      dialog.addEventListener('close', function () {
+        document.body.classList.remove('modal-open');
+        if (lastTrigger && typeof lastTrigger.focus === 'function') lastTrigger.focus();
+      });
+      dialog.addEventListener('click', function (event) {
+        if (event.target === dialog) closeDialog();
+      });
 
-  window.addEventListener('resize', resize);
-  window.addEventListener('mousemove', onMouse, { passive: true });
-  document.documentElement.addEventListener('mouseleave', onLeave);
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        if (!form.reportValidity()) return;
 
-  resize();
-  rafId = requestAnimationFrame(draw);
-})();
-</script>
+        var data = new FormData(form);
+        var company = String(data.get('company') || '').trim();
+        var name = String(data.get('name') || '').trim();
+        var contact = String(data.get('contact') || '').trim();
+        var scope = String(data.get('scope') || '').trim() || '待确认';
+        var need = String(data.get('need') || '').trim() || '待确认';
+
+        currentSummary = [
+          'Astraea Plan 部署评估预约',
+          '公司：' + company,
+          '联系人：' + name,
+          '联系方式：' + contact,
+          '门店规模：' + scope,
+          '希望先接入：' + need
+        ].join('\n');
+
+        summary.textContent = currentSummary;
+        formView.hidden = true;
+        successView.hidden = false;
+        successView.focus();
+      });
+
+      function selectSummary() {
+        var range = document.createRange();
+        range.selectNodeContents(summary);
+        var selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+      }
+
+      copyButton.addEventListener('click', function () {
+        copyStatus.textContent = '';
+        if (navigator.clipboard && window.isSecureContext) {
+          navigator.clipboard.writeText(currentSummary).then(function () {
+            copyStatus.textContent = '已复制，可以发送给项目团队。';
+          }).catch(function () {
+            selectSummary();
+            copyStatus.textContent = '摘要已选中，请使用系统复制快捷键。';
+          });
+        } else {
+          selectSummary();
+          copyStatus.textContent = '摘要已选中，请使用系统复制快捷键。';
+        }
+      });
+
+      editButton.addEventListener('click', function () {
+        successView.hidden = true;
+        formView.hidden = false;
+        document.getElementById('company').focus();
+      });
+
+      var revealItems = Array.prototype.slice.call(document.querySelectorAll('[data-reveal]'));
+      if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        var observer = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          });
+        }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+
+        revealItems.forEach(function (item) {
+          observer.observe(item);
+        });
+      } else {
+        revealItems.forEach(function (item) {
+          item.classList.add('is-visible');
+        });
+      }
+
+      document.getElementById('year').textContent = String(new Date().getFullYear());
+    })();
+  </script>
 </body>
 </html>

@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta name="msvalidate.01" content="390E66CB7969745CA44781618CAB65D5" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="bytedance-verification-code" content="lJJyW3NAXo6/PtTeVssL" />
+  <meta name="baidu-site-verification" content="codeva-CYFAAQzfXk" />
+  <title>Astraea Plan｜企业级智能体部署架构，连锁企业私有化办公调度智能体 - 设计者：大军</title>
+  <meta name="description" content="Astraea Plan是面向连锁多门店场景的企业级智能体部署方案，一套私有化AI全域自治管理系统，以自研智能体调度中枢搭建办公调度智能体集群，打通飞书、企业微信、钉钉、微信公众号等渠道，实现总部门店自动化工单、数据监控、任务分发，包含Cosmic Web门店节点部署项目。方案由大军主导设计，已落地魔方小镇城市书房连锁体系。" />
+  <meta name="keywords" content="Astraea Plan,企业级智能体部署,办公调度智能体集群,连锁企业私有化AI,智能体架构,智能体调度中枢,魔方小镇城市书房,大军" />
+  <meta property="og:title" content="Astraea Plan｜企业级智能体部署架构 - 设计者：大军" />
+  <meta property="og:description" content="面向连锁多门店场景的企业级智能体部署方案，私有化AI全域自治管理系统，已落地魔方小镇城市书房连锁体系，由大军主导设计。" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://luhongshuai.com/" />
+  <link rel="canonical" href="https://luhongshuai.com/" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Astraea Plan",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "macOS / Linux",
+    "description": "面向连锁多门店场景的企业级智能体部署架构（Agent Infrastructure），已生产落地于魔方小镇城市书房188家门店体系。包含智能体集群调度、A2A智能体间协议、本地+云端双模型通道、工作经验沉淀技能体系、每日自动化业务闭环。由大军主导设计。",
+    "offers": {
+      "@type": "Offer",
+      "price": "按业务规模灵活定制",
+      "priceCurrency": "CNY"
+    },
+    "featureList": "智能体集群调度, A2A协议互联, 本地私有化+云端双模型, 每日自动化闭环, 工作经验沉淀, 单点自愈, 跨设备互联"
+  }
+  </script>
+  <style>
+    :root {
+      --bg: #060a14;
+      --bg2: #0a1020;
+      --card: rgba(17, 24, 39, 0.8);
+      --border: rgba(0, 212, 255, 0.15);
+      --accent: #00d4ff;
+      --accent-dim: rgba(0, 212, 255, 0.35);
+      --accent2: #7b61ff;
+      --text: #e5e7eb;
+      --muted: #8892a6;
+      --glow: 0 0 20px rgba(0, 212, 255, 0.3);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Noto Sans SC", "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.75;
+      overflow-x: hidden;
+    }
+    /* 星空网格背景 */
+    .stars {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: -2;
+      background:
+        radial-gradient(ellipse at 20% 20%, rgba(0, 212, 255, 0.06) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 30%, rgba(123, 97, 255, 0.05) 0%, transparent 50%),
+        var(--bg);
+    }
+    #bg-network {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.85;
+    }
+    .grid-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: -1;
+      background-image:
+        linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+      -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+    }
+    .container { max-width: 900px; margin: 0 auto; padding: 40px 24px 60px; }
+
+    /* 导航 */
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px 24px;
+    }
+    .nav .logo {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 0.5px;
+    }
+    .nav .logo span { color: var(--muted); font-weight: 400; margin-left: 8px; font-size: 0.85rem; }
+    .nav .links a {
+      color: var(--muted);
+      text-decoration: none;
+      margin-left: 24px;
+      font-size: 0.9rem;
+      transition: color 0.2s;
+    }
+    .nav .links a:hover { color: var(--accent); }
+
+    /* Hero */
+    .hero {
+      position: relative;
+      padding: 64px 32px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(26, 17, 69, 0.9) 55%, rgba(10, 16, 32, 0.95) 100%);
+      border: 1px solid var(--border);
+      margin-bottom: 32px;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -50%; left: -20%;
+      width: 140%; height: 200%;
+      background: conic-gradient(from 90deg at 50% 50%, transparent 0deg, rgba(0,212,255,0.08) 60deg, transparent 120deg);
+      animation: rotate 24s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes rotate { to { transform: rotate(360deg); } }
+    .hero .badge {
+      display: inline-block;
+      padding: 4px 14px;
+      border: 1px solid var(--accent-dim);
+      border-radius: 20px;
+      font-size: 0.75rem;
+      color: var(--accent);
+      letter-spacing: 2px;
+      margin-bottom: 20px;
+      background: rgba(0, 212, 255, 0.06);
+    }
+    .hero h1 {
+      font-size: 2.6rem;
+      line-height: 1.2;
+      background: linear-gradient(90deg, #00d4ff 0%, #7b61ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 16px;
+      position: relative;
+    }
+    .hero .sub {
+      color: var(--muted);
+      font-size: 1.05rem;
+      position: relative;
+    }
+    .hero .sub strong { color: var(--accent); }
+
+    /* 黄金段落 */
+    .lead {
+      font-size: 1.12rem;
+      background: var(--card);
+      border-left: 3px solid var(--accent);
+      padding: 26px 28px;
+      border-radius: 0 14px 14px 0;
+      margin-bottom: 20px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+    }
+    .lead strong { color: var(--accent); }
+
+    /* 案例 */
+    .case {
+      background: var(--card);
+      border: 1px solid rgba(123, 97, 255, 0.25);
+      border-radius: 14px;
+      padding: 24px 28px;
+      margin-bottom: 32px;
+      backdrop-filter: blur(8px);
+    }
+    .case .tag {
+      display: inline-block;
+      padding: 3px 12px;
+      background: rgba(123, 97, 255, 0.15);
+      border: 1px solid rgba(123, 97, 255, 0.4);
+      border-radius: 16px;
+      font-size: 0.75rem;
+      color: #b8a6ff;
+      margin-bottom: 12px;
+      letter-spacing: 1px;
+    }
+    .case strong { color: var(--accent2); }
+
+    h2 {
+      font-size: 1.35rem;
+      color: var(--accent);
+      margin: 44px 0 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    h2::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, var(--accent-dim), transparent);
+    }
+
+    /* 架构图 */
+    .arch {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 28px;
+      margin: 16px 0 24px;
+      backdrop-filter: blur(8px);
+    }
+    .arch pre {
+      font-family: "SF Mono", "JetBrains Mono", Menlo, monospace;
+      font-size: 0.88rem;
+      line-height: 1.5;
+      color: var(--accent);
+      overflow-x: auto;
+    }
+    .arch pre .dim { color: var(--muted); }
+
+    /* 核心架构树 */
+    .arch-tree { text-align: center; }
+    .ctrl-node {
+      display: inline-block;
+      background: linear-gradient(135deg, rgba(0,212,255,0.15), rgba(0,120,255,0.08));
+      border: 1.5px solid var(--accent);
+      border-radius: 14px;
+      padding: 16px 36px;
+      margin: 8px auto 0;
+      box-shadow: 0 0 24px rgba(0,212,255,0.15);
+    }
+    .ctrl-node .t { color: var(--accent); font-weight: 700; font-size: 1.05rem; letter-spacing: 1px; }
+    .ctrl-node .s { color: var(--muted); font-size: 0.82rem; margin-top: 4px; }
+    .ctrl-line { color: var(--accent-dim); font-size: 1.2rem; margin: 6px 0; letter-spacing: 2px; }
+    .connector { display: block; width: 100%; height: 96px; margin: 2px 0 10px; }
+    /* 实线流动光点 */
+    .flow-dot { animation: dot-pulse 1.2s ease-in-out infinite alternate; }
+    @keyframes dot-pulse {
+      from { opacity: 0.6; }
+      to { opacity: 1; }
+    }
+    /* 总控方框：彩色流光边框 */
+    .ctrl-node { position: relative; z-index: 0; }
+    .ctrl-node::before {
+      content: "";
+      position: absolute;
+      inset: -2px;
+      border-radius: 16px;
+      padding: 2px;
+      background: conic-gradient(from var(--angle, 0deg), #00d4ff, #ff8a65, #ffb74d, #00d4ff, #ff8a65, #00d4ff);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask-composite: exclude;
+      animation: border-flow 4s linear infinite;
+      z-index: -1;
+    }
+    @property --angle {
+      syntax: '<angle>';
+      initial-value: 0deg;
+      inherits: false;
+    }
+    @keyframes border-flow {
+      to { --angle: 360deg; }
+    }
+    .branches { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-top: 10px; }
+    .branch {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 16px;
+      text-align: left;
+      backdrop-filter: blur(8px);
+    }
+    .branch-head { color: var(--accent2); font-weight: 700; font-size: 1rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+    .branch.outer .branch-head { color: #ffb74d; }
+    .branch.store .branch-head { color: #ff8a65; }
+    .agent-chip {
+      background: rgba(0,212,255,0.07);
+      border: 1px solid rgba(0,212,255,0.2);
+      border-radius: 8px;
+      padding: 8px 12px;
+      margin: 6px 0;
+      color: var(--text);
+      font-size: 0.9rem;
+    }
+    .branch.outer .agent-chip { border-color: rgba(255,183,77,0.3); background: rgba(255,183,77,0.06); }
+    .branch.store .agent-chip { border-color: rgba(255,138,101,0.3); background: rgba(255,138,101,0.06); }
+    .branch-foot { color: var(--muted); font-size: 0.78rem; margin-top: 12px; padding-top: 10px; border-top: 1px dashed rgba(0,212,255,0.15); }
+
+
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0 24px; }
+    .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin: 16px 0 24px; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px;
+      transition: transform 0.2s, border-color 0.2s;
+      backdrop-filter: blur(8px);
+    }
+    .card:hover { transform: translateY(-3px); border-color: var(--accent-dim); }
+    .card h3 { color: var(--accent); margin-bottom: 10px; font-size: 1.02rem; }
+    .card ul { padding-left: 20px; }
+    .card li { margin: 6px 0; color: var(--text); font-size: 0.95rem; }
+
+    /* 每日闭环 */
+    .timeline {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px 28px;
+      margin: 16px 0;
+      font-family: "SF Mono", Menlo, monospace;
+      font-size: 0.92rem;
+      backdrop-filter: blur(8px);
+    }
+    .timeline .t-item {
+      display: flex;
+      align-items: baseline;
+      padding: 8px 0;
+      border-bottom: 1px dashed rgba(0, 212, 255, 0.12);
+    }
+    .timeline .t-item:last-child { border-bottom: none; }
+    .timeline .t-time { color: var(--accent); font-weight: 600; width: 64px; flex-shrink: 0; }
+    .timeline .t-text { color: var(--text); }
+
+    /* FAQ */
+    .faq {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px 26px;
+      margin: 12px 0;
+      backdrop-filter: blur(8px);
+    }
+    .faq .q { color: var(--accent); font-weight: 600; margin-bottom: 6px; }
+    .faq .a { color: var(--text); }
+
+    /* 页脚 */
+    .footer {
+      margin-top: 60px;
+      padding: 24px 0;
+      border-top: 1px solid rgba(0, 212, 255, 0.1);
+      color: var(--muted);
+      font-size: 0.88rem;
+      text-align: center;
+    }
+    .footer .brand { color: var(--accent); font-weight: 600; }
+    .footer a { color: var(--accent2); text-decoration: none; }
+
+    @media (max-width: 640px) {
+      .grid { grid-template-columns: 1fr; }
+      .grid3 { grid-template-columns: 1fr; }
+      .branches { grid-template-columns: 1fr; }
+      .hero { padding: 40px 20px; }
+      .hero h1 { font-size: 1.7rem; }
+      .nav .links a { margin-left: 14px; }
+      /* 手机导航：链接换行紧凑排布 */
+      .nav { flex-wrap: wrap; gap: 8px; padding: 14px 16px; }
+      .nav .logo { font-size: 1.05rem; }
+      .nav .logo span { display: block; margin-left: 0; font-size: 0.72rem; }
+      .nav .links { display: flex; flex-wrap: wrap; gap: 4px 12px; width: 100%; margin-top: 6px; }
+      .nav .links a { margin-left: 0; font-size: 0.82rem; }
+      /* 容器与卡片紧凑 */
+      .container { padding: 20px 14px 40px; }
+      .lead { padding: 18px 16px; font-size: 1rem; }
+      .case { padding: 18px 16px; margin-bottom: 20px; }
+      .card { padding: 16px; }
+      .faq { padding: 16px 14px; }
+      .hero { padding: 32px 16px; border-radius: 14px; }
+      .hero .sub { font-size: 0.95rem; }
+      /* 星球调小避免抢屏 */
+      #bg-network { opacity: 0.75; }
+      /* 核心架构三分支：横向滑动卡片（保留并列语义，不纵向堆叠） */
+      .branches {
+        display: flex;
+        grid-template-columns: none;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        gap: 14px;
+        margin: 10px -6px 0;
+        padding: 2px 6px 12px;
+        scrollbar-width: thin;
+      }
+      .branches::-webkit-scrollbar { height: 4px; }
+      .branches::-webkit-scrollbar-thumb { background: rgba(0,212,255,0.3); border-radius: 2px; }
+      .branch {
+        flex: 0 0 80%;
+        scroll-snap-align: center;
+      }
+      /* 滑动提示 */
+      .arch-tree .branches::after {
+        content: '← 左右滑动查看 →';
+        flex: 0 0 auto;
+        align-self: center;
+        color: var(--muted);
+        font-size: 0.72rem;
+        padding: 0 8px;
+        white-space: nowrap;
+      }
+    }
+    @media (max-width: 420px) {
+      .hero h1 { font-size: 1.45rem; }
+      .nav .logo span { display: none; }        /* 超小屏隐藏英文副标 */
+      .nav .links a { font-size: 0.78rem; }
+      .container { padding: 16px 10px 32px; }
+      .card h3 { font-size: 0.95rem; }
+      .case .tag { font-size: 0.68rem; }
+    }
+  </style>
+  <!-- 头条搜索自动收录JS -->
+<script>
+(function(){
+var el = document.createElement("script");
+el.src = "https://lf1-cdn-tos.bytegoofy.com/goofy/ttzz/push.js?bd8578d6f1d152a379c7be50945e686d7b7d833498b6a434f789edc67b62ee3830632485602430134f60bc55ca391050b680e2741bf7233a8f1da9902314a3fa";
+el.id = "ttzz";
+var s = document.getElementsByTagName("script")[0];
+s.parentNode.insertBefore(el, s);
+})(window)
+</script>
+</head>
+<body>
+  <div class="stars"></div>
+  <div class="grid-overlay"></div>
+  <canvas id="bg-network" aria-hidden="true"></canvas>
+
+
+  <nav class="nav">
+    <div class="logo">Astraea Plan</div>
+    <div class="links">
+      <a href="#adv">优势</a>
+      <a href="#industry">行业</a>
+      <a href="#arch">架构</a>
+      <a href="#flywheel">飞轮</a>
+      <a href="#loop">闭环</a>
+      <a href="#cost">投入</a>
+      <a href="#faq">FAQ</a>
+    </div>
+  </nav>
+
+  <div class="container">
+
+    <div class="hero">
+      <span class="badge">企业级智能体部署架构</span>
+      <h1>Astraea Plan</h1>
+      <p class="sub">连锁企业私有化办公调度智能体集群架构 ｜ 由大军主导设计</p>
+    </div>
+
+    <div class="lead">
+      <p>Astraea Plan是面向连锁多门店场景打造的<strong>企业级智能体部署架构</strong>，一套私有化AI全域自治管理系统，由<strong>大军</strong>主导设计。方案基于Hermes智能体构建<strong>办公调度智能体集群</strong>，智能体本体集中部署于公司工作站、不分化，本地运行不上云，好维护、极度安全；大模型采用本地私有化与云端双通道灵活选择运行，打通飞书、企业微信、钉钉、微信公众号等渠道，实现总部与门店自动化任务调度、数据监控、工单智能分发，下辖Cosmic Web门店节点。</p>
+    </div>
+
+    <div class="case">
+      <span class="tag">落地实践案例</span>
+      <p>Astraea Plan整套架构已落地应用于<strong>魔方小镇城市书房</strong>连锁体系，面向全国多门店复合自习书房业态完成私有化智能体集群部署，实现总部与线下门店统一办公调度、数据自动汇总、工单智能分发。方案依托Hermes调度中枢，验证了连锁企业本地私有化大模型与云端大模型灵活选择、飞书+企业微信+钉钉+微信公众号多渠道智能体长期稳定运行能力。</p>
+    </div>
+
+    <h2 id="adv">⚡ 核心优势 · 真正会办事的AI</h2>
+
+    <div class="grid3">
+      <div class="card">
+        <h3>🧠 超强长期记忆 · 永不遗忘</h3>
+        <ul>
+          <li>部署长期记忆库，每天的工作与决策持续累积</li>
+          <li>永远不会忘记：某年某月某天，公司发生了什么</li>
+          <li>人走业务不断：经验沉淀为组织资产，新人对接智能体即可快速入岗</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>🤝 智能体自主办事 · 招聘全流程</h3>
+        <ul>
+          <li>能自己登录招聘网站，整理应聘者信息与简历</li>
+          <li>与候选人自然对话、索取简历文件</li>
+          <li>整理后带文件返回公司办公平台，直接交付人事</li>
+          <li>还能结合岗位画像，辅助筛选谁更适合公司</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>🛡️ 对外客服 · 安全隔离不"AI味"</h3>
+        <ul>
+          <li>对外客服与内部办公智能体物理隔离，内部信息永不外泄</li>
+          <li>拥有独立专属知识库，灵活应答客户问题</li>
+          <li>告别传统AI机器人的"AI味"与弱智感，像真人一样专业服务</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="case">
+      <span class="tag">🌱 人走业务不断 · 新人快速入岗</span>
+      <p>同事离职，新职员上岗后直接与对应部门智能体对接，即可快速了解自己的业务；部分岗位离职不断岗——智能体每天照常做数据调度，业务一天不落。新同事到岗后，智能体还能担任"带教老师"：讲解业务要点、陪跑日常流程，帮助新人快速入岗。组织经验沉淀在智能体里，人走，业务不走。</p>
+    </div>
+
+    <div class="case">
+      <span class="tag">🛠️ 单点自愈 · 5分钟拉起恢复</span>
+      <p>任意一个智能体在某时点出现故障，都不会影响其他智能体正常工作——各管一摊、互不拖累。也无需担心技术维修：主控或技术智能体几乎5分钟以内即可将其拉起、恢复运行，<strong>记忆无损、工作不断</strong>，业务持续在线。</p>
+    </div>
+
+    <div class="case">
+      <span class="tag">🏭 跨行业适配 · 灵活改造部署</span>
+      <p>智能体架构可按不同行业灵活改造——零售、餐饮、教育、制造、服务……按行业特性定制智能体分工与业务流程，一套架构，适配各类行业场景。</p>
+    </div>
+
+    <p style="color: var(--muted); margin-top: 4px;">智能体之间还能通过A2A协议协作：老板（主管）一个主控指挥全局，同部门严格授权发起讨论对抗，让数据经过检验、更准确。</p>
+    <div class="grid">
+      <div class="card">
+        <h3>📡 纵向指挥 · 上下级派发任务</h3>
+        <ul>
+          <li>老板（主管）只需一个主控智能体，统一指挥全局</li>
+          <li>可向部门任意一个智能体直接派发任务，上下级关系清晰</li>
+          <li>任务自动流转、结果自动回传，全程留痕可追溯</li>
+          <li>指挥链一条线，权责分明，管理效率倍增</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>⚔️ 横向协作 · 严格授权讨论与对抗</h3>
+        <ul>
+          <li>同部门多智能体，经严格授权发起A2A讨论与对抗</li>
+          <li>智能体与智能体互相审查、对抗验证，纠出彼此的疏漏</li>
+          <li>数据经多重校验，更准确、更可靠</li>
+          <li>像资深团队互审互校，把单一智能体的误差降到最低</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="case" style="border-color: rgba(0, 212, 255, 0.4); box-shadow: 0 0 30px rgba(0,212,255,0.08);">
+      <span class="tag">🌐 Agent Network · 已投入生产</span>
+      <p>这不是蓝图，是<strong>现状</strong>。集群基于 Linux 基金会 A2A 标准协议，智能体与智能体之间已经实现：<strong>相互发现、能力理解、授权协作、上下文转交、结果互验</strong>。本机与异地电脑上的智能体已<strong>跨设备互联并每日生产运行</strong>——多部门智能体像一支团队一样互相对话、互审互校，而不是各自孤岛。传话走 A2A，任务跨机流转，全程留痕可审计。</p>
+      <p style="margin-top:0.6rem;">举个简单的例子：总部与千里之外的门店，各有一名智能体值守。总部智能体要核对门店账目，只需与门店智能体对话——对方在本地查数、完成对账、把结果传回总部，全程自动、全程留痕；查数据、盯监控、对话协作、互审互校，跨地域都一样顺滑。</p>
+      <div class="grid3" style="margin-top:1rem;">
+        <div class="card">
+          <h3>🖥️ 单机多智能体</h3>
+          <ul>
+            <li>一台主机上，多个部门智能体协同共事</li>
+            <li>主控统一调度，部门各司其职、互不干扰</li>
+            <li>单点自愈，任一智能体故障 5 分钟内拉起恢复</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>🔗 局域网跨设备</h3>
+          <ul>
+            <li>同一办公网络内，多台电脑上的智能体互联互通</li>
+            <li>任务跨机流转、文件就近调用，无需手动搬运</li>
+            <li>办公室里的智能体团队，随时互相支援</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>🏪 跨地区连锁企业</h3>
+          <ul>
+            <li>总部与全国各门店的智能体跨地域互联</li>
+            <li>门店数据本地闭环，总部远程调度与汇总</li>
+            <li>千里之外如同比邻，业务协同不间断</li>
+          </ul>
+        </div>
+      </div>
+      <p style="margin-top:0.8rem; color: var(--muted);">三阶段逐级打通，均已投入生产——从一台主机到一间办公室，再到全国连锁企业，智能体网络随业务规模一起成长。</p>
+    </div>
+
+    <h2 id="industry">🏭 行业落地能力 · 一套架构适配各类行业</h2>
+    <p style="color: var(--muted);">从连锁企业到餐饮连锁，Astraea Plan架构可按行业特性灵活改造——边缘实时闭环 + 行业专属知识库 + 按规模部署，真正"一套架构，适配百业"。</p>
+    <div class="grid3">
+      <div class="card">
+        <h3>⚡ 边缘实时 + 中心批处理混合架构</h3>
+        <ul>
+          <li>门店侧：点餐、排班、库存预警等高频场景在店内本地实时闭环</li>
+          <li>总部侧：跨店汇总、经营分析、策略生成回传总控</li>
+          <li>高峰期分钟级响应，不依赖云端往返</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>📚 行业专属知识库（RAG增强）</h3>
+        <ul>
+          <li>接入行业特有结构化数据：菜品、过敏原、保质期、供应商、促销规则</li>
+          <li>关键领域（过敏原/保质期/价格）杜绝模型幻觉</li>
+          <li>通用模型 + 专属知识库，回答既准又专业</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>📦 按规模灵活部署</h3>
+        <ul>
+          <li>中大型连锁/加盟：深度定制私有化，专属技术团队优化</li>
+          <li>小型连锁：标准化智能运营套件，快速落地控制成本</li>
+          <li>端云协同：核心数据本地加密，云端只做模型迭代</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2 id="arch">🏗️ 核心架构</h2>
+    <div class="arch-tree">
+      <div class="ctrl-node">
+        <div class="t">总控智能体 · 中央</div>
+        <div class="s">统一调度 / 学习 / 沉淀 / 汇报 —— 全局可控</div>
+      </div>
+      <div class="ctrl-line"></div>
+      <svg class="connector" viewBox="0 0 900 110" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <filter id="glow-line" x="-80%" y="-80%" width="260%" height="260%">
+            <feGaussianBlur stdDeviation="4.5" result="blur"/>
+            <feMerge>
+              <feMergeNode in="blur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
+        <!-- 总控 → 内部办公：青色实线 + 流动光点 -->
+        <path d="M450,0 V20 L150,52 V110" stroke="#00d4ff" stroke-width="3" fill="none" filter="url(#glow-line)" opacity="0.95"/>
+        <path d="M450,0 V20 L150,52 V110" stroke="#00d4ff" stroke-width="1" fill="none" opacity="0.45"/>
+        <circle class="flow-dot" r="4" fill="#00d4ff" filter="url(#glow-line)">
+          <animateMotion dur="1.6s" repeatCount="indefinite" path="M450,0 V20 L150,52 V110"/>
+        </circle>
+        <!-- 总控 → 对外：青色实线 + 流动光点 -->
+        <path d="M450,0 V110" stroke="#00d4ff" stroke-width="3" fill="none" filter="url(#glow-line)" opacity="0.95"/>
+        <path d="M450,0 V110" stroke="#00d4ff" stroke-width="1" fill="none" opacity="0.45"/>
+        <circle class="flow-dot" r="4" fill="#00d4ff" filter="url(#glow-line)">
+          <animateMotion dur="2.2s" repeatCount="indefinite" path="M450,0 V110"/>
+        </circle>
+        <!-- 总控 → 门店：橙红实线 + 流动光点 -->
+        <path d="M450,0 V20 L750,52 V110" stroke="#ff8a65" stroke-width="3" fill="none" filter="url(#glow-line)" opacity="0.95"/>
+        <path d="M450,0 V20 L750,52 V110" stroke="#ff8a65" stroke-width="1" fill="none" opacity="0.45"/>
+        <circle class="flow-dot" r="4" fill="#ff8a65" filter="url(#glow-line)">
+          <animateMotion dur="1.2s" repeatCount="indefinite" path="M450,0 V20 L750,52 V110"/>
+        </circle>
+        <!-- 末端箭头：指向三个板块 -->
+        <polygon points="138,92 150,110 162,92" fill="#00d4ff" filter="url(#glow-line)"/>
+        <polygon points="438,92 450,110 462,92" fill="#00d4ff" filter="url(#glow-line)"/>
+        <polygon points="738,92 750,110 762,92" fill="#ff8a65" filter="url(#glow-line)"/>
+      </svg>
+      <div class="branches">
+        <div class="branch">
+          <div class="branch-head">🏢 内部办公智能体</div>
+          <div class="agent-chip">财务部智能体</div>
+          <div class="agent-chip">运营部智能体</div>
+          <div class="agent-chip">图书部智能体</div>
+          <div class="agent-chip">市场部智能体</div>
+          <div class="branch-foot">每天自动拉数 / 出日报 / 标异常 / 发部门群</div>
+        </div>
+        <div class="branch outer">
+          <div class="branch-head">🌐 对外智能体</div>
+          <div class="agent-chip">招聘智能体</div>
+          <div class="agent-chip">客服智能体</div>
+          <div class="agent-chip">更多对外场景 …</div>
+          <div class="branch-foot">对外服务 / 独立知识库 / 物理隔离不泄密</div>
+        </div>
+        <div class="branch store">
+          <div class="branch-head">🏪 门店智能体</div>
+          <div class="agent-chip">数据监控智能体</div>
+          <div class="agent-chip">物料监控智能体</div>
+          <div class="agent-chip">门店运营节点 …</div>
+          <div class="branch-foot">终端场景 / 门店数据与物料实时管控</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h3>核心设计：物理隔离</h3>
+        <ul>
+          <li>一个企微Bot只服务一个部门群，各管各的，永不交叉</li>
+          <li>每个部门智能体知识范围严格垂直，绝不混入其他部门知识</li>
+          <li>一个进程挂了不影响其他部门</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>关键能力</h3>
+        <ul>
+          <li>智能体本体部署于公司工作站、不分化，好维护、极度安全</li>
+          <li>大模型本地私有化 + 云端双通道，灵活选择运行</li>
+          <li>飞书、企业微信、钉钉、微信公众号等渠道打通</li>
+          <li>总部-门店自动化工单、数据监控、任务分发</li>
+          <li>Cosmic Web门店节点部署</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2 id="flywheel">🌀 数据飞轮 · 智能体越用越顺手</h2>
+    <p style="color: var(--muted);">数据每天都在转，知识每天都在长——智能体不是装完就定型，而是与企业一起持续进化、越用越懂业务。</p>
+    <div class="grid3">
+      <div class="card">
+        <h3>⚙️ 数据飞轮 · 自动运转</h3>
+        <ul>
+          <li>经营数据每日自动汇聚、对账与复盘——白天干活，夜里沉淀</li>
+          <li>数据每转一圈，智能体对企业业务的理解就更深一层</li>
+          <li>多部门协同跑数、异常自动预警，管理层只看结论、不用翻表</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>🏛️ 企业专属知识库 · 自家档案自家用</h3>
+        <ul>
+          <li>制度、经验、文档统一沉淀入库，私有本地存储，不上云、不外泄</li>
+          <li>智能体答问先查自家知识，有据可依，不靠模型凭空发挥</li>
+          <li>海量档案也能精准命中，回答既快又靠谱</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>📊 老板工作台 · 一屏看清全局</h3>
+        <ul>
+          <li>智能体集群运行状态可视化：各部门动态、任务进度一目了然</li>
+          <li>异常与预警自动上屏，问题在影响业务前就被看见</li>
+          <li>随时打开即看，全公司智能办公的运转尽在掌握</li>
+        </ul>
+      </div>
+    </div>
+    <div class="case" style="border-color: rgba(0, 212, 255, 0.4); box-shadow: 0 0 30px rgba(0,212,255,0.08);">
+      <span class="tag">🧠 持久记忆库 · 沉淀反哺</span>
+      <p>每一天的业务数据、工作决策与复盘，都会沉淀进<strong>持久记忆库</strong>长期留存——智能体对这家企业越用越懂、越懂越准。人走，业务不断；新人入职，直接对接智能体就能接手业务、获得带教。企业经验在智能体身上持续积累、反向沉淀，这正是企业级智能体与单点 AI 助手的本质区别。</p>
+    </div>
+
+    <h2 id="loop">🔄 每日闭环</h2>
+    <div class="timeline">
+      <div class="t-item"><span class="t-time">23:55</span><span class="t-text">各部门智能体生成当天详细工作总结 → 归档 + 发部门群</span></div>
+      <div class="t-item"><span class="t-time">23:57</span><span class="t-text">总控智能体检查归档、逐字阅读每一份总结、存入永久记忆</span></div>
+      <div class="t-item"><span class="t-time">23:59</span><span class="t-text">总控向管理层汇报：归档情况 + 各部门今日核心动态</span></div>
+    </div>
+    <p style="color: var(--muted);">这套闭环跑下来，管理层每天睡前都能掌握全公司各部门的动态。而总控智能体，每天都在变聪明。</p>
+
+    <h2 id="journey">🚀 研发历程 · 从立项到多部门稳定生产</h2>
+    <div class="timeline">
+      <div class="t-item"><span class="t-time">2026.03</span><span class="t-text"><strong>项目立项研发</strong>：Astraea Plan正式启动，完成智能体集群架构设计、核心调度引擎与部门知识库搭建</span></div>
+      <div class="t-item"><span class="t-time">2026.05</span><span class="t-text"><strong>企业内部公测</strong>：多部门同时上线公测，财务、运营、图书、市场等核心部门智能体开始协同办公</span></div>
+      <div class="t-item"><span class="t-time">2026.08</span><span class="t-text"><strong>数据基座升级</strong>：经营数据直连日清，企业知识库与持久记忆库成型；数据飞轮自动运转、老板可视化工作台上线，多部门持续生产运行</span></div>
+      <div class="t-item"><span class="t-time">至今</span><span class="t-text"><strong>稳定生产使用</strong>：持续稳定运行 + 不断升级迭代，多部门已实现常态化智能办公，每天自动完成数据汇总、工作总结、智能复盘与管理层汇报</span></div>
+    </div>
+    <p style="color: var(--muted);">从研发到多部门稳定生产，Astraea Plan经受住了真实业务场景的持续检验——不是概念蓝图，而是已经跑起来的生产系统。</p>
+
+    <h2 id="cost">💻 设备投入 · 按业务规模灵活定制</h2>
+    <div class="case">
+      <span class="tag">💰 轻投入 · 高回报</span>
+      <p>Astraea Plan采用<strong>按需分级部署</strong>：设备投入随业务规模弹性伸缩，小团队轻量起步、中大型团队私有化重算力——<strong>设备费用与市面已知同类方案相比极低</strong>，token 使用量极低、维护费用极低，能力却卓越超强。</p>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <h3>🚀 小团队 · 轻量起步</h3>
+        <ul>
+          <li>设备投入 <strong>数万元起</strong>，单机工作站即可承载整套智能体集群</li>
+          <li>云端大模型按量调度，<strong>每月调度费用约千元起</strong></li>
+          <li>软件部署成本极低，开箱即用、无需专门机房</li>
+          <li>先跑通业务验证，再按需平滑扩容</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>🏢 中大型团队 · 私有化重算力</h3>
+        <ul>
+          <li>本地私有化部署<strong>能力超强的大模型</strong>，大幅节省 token 消耗</li>
+          <li>设备部署 <strong>数十万元起</strong>，按门店/业务规模弹性扩展</li>
+          <li>软件部署费用同样极低，一次性交付、长期可用</li>
+          <li>核心数据全程本地，安全合规与成本双优</li>
+        </ul>
+      </div>
+    </div>
+    <p style="color: var(--muted); margin-top: 4px;">本地推理 + 云端增量双通道：日常高频任务走本地模型几乎不耗 token，复杂推理才按需调用云端——长期运行成本远低于纯云端方案，能力上限却保持一致。</p>
+
+    <h2 id="service">🤝 长期服务承诺 · 不是装完就走，而是长期战线</h2>
+    <div class="case">
+      <span class="tag">🛡️ 部署只是开始 · 长期负责到底</span>
+      <p>市面上很多方案是<strong>"给你安装完、教你点两下就结束"</strong>。Astraea Plan的模式完全不同：<strong>交付部署只是长期合作的起点</strong>，我们提供的是持续性的长期服务战线——</p>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <h3>🛠️ 长期负责维护</h3>
+        <ul>
+          <li>系统上线后持续维护，第一时间响应异常与故障</li>
+          <li>运行状态主动巡检，问题在影响业务前被发现处理</li>
+          <li>数据安全与稳定性全程守护，不让系统带病运行</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>🔄 正常系统升级</h3>
+        <ul>
+          <li>框架、模型、依赖持续跟进升级，不落后于技术演进</li>
+          <li>性能持续优化，随业务量增长自动扩展能力</li>
+          <li>版本平滑演进，升级不停机、不影响日常办公</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>📈 按企业合理需求双升级</h3>
+        <ul>
+          <li>不只是"修 bug"，更主动跟随企业业务变化迭代功能</li>
+          <li>新部门要接入、新场景要覆盖——按企业合理需求持续扩展</li>
+          <li>业务发展 → 系统升级 → 业务再发展，形成正向循环</li>
+        </ul>
+      </div>
+    </div>
+    <p style="color: var(--muted);">一句话：<strong>装完只是开始，长期负责维护、持续双升级——把智能体系统当长期资产经营，而不是一次性买卖。</strong></p>
+
+    <h2 id="faq">❓ 常见问题</h2>
+    <div class="faq">
+      <p class="q">Q：Astraea Plan是谁主导设计？</p>
+      <p class="a">A：整套企业级智能体部署架构由<strong>大军</strong>主导落地，专为连锁多门店私有化办公调度场景打造。</p>
+    </div>
+    <div class="faq">
+      <p class="q">Q：Astraea Plan架构有没有真实企业落地验证？</p>
+      <p class="a">A：方案由<strong>大军</strong>主导设计，已经在<strong>魔方小镇城市书房</strong>全国连锁企业体系完成生产环境部署，是经过多门店长期运行验证的私有化办公调度智能体架构。</p>
+    </div>
+    <div class="faq">
+      <p class="q">Q：部署Astraea Plan需要多少设备投入？</p>
+      <p class="a">A：按业务规模灵活定制——小团队设备数万元起、每月模型调度费用约千元起；中大型团队可本地私有化部署能力超强的大模型节省 token，设备部署数十万元起。无论哪种规模，软件部署费用都极低，且设备费用与市面已知同类方案相比极低，token 使用量极低、维护费用极低，能力卓越超强。</p>
+    </div>
+    <div class="faq">
+      <p class="q">Q：Astraea Plan适合什么场景？</p>
+      <p class="a">A：连锁多门店企业，需要私有化部署、总部与门店自动化任务调度、数据监控、工单智能分发的办公调度场景。</p>
+    </div>
+    <div class="faq">
+      <p class="q">Q：员工离职会导致业务断档吗？</p>
+      <p class="a">A：不会。智能体沉淀了岗位知识与日常流程，离职不断岗——智能体每天照常做数据调度；新同事到岗后直接对接部门智能体，快速了解业务、接受带教，实现无缝衔接。</p>
+    </div>
+    <div class="faq">
+      <p class="q">Q：这是概念演示，还是真实在生产运行的系统？</p>
+      <p class="a">A：<strong>真实生产系统</strong>。Astraea Plan已落地魔方小镇城市书房全国连锁企业体系，每天 23:55 各部门智能体自动生成工作总结、总控智能体逐份归档复盘并汇报管理层——这条闭环已连续运行多月。本机与异地电脑上的智能体通过 A2A 协议跨设备互联，任务跨机流转、全程留痕。不是演示页，是正在跑的生产架构。</p>
+    </div>
+    <div class="faq">
+      <p class="q">Q：这是一套"几个 AI 助手"的堆叠，还是一个整体架构？</p>
+      <p class="a">A：是<strong>整体架构</strong>。Astraea Plan = 智能体集群调度层 + A2A 智能体间协议 + 本地/云端双模型通道 + 工作经验沉淀技能体系 + 每日自动化闭环，五层一体。多个部门智能体（财务、运营、图书、市场、工程等）各司其职，由主控统一指挥，靠 A2A 对等协作——不是各自独立的助手，是一个协同工作的整体。</p>
+    </div>
+    <div class="faq">
+      <p class="q">Q：本地私有化部署与云端模型是什么关系？</p>
+      <p class="a">A：<strong>双通道灵活选择</strong>。日常高频任务走本地私有化模型，几乎不消耗 token；复杂推理按需调用云端能力更强的模型——两者由集群统一调度、按任务特性选择，长期运行成本远低于纯云端方案，数据安全与能力上限兼得。</p>
+    </div>
+    <div class="faq">
+      <p class="q">Q：Astraea Plan基于什么技术构建？</p>
+      <p class="a">A：Astraea Plan基于<strong>Hermes 开源框架基座</strong>构建办公调度智能体集群，智能体本体集中部署于公司工作站、不分化，本地运行不上云，好维护、极度安全；大模型采用本地私有化与云端双通道灵活选择运行，打通飞书、企业微信、钉钉、微信公众号等渠道。</p>
+    </div>
+
+    <div class="footer">
+      <div style="margin-bottom: 20px; color: var(--muted); font-size: 0.9rem;">
+        项目咨询：
+        <a id="mail-link" style="color: var(--accent2); text-decoration: none; font-weight: 500;"></a>
+        &nbsp;｜&nbsp;
+        <span style="display: inline-flex; align-items: center; gap: 5px; color: var(--muted);">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="#07c160" style="vertical-align: -2px;" role="img" xmlns="http://www.w3.org/2000/svg"><title>WeChat</title><path d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 0 1 .213.665l-.39 1.48c-.019.07-.048.141-.048.213 0 .163.13.295.29.295a.326.326 0 0 0 .167-.054l1.903-1.114a.864.864 0 0 1 .717-.098 10.16 10.16 0 0 0 2.837.403c.276 0 .543-.027.811-.05-.857-2.578.157-4.972 1.932-6.446 1.703-1.415 3.882-1.98 5.853-1.838-.576-3.583-4.196-6.348-8.596-6.348zM5.785 5.991c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 0 1-1.162 1.178A1.17 1.17 0 0 1 4.623 7.17c0-.651.52-1.18 1.162-1.18zm5.813 0c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 0 1-1.162 1.178 1.17 1.17 0 0 1-1.162-1.178c0-.651.52-1.18 1.162-1.18zm5.34 2.867c-1.797-.052-3.746.512-5.28 1.786-1.72 1.428-2.687 3.72-1.78 6.22.942 2.453 3.666 4.229 6.884 4.229.826 0 1.622-.12 2.361-.336a.722.722 0 0 1 .598.082l1.584.926a.272.272 0 0 0 .14.047c.134 0 .24-.111.24-.247 0-.06-.023-.12-.038-.177l-.327-1.233a.582.582 0 0 1-.023-.156.49.49 0 0 1 .201-.398C23.024 18.48 24 16.82 24 14.98c0-3.21-2.931-5.837-6.656-6.088V8.89c-.135-.01-.27-.027-.407-.03zm-2.53 3.274c.535 0 .969.44.969.982a.976.976 0 0 1-.969.983.976.976 0 0 1-.969-.983c0-.542.434-.982.97-.982zm4.844 0c.535 0 .969.44.969.982a.976.976 0 0 1-.969.983.976.976 0 0 1-.969-.983c0-.542.434-.982.969-.982z"/></svg>
+          <span style="color: var(--accent2); font-weight: 500;">WeChat：longjunhao</span>
+        </span>
+      </div>
+      <p><span class="brand">Astraea Plan</span> · 企业级智能体部署架构 · 设计者：大军</p>
+      <p>© 2026 Astraea Plan · <a href="https://github.com/Lugpt/astraea-plan-yuheng">GitHub: astraea-plan</a></p>
+    </div>
+
+  </div>
+
+  <script>
+    const user = "longjunhao01";
+    const domain = "gmail.com";
+    const targetEmail = `${user}@${domain}`;
+    document.getElementById("mail-link").innerText = targetEmail;
+    document.getElementById("mail-link").href = `mailto:${targetEmail}`;
+  </script>
+
+<script>
+/* ── Astraea Plan · 动态粒子网络背景 ──
+   粒子=智能体节点，连线=A2A通信链路
+   鼠标移动产生引力 → 粒子聚拢，体现"总控指挥全局" */
+(function () {
+  const canvas = document.getElementById('bg-network');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let W, H, particles = [], meteors = [], planets = [], mouse = { x: null, y: null }, rafId = null, meteorTimer = 0;
+
+  /* ── 真实星球：3D 贴图球体 + 自转 + 公转 ── */
+  const PLANET_TEXTURES = {
+    earth: 'textures/earth.jpg', jupiter: 'textures/jupiter.jpg',
+  };
+  const IMG_CACHE = {};
+  function loadTexture(src) {
+    return new Promise((res, rej) => {
+      if (IMG_CACHE[src]) return res(IMG_CACHE[src]);
+      const img = new Image();
+      img.onload = () => { IMG_CACHE[src] = img; res(img); };
+      img.onerror = rej;
+      img.src = src;
+    });
+  }
+  // 星球配置：位置(0-1比例)、半径(px基准)、自转速度、公转半径/速度、纹理
+  // 两颗：木星（左上）+ 地球（右下），低调不抢内容
+  const PLANET_DEFS = [
+    { name: 'jupiter', tex: 'jupiter', x: 0.18, y: 0.30, r: 46, spin: 0.0021, glow: '210, 180, 150' },
+    { name: 'earth',   tex: 'earth',   x: 0.84, y: 0.74, r: 42, spin: 0.0016, glow: '70, 150, 255' },
+  ];
+  // 程序化兜底纹理：纹理加载失败时生成渐变球贴图（保证星球必显示）
+  function makeFallbackTexture(hue1, hue2) {
+    const cv = document.createElement('canvas');
+    cv.width = 256; cv.height = 128;
+    const cx = cv.getContext('2d');
+    const g = cx.createLinearGradient(0, 0, 256, 0);
+    g.addColorStop(0, hue1); g.addColorStop(0.5, hue2); g.addColorStop(1, hue1);
+    cx.fillStyle = g; cx.fillRect(0, 0, 256, 128);
+    // 加一些随机"表面"斑点，模拟星球纹理
+    for (let i = 0; i < 40; i++) {
+      cx.fillStyle = `rgba(255,255,255,${Math.random() * 0.15})`;
+      cx.beginPath();
+      cx.arc(Math.random() * 256, Math.random() * 128, 3 + Math.random() * 8, 0, Math.PI * 2);
+      cx.fill();
+    }
+    const img = new Image();
+    img.src = cv.toDataURL();
+    return img;
+  }
+  const FALLBACK_HUES = {
+    earth: ['#3a7bd5', '#5a9bd5'], jupiter: ['#d4a574', '#b07b4a'],
+  };
+  // 逐颗加载纹理（带兜底）
+  PLANET_DEFS.forEach((p) => {
+    loadTexture(PLANET_TEXTURES[p.tex]).then(() => {
+      planets.push({ ...p, img: IMG_CACHE[PLANET_TEXTURES[p.tex]], rot: Math.random() * 360 });
+    }).catch(() => {
+      // 兜底：程序化渐变球，星球照样显示
+      const [h1, h2] = FALLBACK_HUES[p.tex] || ['#888888', '#555555'];
+      planets.push({ ...p, img: makeFallbackTexture(h1, h2), rot: Math.random() * 360, fallback: true });
+    });
+  });
+  // 土星环纹理
+  let saturnRingImg = null;
+  loadTexture('textures/saturn_ring.jpg').then((img) => { saturnRingImg = img; }).catch(() => {});
+
+  const COLORS = ['0, 212, 255', '123, 97, 255', '0, 180, 255'];
+
+  function resize() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = window.innerWidth; H = window.innerHeight;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    // 粒子数随屏幕自适应：约每 18000px² 一个，60~110 之间
+    const target = Math.round((W * H) / 18000);
+    const count = Math.max(60, Math.min(110, target));
+    particles = [];
+    for (let i = 0; i < count; i++) {
+      particles.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        vx: (Math.random() - 0.5) * 0.45,
+        vy: (Math.random() - 0.5) * 0.45,
+        r: Math.random() * 1.8 + 0.8,
+        c: COLORS[Math.floor(Math.random() * COLORS.length)]
+      });
+    }
+  }
+
+  /* ── 绘制 3D 星球（贴图球体自转） ── */
+  function drawPlanets() {
+    if (planets.length < 1) return;   // 至少1颗加载完就开画，其余逐步出现
+    const now = performance.now();
+
+    for (const p of planets) {
+      // 公转（月球绕地球）
+      let px = p.x * W, py = p.y * H;
+      if (p.orbit) {
+        const a = now * p.orbit.speed;
+        px = p.orbit.cx * W + Math.cos(a) * p.orbit.rad * W;
+        py = p.orbit.cy * H + Math.sin(a) * p.orbit.rad * H;
+      }
+      const R = p.r * (W / 1440) * 2.2;   // 按视口缩放
+      p.rot = (p.rot || 0) + p.spin * 26; // 自转推进（更快可见）
+
+      // 太阳：发光光晕
+      if (p.name === 'sun') {
+        const g = ctx.createRadialGradient(px, py, R * 0.2, px, py, R * 3.2);
+        g.addColorStop(0, 'rgba(255, 190, 80, 0.55)');
+        g.addColorStop(0.4, 'rgba(255, 140, 40, 0.18)');
+        g.addColorStop(1, 'rgba(255, 120, 30, 0)');
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(px, py, R * 3.2, 0, Math.PI * 2); ctx.fill();
+      }
+      // 其他有 glow 的星球（地球）：淡蓝大气光晕
+      else if (p.glow) {
+        const g = ctx.createRadialGradient(px, py, R * 0.8, px, py, R * 1.8);
+        g.addColorStop(0, `rgba(${p.glow}, 0.25)`);
+        g.addColorStop(1, `rgba(${p.glow}, 0)`);
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(px, py, R * 1.8, 0, Math.PI * 2); ctx.fill();
+      }
+
+      // 土星环（在球体后面画下半，前面画上半 → 立体环绕感）
+      if (p.ring) drawSaturnRing(px, py, R, now, false);
+
+      // 球体本体：真实球面渲染（贴图横向无缝滚动 = 自转）
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(px, py, R, 0, Math.PI * 2);
+      ctx.clip();
+      const img = p.img;
+      const dispW = R * 2;                        // 显示宽 = 球直径
+      const dispH = R * 2;                        // 显示高 = 球直径（2:1贴图纵向拉伸成球）
+      const off = ((p.rot % 360) / 360) * dispW;  // 自转偏移（绕一周=360°）
+      // 4 张相邻贴图平铺 = 无缝自转（drawImage 全浏览器兼容 + 数学上全覆盖）
+      ctx.globalAlpha = 0.72;                     // 整体调暗（不抢内容）
+      ctx.drawImage(img, px - off - dispW * 1.5, py - R, dispW, dispH);
+      ctx.drawImage(img, px - off - dispW * 0.5, py - R, dispW, dispH);
+      ctx.drawImage(img, px - off + dispW * 0.5, py - R, dispW, dispH);
+      ctx.drawImage(img, px - off + dispW * 1.5, py - R, dispW, dispH);
+      ctx.globalAlpha = 1;
+      // 球面体积光影：边缘暗 + 左上高光（光源在左上）——整体更暗
+      const sg = ctx.createRadialGradient(
+        px - R * 0.4, py - R * 0.45, R * 0.2,
+        px, py, R * 1.15
+      );
+      sg.addColorStop(0, 'rgba(255,255,255,0.18)');   // 高光点（压暗）
+      sg.addColorStop(0.45, 'rgba(255,255,255,0.03)');
+      sg.addColorStop(0.8, 'rgba(0,0,15,0.45)');
+      sg.addColorStop(1, 'rgba(0,0,25,0.75)');         // 边缘暗（加深）
+      ctx.fillStyle = sg;
+      ctx.fillRect(px - R, py - R, R * 2, R * 2);
+      ctx.restore();
+      // 大气层光晕（调暗）
+      const atm = ctx.createRadialGradient(px, py, R * 0.92, px, py, R * 1.3);
+      atm.addColorStop(0, `rgba(${p.glow || '180, 150, 120'}, 0.10)`);
+      atm.addColorStop(1, `rgba(${p.glow || '180, 150, 120'}, 0)`);
+      ctx.fillStyle = atm;
+      ctx.beginPath(); ctx.arc(px, py, R * 1.3, 0, Math.PI * 2); ctx.fill();
+
+      // 星球轮廓描边（深空感）
+      ctx.beginPath();
+      ctx.arc(px, py, R, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(255,255,255,0.10)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      // 土星环（球体前面上半）
+      if (p.ring) drawSaturnRing(px, py, R, now, true);
+    }
+  }
+
+  /* ── 土星环：椭圆环带 ── */
+  function drawSaturnRing(cx, cy, R, now, front) {
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(-0.42);                       // 倾角
+    const rx = R * 2.15, ry = R * 0.62;
+    // 前/后半环不同绘制避免遮挡错误
+    ctx.beginPath();
+    ctx.ellipse(0, 0, rx, ry, 0, front ? Math.PI : 0, front ? Math.PI * 2 : Math.PI, !front);
+    ctx.strokeStyle = 'rgba(210, 180, 140, 0.55)';
+    ctx.lineWidth = R * 0.38;
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  /* ── 流星雨：从右上斜划向左下，带拖尾，快速划过 ── */
+  function spawnMeteor() {
+    // 全部从上方/两侧进入，只朝下或斜下方向（绝不向上飞）
+    const edge = Math.floor(Math.random() * 3);       // 0=上 1=右 2=左
+    const speed = 10 + Math.random() * 6;
+    const tail = 110 + Math.random() * 120;
+    let x0, y0, vx, vy;
+    if (edge === 0) {                                 // 顶部 → 斜向左下/右下
+      x0 = Math.random() * W * 0.85;
+      y0 = -30 - Math.random() * 80;
+      const dir = Math.random() > 0.5 ? 1 : -1;
+      vx = dir * (7 + Math.random() * 6);
+      vy = 8 + Math.random() * 5;
+    } else if (edge === 1) {                          // 右侧 → 斜向左下
+      x0 = W + 30 + Math.random() * 80;
+      y0 = Math.random() * H * 0.8;
+      vx = -(7 + Math.random() * 6);
+      vy = 7 + Math.random() * 5;
+    } else {                                          // 左侧 → 斜向右下
+      x0 = -30 - Math.random() * 80;
+      y0 = Math.random() * H * 0.8;
+      vx = 7 + Math.random() * 6;
+      vy = 7 + Math.random() * 5;
+    }
+    meteors.push({
+      x: x0, y: y0, vx, vy,
+      tail, life: 1,
+      w: Math.random() * 2.4 + 1.6,
+      hue: (function () {
+        const palette = ['0, 212, 255', '80, 160, 255', '255, 90, 90', '120, 230, 140', '255, 170, 60', '200, 120, 255'];
+        return palette[Math.floor(Math.random() * palette.length)];
+      })()
+    });
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    const LINK_DIST = 130;
+    // 先画连线（在粒子下方）
+    for (let i = 0; i < particles.length; i++) {
+      const p = particles[i];
+      for (let j = i + 1; j < particles.length; j++) {
+        const q = particles[j];
+        const dx = p.x - q.x, dy = p.y - q.y;
+        const d2 = dx * dx + dy * dy;
+        if (d2 < LINK_DIST * LINK_DIST) {
+          const alpha = (1 - Math.sqrt(d2) / LINK_DIST) * 0.28;
+          ctx.strokeStyle = `rgba(${p.c}, ${alpha})`;
+          ctx.lineWidth = 0.7;
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(q.x, q.y);
+          ctx.stroke();
+        }
+      }
+    }
+    // ── 流星雨：更新 + 绘制 ──
+    // 定时生成：平均每 1.8~3.5 秒一条
+    meteorTimer += 16;
+    if (meteorTimer > 700 + Math.random() * 900) {
+      meteorTimer = 0;
+      spawnMeteor();
+      if (Math.random() < 0.45) spawnMeteor();   // 45% 双流星
+      if (Math.random() < 0.18) spawnMeteor();   // 18% 三流星
+    }
+    for (let i = meteors.length - 1; i >= 0; i--) {
+      const m = meteors[i];
+      m.x += m.vx; m.y += m.vy;
+      m.life -= 0.014;                            // 渐隐
+      if (m.life <= 0 || m.x < -m.tail - 60 || m.y > H + 60) {
+        meteors.splice(i, 1);
+        continue;
+      }
+      // 拖尾：从头部到尾部渐变
+      const tx = m.x - (m.vx / Math.hypot(m.vx, m.vy)) * m.tail;
+      const ty = m.y - (m.vy / Math.hypot(m.vx, m.vy)) * m.tail;
+      const grad = ctx.createLinearGradient(m.x, m.y, tx, ty);
+      grad.addColorStop(0, `rgba(${m.hue}, ${1.0 * m.life})`);
+      grad.addColorStop(0.25, `rgba(255, 255, 255, ${0.75 * m.life})`);
+      grad.addColorStop(1, `rgba(${m.hue}, 0)`);
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = m.w * m.life;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(m.x, m.y);
+      ctx.lineTo(tx, ty);
+      ctx.stroke();
+      // 外发光
+      ctx.strokeStyle = `rgba(${m.hue}, ${0.28 * m.life})`;
+      ctx.lineWidth = m.w * 2.4 * m.life;
+      ctx.beginPath();
+      ctx.moveTo(m.x, m.y);
+      ctx.lineTo(tx, ty);
+      ctx.stroke();
+      // 头部亮点（更大更亮）
+      ctx.beginPath();
+      ctx.arc(m.x, m.y, 2.6 * m.life, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255, 255, 255, ${0.95 * m.life})`;
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(m.x, m.y, 5 * m.life, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${m.hue}, ${0.35 * m.life})`;
+      ctx.fill();
+    }
+
+    // ── 星球层（在粒子下层） ──
+    drawPlanets();
+
+    // 画粒子 + 鼠标引力
+    for (const p of particles) {
+      // 鼠标引力（总控吸引）
+      if (mouse.x !== null) {
+        const dx = mouse.x - p.x, dy = mouse.y - p.y;
+        const d = Math.sqrt(dx * dx + dy * dy);
+        if (d < 160 && d > 0.01) {
+          const force = (160 - d) / 160 * 0.06;
+          p.vx += (dx / d) * force;
+          p.vy += (dy / d) * force;
+        }
+      }
+      p.x += p.vx; p.y += p.vy;
+      // 边界反弹（留 20px 边距）
+      if (p.x < 20 || p.x > W - 20) p.vx *= -1;
+      if (p.y < 20 || p.y > H - 20) p.vy *= -1;
+      // 速度上限（防爆走）
+      const sp = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
+      if (sp > 0.8) { p.vx *= 0.8 / sp; p.vy *= 0.8 / sp; }
+      // 鼠标附近的粒子更亮
+      let glow = 1;
+      if (mouse.x !== null) {
+        const dx = mouse.x - p.x, dy = mouse.y - p.y;
+        const d = Math.sqrt(dx * dx + dy * dy);
+        if (d < 160) glow = 1.6;
+      }
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r * glow, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${p.c}, ${0.5 * Math.min(glow, 1.8)})`;
+      ctx.fill();
+    }
+    rafId = requestAnimationFrame(draw);
+  }
+
+  function onMouse(e) { mouse.x = e.clientX; mouse.y = e.clientY; }
+  function onLeave() { mouse.x = null; mouse.y = null; }
+
+  // 页面可见才动画（省电）
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) { cancelAnimationFrame(rafId); }
+    else { rafId = requestAnimationFrame(draw); }
+  });
+
+  window.addEventListener('resize', resize);
+  window.addEventListener('mousemove', onMouse, { passive: true });
+  document.documentElement.addEventListener('mouseleave', onLeave);
+
+  resize();
+  rafId = requestAnimationFrame(draw);
+})();
+</script>
+</body>
+</html>

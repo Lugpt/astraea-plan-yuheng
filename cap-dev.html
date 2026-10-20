@@ -1,0 +1,649 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Astraea Plan 软件开发能力：从需求拆解、智能体实现到人工验收与上线维护，覆盖企业官网、内部工具与微信小程序。" />
+  <title>软件开发｜Astraea Plan 能力</title>
+  <style>
+    :root{--bg:#F6F7F9;--surface:#FFFFFF;--surface-soft:#F1F3F7;--fg:#16233A;--muted:#6B7689;--border:#DDE2EA;--accent:#FF5A1F;--blue:#2F6BFF;--blue-soft:#5B8DFF;--deep:#123A8F;--font-body:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;--font-mono:"SFMono-Regular","SF Mono",Menlo,Consolas,monospace;--ease-out:cubic-bezier(0.23,1,0.32,1);--container:1200px;--space-section:clamp(72px,8vw,120px);--muted-strong:color-mix(in oklab,var(--muted) 74%,var(--fg));}
+    *{box-sizing:border-box;}
+    html{scroll-behavior:smooth;scroll-padding-top:96px;}
+    html,body{overflow-x:hidden;max-width:100%;}
+    body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:17px;line-height:1.8;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
+    body.menu-open{overflow:hidden;}
+    a{color:inherit;text-decoration:none;}
+    button,a{-webkit-tap-highlight-color:transparent;}
+    button{font:inherit;}
+    img{display:block;max-width:100%;}
+    ::selection{background:color-mix(in oklab,var(--blue) 24%,transparent);color:var(--fg);}
+    :focus-visible{outline:3px solid var(--blue);outline-offset:4px;}
+    .site-header a:focus-visible,.site-header button:focus-visible{outline-color:#fff;box-shadow:0 0 0 6px var(--deep);}
+    .glass a:focus-visible,.glass button:focus-visible{outline-color:#fff;box-shadow:0 0 0 6px rgba(18,58,143,.72);}
+    .site-footer a:focus-visible,.boundary a:focus-visible{outline-color:#fff;}
+    .skip-link{position:fixed;top:12px;left:12px;z-index:1000;padding:10px 16px;background:var(--surface);color:var(--fg);border:1px solid var(--border);border-radius:8px;transform:translateY(-160%);transition:transform .2s var(--ease-out);}
+    .skip-link:focus{transform:translateY(0);}
+    .container{max-width:var(--container);margin-inline:auto;padding-inline:clamp(20px,5vw,64px);box-sizing:border-box;}
+    .site-header{position:fixed;inset:0 0 auto;z-index:100;color:#fff;background:rgba(12,18,32,.35);border-bottom:1px solid rgba(255,255,255,.14);-webkit-backdrop-filter:blur(18px) saturate(150%);backdrop-filter:blur(18px) saturate(150%);transition:background .3s var(--ease-out),border-color .3s var(--ease-out),color .3s var(--ease-out),box-shadow .3s var(--ease-out);}
+    .site-header.is-solid{color:var(--fg);background:rgba(255,255,255,.72);border-color:rgba(22,35,58,.10);-webkit-backdrop-filter:blur(14px) saturate(150%);backdrop-filter:blur(14px) saturate(150%);box-shadow:0 10px 30px rgba(18,58,143,.06);}
+    .nav-shell{width:100%;max-width:var(--container);height:76px;margin-inline:auto;padding-inline:clamp(20px,5vw,64px);display:grid;grid-template-columns:minmax(190px,1fr) auto minmax(160px,1fr);align-items:center;gap:28px;}
+    .brand{display:inline-flex;align-items:center;gap:11px;width:max-content;font-size:18px;font-weight:600;letter-spacing:.01em;white-space:nowrap;}
+    .brand-mark{width:26px;height:26px;display:grid;place-items:center;border:1px solid currentColor;border-radius:50%;opacity:.95;}
+    .brand-mark svg{width:14px;height:14px;}
+    .desktop-nav{display:flex;align-items:center;justify-content:center;gap:clamp(18px,2.4vw,34px);font-size:15px;font-weight:500;letter-spacing:.02em;white-space:nowrap;}
+    .desktop-nav a{position:relative;display:inline-flex;align-items:center;min-height:44px;opacity:.82;transition:opacity .2s var(--ease-out);}
+    .desktop-nav a:hover,.desktop-nav a:focus-visible{opacity:1;}
+    .desktop-nav a::after{content:"";position:absolute;left:0;right:0;bottom:8px;height:2px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .25s var(--ease-out);}
+    .desktop-nav a:hover::after,.desktop-nav a.is-current::after{transform:scaleX(1);}
+    .desktop-nav a.is-current{opacity:1;font-weight:600;}
+    .header-cta{justify-self:end;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 20px;border-radius:999px;background:var(--accent);color:var(--fg);font-size:14px;font-weight:600;letter-spacing:.02em;box-shadow:0 8px 24px rgba(255,90,31,.20);transition:background .2s var(--ease-out),transform .2s var(--ease-out),box-shadow .2s var(--ease-out);}
+    .header-cta:hover{background:color-mix(in oklab,var(--accent) 90%,var(--surface));transform:translateY(-1px);box-shadow:0 12px 28px rgba(255,90,31,.26);}
+    .header-cta:active{transform:translateY(0);}
+    .header-cta svg{width:14px;height:14px;transition:transform .2s var(--ease-out);}
+    .header-cta:hover svg{transform:translateX(3px);}
+    .nav-toggle{display:none;justify-self:end;width:44px;height:44px;padding:0;border:1px solid currentColor;border-radius:50%;background:transparent;color:inherit;cursor:pointer;}
+    .nav-toggle span{position:relative;display:block;width:17px;height:1px;margin:0 auto;background:currentColor;transition:transform .25s var(--ease-out);}
+    .nav-toggle span::before{content:"";position:absolute;left:0;top:-6px;width:17px;height:1px;background:currentColor;transition:transform .25s var(--ease-out),top .25s var(--ease-out);}
+    .nav-toggle[aria-expanded="true"] span{transform:rotate(45deg);}
+    .nav-toggle[aria-expanded="true"] span::before{top:0;transform:rotate(-90deg);}
+    .mobile-nav{display:none;position:fixed;top:76px;inset-inline:0;z-index:99;padding:18px clamp(20px,5vw,40px) 30px;background:rgba(255,255,255,.96);color:var(--fg);border-bottom:1px solid var(--border);box-shadow:0 24px 60px rgba(18,58,143,.12);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);transform:translateY(-12px);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .2s var(--ease-out),transform .2s var(--ease-out),visibility .2s;}
+    .mobile-nav.is-open{opacity:1;visibility:visible;transform:translateY(0);pointer-events:auto;}
+    .mobile-nav a{display:flex;align-items:center;min-height:52px;border-bottom:1px solid var(--border);font-size:17px;font-weight:500;}
+    .mobile-nav a:last-of-type{border-bottom:0;}
+    .mobile-nav .mobile-nav-cta{justify-content:center;margin-top:14px;border:0;border-radius:999px;background:var(--accent);color:var(--fg);font-size:15px;font-weight:600;}
+    .hero{position:relative;isolation:isolate;min-height:760px;height:min(100svh,920px);max-height:920px;display:flex;align-items:flex-end;overflow:hidden;background:var(--fg);}
+    .hero__image{position:absolute;inset:0;z-index:-3;width:100%;height:100%;object-fit:cover;object-position:center 52%;}
+    .hero__scrim{position:absolute;inset:0;z-index:-2;pointer-events:none;background:linear-gradient(105deg,rgba(6,10,20,.45),rgba(6,10,20,.12) 60%,transparent);}
+    .hero__content{position:relative;z-index:1;width:100%;padding-top:132px;padding-bottom:clamp(44px,7vh,76px);}
+    .glass{position:relative;isolation:isolate;background:rgba(255,255,255,.10);-webkit-backdrop-filter:blur(24px) saturate(180%);backdrop-filter:blur(24px) saturate(180%);border:1.5px solid rgba(255,255,255,.45);border-radius:28px;box-shadow:0 28px 90px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.65),inset 0 -1px 0 rgba(255,255,255,.10);overflow:hidden;}
+    .glass::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(148deg,rgba(255,255,255,.30) 0%,rgba(255,255,255,.06) 30%,rgba(255,255,255,0) 52%);}
+    .glass::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),inset 0 24px 48px -24px rgba(255,255,255,.28);}
+    .glass,.glass h1,.glass h2,.glass h3,.glass p{color:#fff;}
+    .hero-panel{width:min(860px,100%);padding:clamp(28px,4.4vw,54px);}
+    .breadcrumb{position:relative;z-index:1;display:flex;align-items:center;gap:10px;margin-bottom:24px;font-size:13px;line-height:1.5;letter-spacing:.04em;color:rgba(255,255,255,.74);}
+    .breadcrumb a{transition:color .2s var(--ease-out);}
+    .breadcrumb a:hover{color:#fff;}
+    .breadcrumb span[aria-current="page"]{color:#fff;}
+    .breadcrumb svg{width:12px;height:12px;opacity:.6;}
+    .eyebrow{position:relative;z-index:1;display:flex;align-items:center;gap:12px;margin:0 0 18px;font-family:var(--font-mono);font-size:12px;line-height:1.4;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.68);}
+    .eyebrow::before{content:"";width:30px;height:1px;background:rgba(255,255,255,.5);}
+    .hero h1{position:relative;z-index:1;max-width:780px;margin:0;font-size:clamp(38px,4.6vw,64px);line-height:1.32;font-weight:600;letter-spacing:0;}
+    .hero-definition{position:relative;z-index:1;max-width:34ch;margin:18px 0 0;font-size:clamp(18px,1.55vw,22px);line-height:1.7;color:rgba(255,255,255,.86);}
+    .hero-actions{position:relative;z-index:1;display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:30px;}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:50px;padding:0 22px;border:1px solid transparent;border-radius:999px;font-size:15px;font-weight:600;line-height:1;letter-spacing:.02em;cursor:pointer;transition:background .2s var(--ease-out),border-color .2s var(--ease-out),color .2s var(--ease-out),transform .2s var(--ease-out),box-shadow .2s var(--ease-out);}
+    .btn svg{width:16px;height:16px;transition:transform .2s var(--ease-out);}
+    .btn:hover svg{transform:translateX(3px);}
+    .btn:active{transform:translateY(1px);}
+    .glass .btn-primary{background:#fff;color:var(--fg);box-shadow:0 10px 30px rgba(2,8,20,.18);}
+    .glass .btn-primary:hover{background:var(--surface-soft);color:var(--fg);box-shadow:0 14px 34px rgba(2,8,20,.24);}
+    .glass .btn-secondary{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.48);color:#fff;}
+    .glass .btn-secondary:hover{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.78);color:#fff;}
+    .hero-scope{position:relative;z-index:1;display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px;margin-top:30px;padding-top:20px;border-top:1px solid rgba(255,255,255,.20);font-size:13px;line-height:1.5;letter-spacing:.03em;color:rgba(255,255,255,.72);}
+    .hero-scope span{display:inline-flex;align-items:center;gap:8px;}
+    .hero-scope span::before{content:"";width:4px;height:4px;border-radius:50%;background:currentColor;opacity:.7;}
+    .section{padding-block:var(--space-section);}
+    .section[id]{scroll-margin-top:92px;}
+    .section-kicker{display:flex;align-items:center;gap:12px;margin:0 0 22px;font-family:var(--font-mono);font-size:12px;line-height:1.4;letter-spacing:.08em;text-transform:uppercase;color:var(--deep);}
+    .section-kicker::after{content:"";width:42px;height:1px;background:currentColor;opacity:.55;}
+    .section h2{margin:0;font-size:clamp(28px,3vw,42px);line-height:1.36;font-weight:600;letter-spacing:0;}
+    .section-intro{margin:20px 0 0;max-width:62ch;color:var(--muted-strong);font-size:17px;line-height:1.85;}
+    .problem{background:var(--bg);}
+    .problem-layout{display:grid;grid-template-columns:minmax(0,1.04fr) minmax(320px,.96fr);align-items:start;gap:clamp(44px,8vw,112px);}
+    .problem h2{max-width:15ch;}
+    .problem-aside{padding-top:5px;border-top:1px solid var(--border);}
+    .problem-item{display:grid;grid-template-columns:84px minmax(0,1fr);gap:24px;padding:24px 0;border-bottom:1px solid var(--border);}
+    .problem-item:first-child{padding-top:0;}
+    .problem-item__label{font-family:var(--font-mono);font-size:12px;line-height:1.7;letter-spacing:.06em;color:var(--deep);}
+    .problem-item h3{margin:0 0 6px;font-size:18px;line-height:1.5;font-weight:600;}
+    .problem-item p{margin:0;color:var(--muted-strong);font-size:15px;line-height:1.8;}
+    .facts{padding-block:0 var(--space-section);background:var(--bg);}
+    .facts-panel{display:grid;grid-template-columns:minmax(220px,.74fr) minmax(0,2.26fr);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+    .facts-lead{padding:32px 32px 32px 0;border-right:1px solid var(--border);}
+    .facts-lead p{max-width:18ch;margin:0;font-size:16px;line-height:1.7;font-weight:500;}
+    .facts-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));}
+    .fact{min-height:126px;padding:24px 24px 22px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);}
+    .fact:nth-child(3n){border-right:0;}
+    .fact:nth-child(-n+3){border-bottom:1px solid var(--border);}
+    .fact:nth-child(n+4){border-bottom:0;}
+    .fact strong{display:block;font-size:clamp(27px,2.4vw,34px);line-height:1.2;font-weight:600;font-variant-numeric:tabular-nums;}
+    .fact span{display:block;margin-top:8px;color:var(--muted-strong);font-size:13px;line-height:1.6;letter-spacing:.02em;}
+    .workflow{background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+    .workflow-head{display:flex;align-items:flex-end;justify-content:space-between;gap:32px;margin-bottom:54px;}
+    .workflow-head .section-intro{max-width:38ch;margin:0 0 4px;}
+    .workflow-track{position:relative;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--border);}
+    .workflow-track::before{content:"";position:absolute;top:-3px;left:0;width:clamp(54px,8vw,110px);height:5px;background:var(--blue);}
+    .workflow-step{position:relative;min-height:290px;padding:30px clamp(20px,2.4vw,32px) 20px 0;border-right:1px solid var(--border);}
+    .workflow-step:last-child{border-right:0;padding-right:0;}
+    .workflow-step + .workflow-step{padding-left:clamp(20px,2.4vw,32px);}
+    .step-number{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;margin-bottom:54px;border:1px solid var(--border);border-radius:50%;color:var(--deep);font-family:var(--font-mono);font-size:12px;line-height:1;}
+    .workflow-step h3{margin:0 0 12px;font-size:20px;line-height:1.5;font-weight:600;}
+    .workflow-step p{max-width:25ch;margin:0;color:var(--muted-strong);font-size:15px;line-height:1.8;}
+    .scope{background:var(--bg);}
+    .scope-layout{display:grid;grid-template-columns:minmax(250px,.78fr) minmax(0,1.62fr);align-items:start;gap:clamp(44px,8vw,112px);}
+    .scope-copy{position:sticky;top:118px;}
+    .scope-copy h2{max-width:10ch;}
+    .scope-copy .section-intro{max-width:30ch;font-size:16px;}
+    .scope-note{display:inline-flex;align-items:center;gap:10px;margin-top:30px;font-family:var(--font-mono);font-size:12px;line-height:1.6;letter-spacing:.05em;color:var(--deep);}
+    .scope-note::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;}
+    .scope-list{border-top:1px solid var(--border);}
+    .scope-row{display:grid;grid-template-columns:72px minmax(160px,.78fr) minmax(220px,1.22fr);gap:22px;padding:28px 0;border-bottom:1px solid var(--border);transition:background .2s var(--ease-out),padding-inline .2s var(--ease-out);}
+    .scope-row:hover{padding-inline:12px;background:var(--surface);}
+    .scope-type{padding-top:4px;font-family:var(--font-mono);font-size:11px;line-height:1.6;letter-spacing:.08em;color:var(--deep);text-transform:uppercase;}
+    .scope-row h3{margin:0;font-size:22px;line-height:1.5;font-weight:600;}
+    .scope-row p{margin:0;color:var(--muted-strong);font-size:15px;line-height:1.8;}
+    .scope-row p strong{color:var(--fg);font-weight:500;}
+    .boundary{position:relative;background:var(--deep);color:#fff;overflow:hidden;}
+    .boundary::after{content:"SYSTEM / HUMAN";position:absolute;right:clamp(20px,5vw,64px);bottom:20px;color:rgba(255,255,255,.12);font-family:var(--font-mono);font-size:clamp(34px,7vw,96px);line-height:1;letter-spacing:.06em;white-space:nowrap;pointer-events:none;}
+    .boundary .section-kicker{color:rgba(255,255,255,.62);}
+    .boundary-head{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(280px,.8fr);gap:clamp(36px,8vw,100px);align-items:end;margin-bottom:54px;}
+    .boundary h2{max-width:15ch;}
+    .boundary-head p{margin:0 0 5px;color:rgba(255,255,255,.74);font-size:16px;line-height:1.85;}
+    .boundary-detail{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1fr) 92px minmax(0,1fr);align-items:stretch;border-top:1px solid rgba(255,255,255,.18);border-bottom:1px solid rgba(255,255,255,.18);}
+    .boundary-col{padding:34px 0;}
+    .boundary-col h3{margin:0 0 22px;font-size:14px;line-height:1.6;font-weight:500;letter-spacing:.04em;color:rgba(255,255,255,.58);}
+    .boundary-col ul{display:grid;gap:14px;margin:0;padding:0;list-style:none;}
+    .boundary-col li{position:relative;padding-left:20px;font-size:16px;line-height:1.7;}
+    .boundary-col li::before{content:"";position:absolute;left:0;top:.78em;width:6px;height:1px;background:rgba(255,255,255,.56);}
+    .boundary-divider{display:grid;place-items:center;border-left:1px solid rgba(255,255,255,.16);border-right:1px solid rgba(255,255,255,.16);color:rgba(255,255,255,.58);font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;writing-mode:vertical-rl;}
+    .site-footer{position:relative;z-index:2;background:var(--deep);color:#fff;border-top:1px solid rgba(255,255,255,.14);}
+    .footer-main{display:grid;grid-template-columns:minmax(260px,1.35fr) .72fr .72fr .8fr;gap:clamp(30px,5vw,72px);padding-block:66px 54px;}
+    .footer-brand .brand{color:#fff;margin-bottom:24px;}
+    .footer-brand p{max-width:31ch;margin:0;color:rgba(255,255,255,.68);font-size:15px;line-height:1.85;}
+    .footer-column h2{margin:2px 0 18px;color:rgba(255,255,255,.58);font-family:var(--font-mono);font-size:11px;line-height:1.5;font-weight:500;letter-spacing:.08em;text-transform:uppercase;}
+    .footer-links{display:grid;gap:8px;font-size:14px;line-height:1.6;}
+    .footer-links a{width:max-content;max-width:100%;color:rgba(255,255,255,.78);transition:color .2s var(--ease-out),transform .2s var(--ease-out);}
+    .footer-links a:hover{color:#fff;transform:translateX(2px);}
+    .footer-bottom{display:flex;align-items:center;justify-content:space-between;gap:20px;padding-block:19px 22px;border-top:1px solid rgba(255,255,255,.14);color:rgba(255,255,255,.58);font-family:var(--font-mono);font-size:11px;line-height:1.7;letter-spacing:.03em;}
+    .footer-bottom a{transition:color .2s var(--ease-out);}
+    .footer-bottom a:hover{color:#fff;}
+    .reveal{opacity:0;transform:translateY(20px);transition:opacity .7s var(--ease-out),transform .7s var(--ease-out);transition-delay:var(--reveal-delay,0ms);}
+    .reveal.is-visible{opacity:1;transform:translateY(0);}
+    @media (max-width:980px){.desktop-nav{gap:18px;font-size:14px;}
+    .nav-shell{grid-template-columns:minmax(160px,1fr) auto minmax(132px,1fr);gap:18px;}
+    .problem-layout,.scope-layout,.boundary-head{grid-template-columns:1fr;gap:42px;}
+    .problem h2,.scope-copy h2,.boundary h2{max-width:18ch;}
+    .facts-panel{grid-template-columns:1fr;}
+    .facts-lead{padding:24px 0;border-right:0;border-bottom:1px solid var(--border);}
+    .facts-lead p{max-width:none;}
+    .workflow-head{align-items:flex-start;flex-direction:column;gap:18px;}
+    .workflow-head .section-intro{max-width:58ch;}
+    .workflow-track{grid-template-columns:repeat(2,minmax(0,1fr));}
+    .workflow-step{padding:28px 28px 30px 0;}
+    .workflow-step:nth-child(2){border-right:0;padding-right:0;}
+    .workflow-step:nth-child(3){padding-left:0;border-top:1px solid var(--border);}
+    .workflow-step + .workflow-step{padding-left:28px;}
+    .workflow-step:nth-child(3){padding-left:0;}
+    .workflow-step:nth-child(4){border-top:1px solid var(--border);}
+    .workflow-step:nth-child(n){min-height:250px;}
+    .step-number{margin-bottom:38px;}
+    .scope-copy{position:static;}
+    .scope-copy .section-intro{max-width:55ch;}
+    .scope-row{grid-template-columns:64px minmax(150px,.82fr) minmax(200px,1.18fr);}
+    .footer-main{grid-template-columns:1.25fr .75fr .75fr;}
+    .footer-column:last-child{grid-column:2 / 4;}
+    }
+    @media (max-width:760px){.site-header{color:#fff;}
+    .site-header.is-solid{color:var(--fg);}
+    .nav-shell{height:68px;grid-template-columns:1fr auto;gap:16px;}
+    .desktop-nav,.header-cta{display:none;}
+    .nav-toggle{display:grid;place-items:center;}
+    .mobile-nav{display:block;top:68px;}
+    .brand{font-size:17px;}
+    .brand-mark{width:24px;height:24px;}
+    .hero{height:auto;min-height:780px;max-height:none;align-items:flex-end;}
+    .hero__image{object-position:58% center;}
+    .hero__content{padding-top:116px;padding-bottom:34px;}
+    .hero-panel{padding:26px 22px 24px;border-radius:24px;}
+    .breadcrumb{flex-wrap:wrap;margin-bottom:20px;font-size:12px;}
+    .hero h1{font-size:clamp(38px,10vw,52px);line-height:1.3;}
+    .hero-definition{max-width:24ch;margin-top:14px;font-size:18px;line-height:1.75;}
+    .hero-actions{gap:10px;margin-top:24px;}
+    .btn{min-height:48px;padding-inline:19px;}
+    .hero-scope{margin-top:24px;padding-top:17px;gap:8px 14px;}
+    .problem-item{grid-template-columns:66px minmax(0,1fr);gap:16px;}
+    .facts-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+    .fact{min-height:112px;padding:20px 16px;}
+    .fact:nth-child(3n){border-right:1px solid var(--border);}
+    .fact:nth-child(2n){border-right:0;}
+    .fact:nth-child(-n+4){border-bottom:1px solid var(--border);}
+    .fact:nth-child(n+5){border-bottom:0;}
+    .workflow-track{grid-template-columns:1fr;}
+    .workflow-step,.workflow-step + .workflow-step,.workflow-step:nth-child(3){min-height:0;padding:26px 0 28px;border-right:0;border-top:1px solid var(--border);}
+    .workflow-step:first-child{border-top:0;}
+    .step-number{margin-bottom:22px;}
+    .workflow-step p{max-width:44ch;}
+    .scope-row{grid-template-columns:58px minmax(0,1fr);gap:10px 16px;padding:24px 0;}
+    .scope-row:hover{padding-inline:8px;}
+    .scope-row p{grid-column:2;}
+    .boundary-head{margin-bottom:40px;}
+    .boundary-detail{grid-template-columns:1fr;}
+    .boundary-divider{min-height:52px;border:0;border-top:1px solid rgba(255,255,255,.16);border-bottom:1px solid rgba(255,255,255,.16);writing-mode:horizontal-tb;}
+    .boundary-col{padding:28px 0;}
+    .boundary-col + .boundary-col{border-top:0;}
+    .boundary::after{display:none;}
+    .footer-main{grid-template-columns:repeat(2,minmax(0,1fr));gap:36px 28px;padding-block:52px 42px;}
+    .footer-brand{grid-column:1 / -1;}
+    .footer-column:last-child{grid-column:1 / -1;}
+    .footer-bottom{align-items:flex-start;flex-direction:column;gap:8px;}
+    }
+    @media (max-width:430px){.hero{min-height:810px;}
+    .hero-panel{padding:24px 18px 22px;}
+    .hero-actions{display:grid;grid-template-columns:1fr 1fr;}
+    .btn{width:100%;padding-inline:12px;}
+    .hero-scope{font-size:12px;}
+    .problem-item{grid-template-columns:1fr;gap:3px;}
+    .scope-row{grid-template-columns:1fr;gap:5px;}
+    .scope-row p{grid-column:1;}
+    .fact{padding-inline:14px;}
+    .footer-main{grid-template-columns:1fr;}
+    .footer-brand,.footer-column:last-child{grid-column:auto;}
+    }
+    @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto;}
+    *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important;scroll-behavior:auto !important;}
+    .reveal{opacity:1;transform:none;}
+    }
+  </style>
+<style>
+.inline-figure{margin:56px auto;max-width:1200px;padding-inline:clamp(20px,5vw,64px);box-sizing:border-box}
+.inline-figure .fig-box{border-radius:24px;overflow:hidden;box-shadow:0 28px 70px rgba(48,58,86,.14);border:1px solid #DDE2EA}
+.inline-figure img{display:block;width:100%;height:clamp(220px,30vw,400px);object-fit:cover}
+.inline-figure figcaption{padding:14px 22px;font-size:14px;line-height:1.6;color:#6B7689;background:#fff}
+</style>
+<style>
+svg{max-width:100%;vertical-align:middle}
+.button svg,.button--primary svg,.button--glass svg,button svg,a.button svg,.hero-actions svg{width:18px;height:18px;flex:none;display:inline-block}
+</style>
+<style>
+[class*="node"] svg,[class*="icon"] svg,[class*="step"] svg,[class*="badge"] svg,[class*="mark"] svg,[class*="chip"] svg{width:44px;height:44px;flex:none;display:inline-block}
+[class*="number"] svg,[class*="num"] svg{width:32px;height:32px}
+</style>
+<style>
+[class*="hero"] img{object-fit:cover;object-position:center;max-height:96vh}
+</style>
+<style>
+[class*="scene"] img,[class*="media"] img:not(.hero-photo),[class*="shot"] img{height:auto;max-height:520px;object-fit:cover;width:100%}
+</style>
+<style>
+.hero img,section img,figure img{max-width:100%}
+</style>
+<style>
+.hero__media{overflow:hidden;width:100%}
+.hero__image{width:100%;height:100%;object-fit:cover;display:block}
+</style>
+<style>
+.hero__image{transform:none!important}
+</style>
+<style>
+.glass{position:relative;isolation:isolate;
+background:rgba(255,255,255,.10)!important;
+-webkit-backdrop-filter:blur(24px) saturate(180%)!important;
+backdrop-filter:blur(24px) saturate(180%)!important;
+border:1.5px solid rgba(255,255,255,.45)!important;border-radius:28px!important;
+box-shadow:0 28px 90px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.65)!important;
+overflow:hidden;}
+.glass::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+background:linear-gradient(148deg,rgba(255,255,255,.30) 0%,rgba(255,255,255,.06) 30%,rgba(255,255,255,0) 52%);}
+.glass::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),inset 0 24px 48px -24px rgba(255,255,255,.28);}
+.glass > *{position:relative;z-index:1}
+</style>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">跳到主要内容</a>
+
+  <header class="site-header" data-header>
+    <div class="nav-shell">
+      <a class="brand" href="index.html" aria-label="Astraea Plan 首页">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
+            <path d="M8 1.8v12.4M1.8 8h12.4M3.6 3.6l8.8 8.8M12.4 3.6l-8.8 8.8"/>
+          </svg>
+        </span>
+        <span>Astraea Plan</span>
+      </a>
+
+      <nav class="desktop-nav" aria-label="主导航" data-od-id="primary-navigation">
+        <a class="is-current" href="capabilities.html" aria-current="page">能力</a>
+        <a href="architecture.html">架构</a>
+        <a href="cases.html">案例</a>
+        <a href="pricing.html">投入</a>
+        <a href="about.html">关于</a>
+      </nav>
+
+      <a class="header-cta" href="#contact" data-od-id="header-booking-cta">
+        预约演示
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+          <path d="M2.5 8h10M9 4.5 12.5 8 9 11.5"/>
+        </svg>
+      </a>
+
+      <button class="nav-toggle" type="button" aria-label="打开导航菜单" aria-expanded="false" aria-controls="mobile-navigation" data-nav-toggle data-od-id="nav-menu-toggle">
+        <span aria-hidden="true"></span>
+      </button>
+    </div>
+  </header>
+
+  <nav class="mobile-nav" id="mobile-navigation" aria-label="移动导航" data-mobile-nav data-od-id="mobile-navigation">
+    <a href="capabilities.html" aria-current="page">能力</a>
+    <a href="architecture.html">架构</a>
+    <a href="cases.html">案例</a>
+    <a href="pricing.html">投入</a>
+    <a href="about.html">关于</a>
+    <a class="mobile-nav-cta" href="#contact">预约演示</a>
+  </nav>
+
+  <main id="main-content">
+    <section class="hero" id="top" aria-labelledby="page-title" data-od-id="dev-hero">
+      <img class="hero__image" src="assets/code-4.jpg" width="2000" height="1333" alt="" fetchpriority="high" />
+      <div class="hero__scrim" aria-hidden="true"></div>
+
+      <div class="container hero__content">
+        <div class="glass hero-panel">
+          <nav class="breadcrumb" aria-label="面包屑" data-od-id="breadcrumb">
+            <a href="capabilities.html">能力</a>
+            <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true">
+              <path d="m4.5 2.5 3.5 3.5-3.5 3.5"/>
+            </svg>
+            <span aria-current="page">软件开发</span>
+          </nav>
+
+          <p class="eyebrow">Capability 02 / Software</p>
+          <h1 id="page-title" data-od-id="dev-heading">软件开发。</h1>
+          <p class="hero-definition" data-od-id="dev-definition">网站、软件、小程序，智能体也能接活。</p>
+
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#contact" data-od-id="hero-booking-cta">
+              预约演示
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                <path d="M2.5 8h10M9 4.5 12.5 8 9 11.5"/>
+              </svg>
+            </a>
+            <a class="btn btn-secondary" href="#contact" data-od-id="hero-contact-cta">联系我们</a>
+          </div>
+
+          <div class="hero-scope" aria-label="软件开发覆盖范围">
+            <span>企业官网</span>
+            <span>内部工具</span>
+            <span>微信小程序</span>
+            <span>上线后迭代</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section problem" id="problem" aria-labelledby="problem-title">
+      <div class="container problem-layout">
+        <div class="reveal">
+          <p class="section-kicker">01 / 问题</p>
+          <h2 id="problem-title" data-od-id="problem-heading">找外包慢、贵、沟通成本高，零散需求却不会因此消失。</h2>
+          <p class="section-intro">门店和总部每天都会冒出小需求。它们单看都不复杂，却常常因为排期、转述和返工，被拖成一项大工程。</p>
+        </div>
+
+        <div class="problem-aside reveal" style="--reveal-delay: 100ms">
+          <article class="problem-item">
+            <div class="problem-item__label">需求散</div>
+            <div>
+              <h3>任务碎，难凑成一个项目</h3>
+              <p>一张临时报表、一处页面改版、一条内部审批链，往往不足以进入外包公司的优先排期。</p>
+            </div>
+          </article>
+          <article class="problem-item">
+            <div class="problem-item__label">链路长</div>
+            <div>
+              <h3>每转述一次，就多一层偏差</h3>
+              <p>业务提需求、产品转方案、开发再理解，询价和对齐消耗的时间经常超过实现本身。</p>
+            </div>
+          </article>
+          <article class="problem-item">
+            <div class="problem-item__label">维护断</div>
+            <div>
+              <h3>上线不是结束，改一行也要重新找人</h3>
+              <p>供应商交付后，小调整仍需重新报价和排期，系统很难跟着门店与总部的节奏持续变化。</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+<figure class="inline-figure"><div class="fig-box"><img src="assets/code-1.jpg" alt="Astraea Plan 运行场景" loading="lazy"></div></figure>
+
+
+    <section class="facts" aria-labelledby="facts-title">
+      <div class="container">
+        <div class="facts-panel reveal" data-od-id="operating-scale">
+          <div class="facts-lead">
+            <p id="facts-title">已经运行在真实连锁业务里的智能体基础。</p>
+          </div>
+          <div class="facts-grid">
+            <div class="fact"><strong>200+</strong><span>门店</span></div>
+            <div class="fact"><strong>49</strong><span>城市</span></div>
+            <div class="fact"><strong>10</strong><span>部门</span></div>
+            <div class="fact"><strong>14</strong><span>智能体</span></div>
+            <div class="fact"><strong>182</strong><span>定时任务</span></div>
+            <div class="fact"><strong>7</strong><span>个月持续运行</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+<figure class="inline-figure"><div class="fig-box"><img src="assets/ai-ill-1.jpg" alt="Astraea Plan 运行场景" loading="lazy"></div></figure>
+
+
+    <section class="section workflow" id="workflow" aria-labelledby="workflow-title">
+      <div class="container">
+        <div class="workflow-head reveal">
+          <div>
+            <p class="section-kicker">02 / 怎么做</p>
+            <h2 id="workflow-title" data-od-id="workflow-heading">需求拆解 → 智能体实现 → 人工验收 → 上线维护</h2>
+          </div>
+          <p class="section-intro">把一条完整工作流压短，而不是把风险藏起来。每个节点都有明确输入、负责方和验收结果。</p>
+        </div>
+
+        <div class="workflow-track">
+          <article class="workflow-step reveal" data-od-id="workflow-step-scope">
+            <span class="step-number">01</span>
+            <h3>需求拆解</h3>
+            <p>把业务目标、页面范围、数据来源和验收口径，整理成可以直接执行的清单。</p>
+          </article>
+          <article class="workflow-step reveal" style="--reveal-delay: 80ms" data-od-id="workflow-step-build">
+            <span class="step-number">02</span>
+            <h3>智能体实现</h3>
+            <p>由智能体完成页面、业务逻辑和迭代开发，把等待排期的时间用于实际构建。</p>
+          </article>
+          <article class="workflow-step reveal" style="--reveal-delay: 160ms" data-od-id="workflow-step-review">
+            <span class="step-number">03</span>
+            <h3>人工验收</h3>
+            <p>工程人员检查代码、权限、数据和关键流程，不让模型替自己完成最终验收。</p>
+          </article>
+          <article class="workflow-step reveal" style="--reveal-delay: 240ms" data-od-id="workflow-step-maintain">
+            <span class="step-number">04</span>
+            <h3>上线维护</h3>
+            <p>上线后继续修问题、接新需求，让系统随着门店和总部的实际使用持续迭代。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section scope" id="scope" aria-labelledby="scope-title">
+      <div class="container scope-layout">
+        <div class="scope-copy reveal">
+          <p class="section-kicker">03 / 交付范围</p>
+          <h2 id="scope-title" data-od-id="scope-heading">从对外展示，到内部运转。</h2>
+          <p class="section-intro">优先承接目标清晰、能够分阶段交付的软件开发任务。每一类都从可验证的最小闭环开始。</p>
+          <span class="scope-note">可拆分交付</span>
+        </div>
+
+        <div class="scope-list reveal" style="--reveal-delay: 100ms">
+          <article class="scope-row" data-od-id="scope-row-website">
+            <div class="scope-type">Web / 01</div>
+            <h3>企业官网</h3>
+            <p>品牌、产品、新闻与联系入口的完整页面体系，兼顾内容更新、响应式体验与基础可访问性。</p>
+          </article>
+          <article class="scope-row" data-od-id="scope-row-internal-tools">
+            <div class="scope-type">Tool / 02</div>
+            <h3>内部工具</h3>
+            <p>把重复录入、审批、查询和报表流程做成可用的业务工具，并围绕真实使用持续优化。</p>
+          </article>
+          <article class="scope-row" data-od-id="scope-row-mini-program">
+            <div class="scope-type">Mini / 03</div>
+            <h3>微信小程序</h3>
+            <p>围绕会员、预约、活动与服务入口搭建轻量业务触点，连接门店日常经营与总部运营。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section boundary" id="boundary" aria-labelledby="boundary-title">
+      <div class="container">
+        <div class="boundary-head reveal">
+          <div>
+            <p class="section-kicker">04 / 边界</p>
+            <h2 id="boundary-title" data-od-id="boundary-heading">智能体负责实现，复杂系统仍由人定架构。</h2>
+          </div>
+          <p>复杂系统仍需人工架构，智能体承担实现与迭代。我们把能力边界写清楚，避免用自动化承诺掩盖关键决策。</p>
+        </div>
+
+        <div class="boundary-detail reveal" style="--reveal-delay: 100ms">
+          <div class="boundary-col" data-od-id="boundary-agent-scope">
+            <h3>智能体可以承担</h3>
+            <ul>
+              <li>范围清晰的网站、小程序与内部页面</li>
+              <li>既有架构内的功能实现与持续迭代</li>
+              <li>上线后的修问题、补功能与体验优化</li>
+            </ul>
+          </div>
+          <div class="boundary-divider" aria-hidden="true">Human in the loop</div>
+          <div class="boundary-col" data-od-id="boundary-human-scope">
+            <h3>必须由人工把关</h3>
+            <ul>
+              <li>多系统集成、核心数据模型与总体架构</li>
+              <li>权限安全、稳定性与关键业务规则</li>
+              <li>复杂流程设计、验收标准与上线决策</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer" id="contact" data-od-id="site-footer">
+    <div class="container">
+      <div class="footer-main">
+        <div class="footer-brand">
+          <a class="brand" href="index.html" aria-label="Astraea Plan 首页">
+            <span class="brand-mark" aria-hidden="true">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
+                <path d="M8 1.8v12.4M1.8 8h12.4M3.6 3.6l8.8 8.8M12.4 3.6l-8.8 8.8"/>
+              </svg>
+            </span>
+            <span>Astraea Plan</span>
+          </a>
+          <p>给连锁企业装一套私有化智能体团队，数据不出公司。</p>
+        </div>
+
+        <div class="footer-column">
+          <h2>能力</h2>
+          <div class="footer-links">
+            <a href="cap-dev.html" aria-current="page">软件开发</a>
+            <a href="capabilities.html#operations">智能运营</a>
+            <a href="capabilities.html#analysis">数据分析</a>
+            <a href="capabilities.html#agents">私有化智能体</a>
+          </div>
+        </div>
+
+        <div class="footer-column">
+          <h2>架构</h2>
+          <div class="footer-links">
+            <a href="architecture.html#private">私有化部署</a>
+            <a href="architecture.html#agents">智能体协作</a>
+            <a href="architecture.html#security">数据安全</a>
+            <a href="architecture.html#a2a">A2A 能力</a>
+          </div>
+        </div>
+
+        <div class="footer-column">
+          <h2>联系</h2>
+          <div class="footer-links">
+            <a href="about.html#contact">预约演示</a>
+            <a href="about.html#contact">联系我们</a>
+            <a href="about.html">关于 Astraea Plan</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>© 2026 Astraea Plan · 数据不出公司</span>
+        <a href="#top">回到顶部</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      var header = document.querySelector('[data-header]');
+      var toggle = document.querySelector('[data-nav-toggle]');
+      var mobileNav = document.querySelector('[data-mobile-nav]');
+      var hero = document.querySelector('.hero');
+
+      function syncHeader() {
+        if (!header || !hero) return;
+        var threshold = hero.offsetTop + hero.offsetHeight - header.offsetHeight;
+        header.classList.toggle('is-solid', window.scrollY > threshold);
+      }
+
+      function closeMenu() {
+        if (!toggle || !mobileNav) return;
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.setAttribute('aria-label', '打开导航菜单');
+        mobileNav.classList.remove('is-open');
+        document.body.classList.remove('menu-open');
+      }
+
+      if (toggle && mobileNav) {
+        toggle.addEventListener('click', function () {
+          var open = toggle.getAttribute('aria-expanded') === 'true';
+          toggle.setAttribute('aria-expanded', String(!open));
+          toggle.setAttribute('aria-label', open ? '打开导航菜单' : '关闭导航菜单');
+          mobileNav.classList.toggle('is-open', !open);
+          document.body.classList.toggle('menu-open', !open);
+        });
+
+        mobileNav.querySelectorAll('a').forEach(function (link) {
+          link.addEventListener('click', closeMenu);
+        });
+
+        document.addEventListener('keydown', function (event) {
+          if (event.key === 'Escape') closeMenu();
+        });
+
+        document.addEventListener('click', function (event) {
+          if (!mobileNav.classList.contains('is-open')) return;
+          if (mobileNav.contains(event.target) || toggle.contains(event.target)) return;
+          closeMenu();
+        });
+      }
+
+      var revealItems = document.querySelectorAll('.reveal');
+      if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        var observer = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          });
+        }, { threshold: 0.14, rootMargin: '0px 0px -8% 0px' });
+
+        revealItems.forEach(function (item) {
+          observer.observe(item);
+        });
+      } else {
+        revealItems.forEach(function (item) {
+          item.classList.add('is-visible');
+        });
+      }
+
+      window.addEventListener('scroll', syncHeader, { passive: true });
+      window.addEventListener('resize', syncHeader);
+      syncHeader();
+    })();
+  </script>
+</body>
+</html>

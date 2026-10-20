@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Astraea Plan 部门知识库架构：每个部门的知识，只给该部门用。按职责授权，总控只取汇总结果。" />
+  <title>部门知识库｜Astraea Plan 架构</title>
+  <link rel="stylesheet" href="assets/astraea.css" />
+<style>
+.glass{position:relative;isolation:isolate;background:rgba(255,255,255,.10);
+-webkit-backdrop-filter:blur(24px) saturate(180%);backdrop-filter:blur(24px) saturate(180%);
+border:1.5px solid rgba(255,255,255,.45);border-radius:28px;
+box-shadow:0 28px 90px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.65),inset 0 -1px 0 rgba(255,255,255,.10);
+overflow:hidden;}
+.glass::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+background:linear-gradient(148deg,rgba(255,255,255,.30) 0%,rgba(255,255,255,.06) 30%,rgba(255,255,255,0) 52%);}
+.glass::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),inset 0 24px 48px -24px rgba(255,255,255,.28);}
+.glass,.glass h1,.glass h2,.glass h3,.glass p,.glass span,.glass nav,.glass a,.glass li{color:#fff}
+.glass a{text-decoration:none}.glass > *{position:relative;z-index:1}
+</style>
+<style>
+.inline-figure{margin:56px auto;max-width:1200px;padding-inline:clamp(20px,5vw,64px);box-sizing:border-box}
+.inline-figure .fig-box{border-radius:24px;overflow:hidden;box-shadow:0 28px 70px rgba(48,58,86,.14);border:1px solid #DDE2EA}
+.inline-figure img{display:block;width:100%;height:clamp(220px,30vw,400px);object-fit:cover}
+.inline-figure figcaption{padding:14px 22px;font-size:14px;line-height:1.6;color:#6B7689;background:#fff}
+</style>
+<style>
+html,body{overflow-x:hidden;max-width:100%}
+*,*::before,*::after{box-sizing:border-box}
+img{max-width:100%;height:auto}
+</style>
+<style>
+svg{max-width:100%;vertical-align:middle}
+.button svg,.button--primary svg,.button--glass svg,button svg,a.button svg,.hero-actions svg{width:18px;height:18px;flex:none;display:inline-block}
+</style>
+<style>
+[class*="node"] svg,[class*="icon"] svg,[class*="step"] svg,[class*="badge"] svg,[class*="mark"] svg,[class*="chip"] svg{width:44px;height:44px;flex:none;display:inline-block}
+[class*="number"] svg,[class*="num"] svg{width:32px;height:32px}
+</style>
+<style>
+[class*="hero"] img{object-fit:cover;object-position:center;max-height:96vh}
+</style>
+<style>
+[class*="scene"] img,[class*="media"] img:not(.hero-photo),[class*="shot"] img{height:auto;max-height:520px;object-fit:cover;width:100%}
+</style>
+<style>
+.hero img,section img,figure img{max-width:100%}
+</style>
+<style>
+.hero__media{overflow:hidden;width:100%}
+.hero__image{width:100%;height:100%;object-fit:cover;display:block}
+</style>
+<style>
+.hero__image{transform:none!important}
+</style>
+<style>
+.glass{position:relative;isolation:isolate;
+background:rgba(255,255,255,.10)!important;
+-webkit-backdrop-filter:blur(24px) saturate(180%)!important;
+backdrop-filter:blur(24px) saturate(180%)!important;
+border:1.5px solid rgba(255,255,255,.45)!important;border-radius:28px!important;
+box-shadow:0 28px 90px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.65)!important;
+overflow:hidden;}
+.glass::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+background:linear-gradient(148deg,rgba(255,255,255,.30) 0%,rgba(255,255,255,.06) 30%,rgba(255,255,255,0) 52%);}
+.glass::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),inset 0 24px 48px -24px rgba(255,255,255,.28);}
+.glass > *{position:relative;z-index:1}
+</style>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到正文</a>
+
+  <header class="site-header" data-od-id="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="index.html" aria-label="Astraea Plan 首页">Astraea Plan</a>
+      <nav class="site-nav" id="site-nav" aria-label="主导航">
+        <a href="capabilities.html">能力</a>
+        <a href="architecture.html" class="current" aria-current="page">架构</a>
+        <a href="cases.html">案例</a>
+        <a href="pricing.html">投入</a>
+        <a href="about.html">关于</a>
+      </nav>
+      <div class="header-actions">
+        <button class="header-cta" type="button" data-contact="demo" data-od-id="header-demo">预约演示</button>
+        <button class="nav-toggle" type="button" aria-label="打开导航" aria-expanded="false" aria-controls="site-nav">
+          <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+          <svg class="close-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" data-od-id="arch-hero" aria-labelledby="page-title">
+      <div class="hero-media" aria-hidden="true">
+        <img src="assets/bokeh-2.jpg" alt="" width="2000" height="1333" />
+      </div>
+      <div class="container hero-inner">
+        <div class="glass hero-panel reveal" data-od-id="arch-hero-panel">
+          <nav class="breadcrumbs" aria-label="面包屑">
+            <a href="architecture.html">架构</a>
+            <span class="sep" aria-hidden="true">/</span>
+            <span aria-current="page">部门知识库</span>
+          </nav>
+          <p class="eyebrow">Architecture / Knowledge</p>
+          <h1 id="page-title">部门知识库</h1>
+          <p class="hero-definition">每个部门的知识，只给该部门用。</p>
+          <div class="hero-actions" data-od-id="arch-hero-actions">
+            <button class="btn btn-primary" type="button" data-contact="demo">预约演示</button>
+            <button class="btn btn-ghost" type="button" data-contact="contact">联系我们</button>
+          </div>
+          <div class="hero-meta" aria-label="知识库原则">
+            <span>私有化部署</span>
+            <span>部门隔离</span>
+            <span>客户所有</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-surface" data-od-id="knowledge-problem" aria-labelledby="problem-title">
+      <div class="container">
+        <div class="section-head reveal">
+          <p class="section-index">01 / Problem</p>
+          <div class="section-title-wrap">
+            <p class="kicker">问题不在“能不能查”</p>
+            <h2 id="problem-title">而在“该不该看”。</h2>
+            <p class="section-lead">知识的价值来自可复用，风险也来自错误复用。边界不清，权限做得再细也只能挡住入口。</p>
+          </div>
+        </div>
+
+        <div class="problem-layout">
+          <div class="problem-lead reveal">
+            <h2>两件事会同时发生。</h2>
+            <p>知识混在一起，数字看起来都能查；口径没有归属，回答就变成了各部门各自的解释。</p>
+            <div class="problem-note">
+              <span>NOTE</span>
+              <p>这不是搜索问题，而是知识从进入系统那一刻起，就没有被放对位置。</p>
+            </div>
+          </div>
+          <div class="problem-list reveal">
+            <article class="problem-item" data-od-id="problem-access">
+              <span class="num">01</span>
+              <div>
+                <h3>知识混在一起，谁都能查到不该看的</h3>
+                <p>权限只能限制“打开哪个入口”，却很难阻止一份知识被错误引用。部门之间的职责边界，必须先于权限配置存在。</p>
+              </div>
+            </article>
+            <article class="problem-item" data-od-id="problem-metric">
+              <span class="num">02</span>
+              <div>
+                <h3>口径混用，数字自然对不上</h3>
+                <p>同一个指标，两套定义、两个统计范围、两个更新时间。最后不是系统算错，而是各部门在回答不同的问题。</p>
+              </div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+<figure class="inline-figure"><div class="fig-box"><img src="assets/bluesmoke-1.jpg" alt="Astraea Plan 运行场景" loading="lazy"></div></figure>
+
+
+    <section class="section section-soft" data-od-id="knowledge-structure" aria-labelledby="structure-title">
+      <div class="container">
+        <div class="section-head reveal">
+          <p class="section-index">02 / Structure</p>
+          <div class="section-title-wrap">
+            <p class="kicker">先切开，再授权</p>
+            <h2 id="structure-title">每部门独立知识库，按职责授权，总控只取汇总结果。</h2>
+            <p class="section-lead">隔离解决“谁能看”，授权解决“为什么能看”，汇总解决“上层需要知道什么”。三层各做一件事，不互相替代。</p>
+          </div>
+        </div>
+
+        <div class="architecture-map reveal" data-od-id="knowledge-structure-map">
+          <article class="arch-stage" data-od-id="stage-department-libraries">
+            <div class="arch-stage-head">
+              <span>01</span>
+              <h3>独立知识库</h3>
+            </div>
+            <div class="dept-grid" aria-label="十个部门各自独立的知识库">
+              <span>部门 01</span><span>部门 02</span><span>部门 03</span><span>部门 04</span><span>部门 05</span>
+              <span>部门 06</span><span>部门 07</span><span>部门 08</span><span>部门 09</span><span>部门 10</span>
+            </div>
+            <p>文档、流程与口径各自归属，不先汇成一锅再靠搜索拆开。</p>
+          </article>
+
+          <div class="arch-connector" aria-hidden="true"><span>按职责授权</span></div>
+
+          <article class="arch-stage" data-od-id="stage-duty-access">
+            <div class="arch-stage-head">
+              <span>02</span>
+              <h3>职责授权</h3>
+            </div>
+            <ul class="permission-list">
+              <li>本部门默认可见</li>
+              <li>跨部门按职责申请</li>
+              <li>每次访问可追溯</li>
+            </ul>
+          </article>
+
+          <div class="arch-connector" aria-hidden="true"><span>只读汇总</span></div>
+
+          <article class="arch-stage" data-od-id="stage-control-summary">
+            <div class="arch-stage-head">
+              <span>03</span>
+              <h3>总控</h3>
+            </div>
+            <ul class="summary-list">
+              <li>只看部门结果</li>
+              <li>不穿透部门原文</li>
+              <li>不绕过业务权限</li>
+            </ul>
+          </article>
+        </div>
+        <div class="architecture-caption reveal">
+          <span><strong>隔离</strong> 不是把知识锁死，而是先承认归属。</span>
+          <span><strong>汇总</strong> 不是再建一个全知库，而是只回答管理层需要的问题。</span>
+        </div>
+      </div>
+    </section>
+<figure class="inline-figure"><div class="fig-box"><img src="assets/kb-c.jpg" alt="Astraea Plan 运行场景" loading="lazy"></div></figure>
+
+
+    <section class="ownership" data-od-id="knowledge-ownership" aria-labelledby="ownership-title">
+      <div class="container ownership-grid">
+        <div class="ownership-copy reveal">
+          <p class="section-index">03 / Ownership</p>
+          <h2 id="ownership-title">知识库属于客户，不属于供应商。</h2>
+          <p>交付的不是一套把你锁在里面的黑盒系统。知识库可导出、可迁移、可接管，部门边界与口径资产始终留在公司手里。</p>
+          <div class="ownership-points" aria-label="客户所有权要点">
+            <div><strong>可导出</strong><span>EXPORT</span></div>
+            <div><strong>可迁移</strong><span>MIGRATE</span></div>
+            <div><strong>可接管</strong><span>TAKE OVER</span></div>
+          </div>
+        </div>
+        <div class="ownership-media reveal" data-od-id="ownership-photo-panel">
+          <img src="assets/code-1.jpg" alt="黑色键盘上的 Command 键特写，象征知识库控制权留在客户手中" width="2000" height="2500" />
+          <div class="glass ownership-card">
+            <p class="eyebrow">Control stays with you</p>
+            <h3>控制权属于企业。</h3>
+            <ol>
+              <li><span>01</span><strong>知识内容可完整导出</strong></li>
+              <li><span>02</span><strong>系统与知识资产可迁移</strong></li>
+              <li><span>03</span><strong>企业团队可以接管维护</strong></li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-surface" data-od-id="knowledge-boundary" aria-labelledby="boundary-title">
+      <div class="container">
+        <div class="section-head reveal">
+          <p class="section-index">04 / Boundary</p>
+          <div class="section-title-wrap">
+            <p class="kicker">脏数据是架构风险</p>
+            <h2 id="boundary-title">脏数据会污染知识库，必须有口径维护机制。</h2>
+            <p class="section-lead">知识库不是回收站。只要错误内容能像正常内容一样被检索、被引用、被智能体读取，污染就会扩散到后续判断。</p>
+          </div>
+        </div>
+
+        <div class="governance-callout reveal" data-od-id="governance-callout">
+          <span class="tag">硬边界</span>
+          <p>口径没有责任人，系统越聪明，错误传播得越快。</p>
+        </div>
+
+        <div class="governance-grid reveal" data-od-id="governance-mechanism">
+          <article class="governance-item">
+            <span class="step">01 / OWNER</span>
+            <h3>口径责任人</h3>
+            <p>每个关键指标只对应一个口径负责人，定义、解释与变更都由明确角色负责。</p>
+          </article>
+          <article class="governance-item">
+            <span class="step">02 / HISTORY</span>
+            <h3>变更留痕</h3>
+            <p>新增或修改口径时，保留旧值、变更原因、生效时间与适用范围。</p>
+          </article>
+          <article class="governance-item">
+            <span class="step">03 / REVIEW</span>
+            <h3>发布前对齐</h3>
+            <p>跨部门共用的指标在上线前完成一次确认，不能依赖口头同步。</p>
+          </article>
+          <article class="governance-item">
+            <span class="step">04 / BLOCK</span>
+            <h3>冲突拦截</h3>
+            <p>同一指标出现多个值时不自动合并，进入人工裁定与版本更新。</p>
+          </article>
+        </div>
+        <p class="boundary-note reveal" data-od-id="governance-note">机制必须前置到知识发布流程里，而不是等报表出错之后再追责。</p>
+      </div>
+    </section>
+
+    <section class="quote-section" data-od-id="knowledge-closing">
+      <div class="container quote-inner reveal">
+        <div class="quote-meta">
+          <span>ARCH / KNOWLEDGE</span>
+          <a class="text-link" href="architecture.html">返回架构总览</a>
+        </div>
+        <blockquote>知识库的价值，不是让更多智能体读到更多内容；是让每个智能体只在自己的职责里，读对内容。</blockquote>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer" id="contact" data-od-id="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a class="footer-wordmark" href="index.html">Astraea Plan</a>
+          <p>给连锁企业装一套私有化智能体团队，数据不出公司。</p>
+        </div>
+        <div class="footer-col">
+          <h2>能力</h2>
+          <div class="footer-links">
+            <a href="capabilities.html">能力总览</a>
+            <a href="capabilities.html#agent-team">智能体团队</a>
+            <a href="capabilities.html#scenario-a2a">A2A 协作</a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h2>架构</h2>
+          <div class="footer-links">
+            <a href="architecture.html">架构总览</a>
+            <a href="arch-knowledge.html">部门知识库</a>
+            <a href="architecture.html#governance">安全与边界</a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h2>联系</h2>
+          <div class="footer-links">
+            <button type="button" data-contact="demo">预约演示</button>
+            <button type="button" data-contact="contact">联系我们</button>
+            <a href="about.html">关于 Astraea Plan</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 Astraea Plan · 数据不出公司</span>
+        <span>Private agent infrastructure for chain businesses.</span>
+      </div>
+    </div>
+  </footer>
+
+  <dialog class="contact-dialog" id="contact-dialog" aria-labelledby="contact-dialog-title" aria-describedby="contact-dialog-lead">
+    <div class="dialog-inner">
+      <div class="dialog-top">
+        <span>CONTACT / ASTRAEA PLAN</span>
+        <button class="dialog-close" type="button" data-close aria-label="关闭">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+      <h2 id="contact-dialog-title">预约演示</h2>
+      <p class="dialog-lead" id="contact-dialog-lead">告诉我们你的业务场景，我们会据此准备一次针对性的产品演示。</p>
+      <form class="contact-form" id="contact-form">
+        <div class="form-row">
+          <div class="field">
+            <label for="contact-name">称呼</label>
+            <input id="contact-name" name="name" autocomplete="name" required />
+          </div>
+          <div class="field">
+            <label for="contact-company">公司</label>
+            <input id="contact-company" name="company" autocomplete="organization" required />
+          </div>
+        </div>
+        <div class="field">
+          <label for="contact-channel">联系方式</label>
+          <input id="contact-channel" name="contact" autocomplete="tel" placeholder="手机号或企业微信" required />
+        </div>
+        <div class="field">
+          <label for="contact-context">想解决的问题</label>
+          <textarea id="contact-context" name="context" placeholder="例如：部门知识隔离、经营指标口径、门店运营协同"></textarea>
+        </div>
+        <p class="form-note">演示环境：此表单仅验证交互，不会发送数据。</p>
+        <div class="form-actions">
+          <button class="btn btn-quiet" type="button" data-close>取消</button>
+          <button class="btn btn-primary" type="submit">提交预约</button>
+        </div>
+      </form>
+      <div class="form-success" tabindex="-1" aria-live="polite">
+        <strong>需求已在本地记录。</strong>
+        <p>正式接入预约通道前，这里不会向任何外部服务发送数据。</p>
+      </div>
+    </div>
+  </dialog>
+
+  <script src="assets/astraea.js"></script>
+</body>
+</html>

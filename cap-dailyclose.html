@@ -1,0 +1,1071 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Astraea Plan 数据日清：每天 23:55，各部门智能体自动汇总数据与动作，总控归档，次日晨报汇报管理层。" />
+  <title>数据日清｜Astraea Plan</title>
+  <style>
+    :root {
+      --bg:#F6F7F9; --surface:#FFFFFF; --surface-soft:#F1F3F7;
+      --fg:#16233A; --muted:#6B7689; --border:#DDE2EA;
+      --accent:#FF5A1F; --blue:#2F6BFF; --blue-soft:#5B8DFF; --deep:#123A8F;
+      --font-body:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+      --font-mono:"SFMono-Regular","SF Mono",Menlo,Consolas,monospace;
+      --ease-out: cubic-bezier(0.23,1,0.32,1);
+      --shadow-soft: 0 18px 60px rgba(22,35,58,.08);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    html, body { overflow-x: hidden; max-width: 100%; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--font-body);
+      font-size: 17px;
+      line-height: 1.8;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+    a { color: inherit; text-decoration: none; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    button { font: inherit; }
+    img { display: block; max-width: 100%; }
+    ::selection { background: rgba(255,90,31,.22); color: var(--fg); }
+    :focus-visible {
+      outline: 3px solid rgba(255,90,31,.9);
+      outline-offset: 4px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin-inline: auto;
+      padding-inline: clamp(20px, 5vw, 64px);
+      box-sizing: border-box;
+    }
+    .section { padding-block: clamp(72px, 8vw, 120px); }
+    section[id] { scroll-margin-top: 96px; }
+    .section-heading {
+      margin: 0;
+      font-size: clamp(28px, 3vw, 42px);
+      line-height: 1.32;
+      letter-spacing: 0;
+      font-weight: 600;
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.4;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .eyebrow::before {
+      content: "";
+      width: 24px;
+      height: 1px;
+      background: currentColor;
+      opacity: .7;
+    }
+    .lead { font-size: clamp(18px, 1.6vw, 21px); line-height: 1.85; color: var(--fg); }
+    .copy { color: var(--muted); }
+    .mono { font-family: var(--font-mono); }
+
+    .site-header {
+      position: fixed;
+      z-index: 100;
+      inset: 0 0 auto;
+      color: #fff;
+      background: rgba(12,18,32,.35);
+      -webkit-backdrop-filter: blur(18px) saturate(150%);
+      backdrop-filter: blur(18px) saturate(150%);
+      border-bottom: 1px solid rgba(255,255,255,.14);
+      transition: background .35s var(--ease-out), color .35s var(--ease-out), border-color .35s var(--ease-out);
+    }
+    .site-header.is-scrolled,
+    .site-header.light-header {
+      color: var(--fg);
+      background: rgba(255,255,255,.72);
+      -webkit-backdrop-filter: blur(14px) saturate(160%);
+      backdrop-filter: blur(14px) saturate(160%);
+      border-bottom-color: rgba(22,35,58,.08);
+    }
+    .header-inner {
+      width: 100%;
+      max-width: 1440px;
+      height: 82px;
+      margin-inline: auto;
+      padding-inline: clamp(20px, 4vw, 56px);
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 28px;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 11px;
+      width: max-content;
+      font-size: 16px;
+      line-height: 1;
+      font-weight: 600;
+      letter-spacing: .015em;
+    }
+    .brand-mark {
+      width: 29px;
+      height: 29px;
+      display: grid;
+      place-items: center;
+      border: 1px solid currentColor;
+      border-radius: 50%;
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: .05em;
+    }
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: clamp(18px, 2.5vw, 34px);
+    }
+    .nav a {
+      position: relative;
+      padding-block: 8px;
+      font-size: 14px;
+      line-height: 1.4;
+      letter-spacing: .02em;
+      font-weight: 500;
+      opacity: .86;
+      transition: opacity .2s ease;
+    }
+    .nav a:hover { opacity: 1; }
+    .nav a.is-current::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 1px;
+      height: 2px;
+      background: var(--accent);
+    }
+    .header-cta {
+      justify-self: end;
+      min-height: 44px;
+      padding: 0 20px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      color: #fff;
+      background: var(--accent);
+      font-size: 14px;
+      line-height: 1;
+      letter-spacing: .02em;
+      font-weight: 600;
+      transition: background .2s ease, transform .2s var(--ease-out);
+    }
+    .header-cta:hover { background: oklch(from var(--accent) calc(l - .06) c h); transform: translateY(-1px); }
+    .header-cta:active { transform: translateY(1px); }
+    .menu-toggle {
+      display: none;
+      justify-self: end;
+      width: 44px;
+      height: 44px;
+      padding: 0;
+      border: 1px solid currentColor;
+      border-radius: 50%;
+      color: inherit;
+      background: transparent;
+      cursor: pointer;
+    }
+    .menu-toggle span,
+    .menu-toggle::before {
+      content: "";
+      display: block;
+      width: 17px;
+      height: 1.5px;
+      margin-inline: auto;
+      background: currentColor;
+      transition: transform .25s var(--ease-out), opacity .2s ease;
+    }
+    .menu-toggle span { margin-top: 6px; }
+    .menu-toggle[aria-expanded="true"]::before { transform: translateY(7.5px) rotate(45deg); }
+    .menu-toggle[aria-expanded="true"] span { transform: rotate(-45deg); }
+    .mobile-panel {
+      display: none;
+      position: fixed;
+      inset: 81px 0 auto;
+      padding: 20px clamp(20px, 5vw, 32px) 28px;
+      color: var(--fg);
+      background: rgba(255,255,255,.96);
+      -webkit-backdrop-filter: blur(18px);
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--border);
+      box-shadow: var(--shadow-soft);
+    }
+    .mobile-panel.is-open { display: block; }
+    .mobile-panel nav { display: grid; gap: 4px; }
+    .mobile-panel a {
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      font-size: 16px;
+    }
+    .mobile-panel .header-cta { margin-top: 18px; justify-self: start; color: #fff; }
+
+    .hero {
+      min-height: 980px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      padding-block: 154px 58px;
+      color: #fff;
+      background: #080b12 url("assets/grad-1.jpg") center 46% / cover no-repeat;
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(105deg,rgba(6,10,20,.45),rgba(6,10,20,.12) 60%,transparent);
+      pointer-events: none;
+    }
+    .hero .container { position: relative; z-index: 1; }
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 30px;
+      color: rgba(255,255,255,.72);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.5;
+      letter-spacing: .06em;
+    }
+    .breadcrumb a:hover { color: #fff; }
+    .breadcrumb span[aria-current="page"] { color: #fff; }
+
+    .glass {
+      position:relative; isolation:isolate;
+      background:rgba(255,255,255,.10);
+      -webkit-backdrop-filter:blur(24px) saturate(180%);
+      backdrop-filter:blur(24px) saturate(180%);
+      border:1.5px solid rgba(255,255,255,.45);
+      border-radius:28px;
+      box-shadow:0 28px 90px rgba(0,0,0,.55),
+                 inset 0 1px 0 rgba(255,255,255,.65),
+                 inset 0 -1px 0 rgba(255,255,255,.10);
+      overflow:hidden;
+    }
+    .glass::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+      background:linear-gradient(148deg,rgba(255,255,255,.30) 0%,rgba(255,255,255,.06) 30%,rgba(255,255,255,0) 52%);}
+    .glass::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.12), inset 0 24px 48px -24px rgba(255,255,255,.28);}
+    .glass, .glass h1, .glass h2, .glass h3, .glass p { color:#fff; }
+    .glass-content {
+      position: relative;
+      z-index: 2;
+      width: min(820px, 100%);
+      padding: clamp(30px, 5vw, 58px);
+    }
+    .glass-kicker {
+      margin: 0 0 18px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.5;
+      letter-spacing: .09em;
+      color: rgba(255,255,255,.75);
+    }
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(38px, 4.6vw, 64px);
+      line-height: 1.3;
+      letter-spacing: 0;
+      font-weight: 600;
+    }
+    .hero-definition {
+      max-width: 690px;
+      margin: 17px 0 0;
+      font-size: clamp(20px, 2vw, 27px);
+      line-height: 1.65;
+      color: rgba(255,255,255,.96) !important;
+    }
+    .hero-support {
+      max-width: 640px;
+      margin: 16px 0 0;
+      color: rgba(255,255,255,.74) !important;
+      font-size: 16px;
+      line-height: 1.8;
+    }
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 31px;
+    }
+    .button {
+      min-height: 50px;
+      padding: 0 24px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      font-size: 15px;
+      line-height: 1;
+      font-weight: 600;
+      letter-spacing: .02em;
+      transition: transform .2s var(--ease-out), background .2s ease, border-color .2s ease, color .2s ease;
+    }
+    .button:hover { transform: translateY(-2px); }
+    .button:active { transform: translateY(1px); }
+    .button-primary { color: #fff; background: var(--accent); }
+    .button-primary:hover { background: oklch(from var(--accent) calc(l - .06) c h); }
+    .button-glass {
+      color: #fff;
+      background: rgba(255,255,255,.08);
+      border-color: rgba(255,255,255,.58);
+    }
+    .button-glass:hover { background: rgba(255,255,255,.17); border-color: #fff; }
+    .button-outline {
+      color: var(--fg);
+      background: transparent;
+      border-color: var(--border);
+    }
+    .button-outline:hover { border-color: var(--fg); background: var(--surface); }
+    .button svg { flex: 0 0 auto; }
+    .run-note {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 27px;
+      color: rgba(255,255,255,.76);
+      font-size: 13px;
+      line-height: 1.5;
+      letter-spacing: .02em;
+    }
+    .run-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--blue-soft);
+      box-shadow: 0 0 0 5px rgba(91,141,255,.13);
+    }
+    .hero-facts {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0;
+      width: min(900px, 100%);
+      margin-top: 42px;
+      border-top: 1px solid rgba(255,255,255,.24);
+      border-bottom: 1px solid rgba(255,255,255,.24);
+    }
+    .hero-fact {
+      padding: 20px 22px;
+      border-right: 1px solid rgba(255,255,255,.18);
+    }
+    .hero-fact:first-child { padding-left: 0; }
+    .hero-fact:last-child { border-right: 0; }
+    .hero-fact strong {
+      display: block;
+      color: #fff;
+      font-family: var(--font-mono);
+      font-size: 20px;
+      line-height: 1.35;
+      font-weight: 500;
+      letter-spacing: .01em;
+    }
+    .hero-fact span {
+      display: block;
+      margin-top: 4px;
+      color: rgba(255,255,255,.6);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .problem-grid {
+      display: grid;
+      grid-template-columns: minmax(0,.86fr) minmax(0,1.14fr);
+      gap: clamp(44px, 8vw, 118px);
+      align-items: start;
+    }
+    .problem-copy p { margin: 0; }
+    .problem-copy p + p { margin-top: 20px; }
+    .problem-statement {
+      margin-top: 38px;
+      padding-block: 24px;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      color: var(--fg);
+      font-size: clamp(20px, 2vw, 27px);
+      line-height: 1.65;
+      font-weight: 500;
+    }
+    .handoff {
+      margin-top: 42px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+    .handoff-item {
+      min-height: 158px;
+      padding: 23px 20px;
+      background: var(--bg);
+    }
+    .handoff-item small {
+      display: block;
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      line-height: 1.4;
+      letter-spacing: .06em;
+    }
+    .handoff-item strong {
+      display: block;
+      margin-top: 28px;
+      font-size: 17px;
+      line-height: 1.55;
+      font-weight: 600;
+    }
+    .handoff-item span {
+      display: block;
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .handoff-item:last-child strong { color: var(--deep); }
+
+    .how-section {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .how-grid {
+      display: grid;
+      grid-template-columns: minmax(0,1.15fr) minmax(280px,.72fr);
+      gap: clamp(48px, 8vw, 120px);
+      align-items: start;
+    }
+    .how-intro { max-width: 650px; }
+    .how-intro p { margin: 18px 0 0; }
+    .flow { margin-top: 48px; border-top: 1px solid var(--border); }
+    .flow-step {
+      display: grid;
+      grid-template-columns: 92px minmax(0,1fr);
+      gap: 22px;
+      padding-block: 28px;
+      border-bottom: 1px solid var(--border);
+    }
+    .flow-index {
+      padding-top: 2px;
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.5;
+      letter-spacing: .05em;
+    }
+    .flow-step h3 {
+      margin: 0;
+      font-size: 20px;
+      line-height: 1.55;
+      letter-spacing: 0;
+      font-weight: 600;
+    }
+    .flow-step p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.8;
+    }
+    .flow-time { color: var(--deep) !important; font-weight: 600; }
+    .agent-figure {
+      margin: 0;
+      align-self: stretch;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+    .agent-frame {
+      position: relative;
+      overflow: hidden;
+      border-radius: 8px;
+      background: #0b0d12;
+      aspect-ratio: 3 / 4;
+      max-height: 620px;
+    }
+    .agent-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .agent-frame::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 65%, rgba(5,8,14,.38));
+      pointer-events: none;
+    }
+    .agent-figure figcaption {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      padding-top: 14px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+    .agent-figure figcaption span:last-child { text-align: right; color: var(--fg); }
+
+    .run-section { background: var(--bg); }
+    .run-grid {
+      display: grid;
+      grid-template-columns: minmax(0,.82fr) minmax(0,1.18fr);
+      gap: clamp(44px, 8vw, 112px);
+      align-items: center;
+    }
+    .run-copy p { margin: 20px 0 0; max-width: 480px; }
+    .run-panel {
+      position: relative;
+      overflow: hidden;
+      padding: clamp(28px, 4vw, 44px);
+      color: #fff;
+      background: var(--deep);
+      border-radius: 8px;
+      box-shadow: 0 30px 80px rgba(18,58,143,.18);
+    }
+    .run-panel::after {
+      content: "";
+      position: absolute;
+      right: -90px;
+      top: -110px;
+      width: 290px;
+      height: 290px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .run-panel-top {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding-bottom: 22px;
+      border-bottom: 1px solid rgba(255,255,255,.18);
+    }
+    .status-live {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 13px;
+      line-height: 1.5;
+      color: rgba(255,255,255,.84);
+    }
+    .status-live i {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--blue-soft);
+      box-shadow: 0 0 0 5px rgba(91,141,255,.14);
+    }
+    .run-panel-top .mono { color: rgba(255,255,255,.54); font-size: 11px; letter-spacing: .07em; }
+    .clock {
+      position: relative;
+      z-index: 1;
+      margin: 35px 0 12px;
+      font-family: var(--font-mono);
+      font-size: clamp(64px, 8vw, 108px);
+      line-height: 1;
+      font-weight: 400;
+      letter-spacing: -.03em;
+    }
+    .clock-label {
+      position: relative;
+      z-index: 1;
+      margin: 0;
+      color: rgba(255,255,255,.58);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      line-height: 1.5;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+    .run-details {
+      position: relative;
+      z-index: 1;
+      margin-top: 38px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 18px;
+      border-top: 1px solid rgba(255,255,255,.18);
+      padding-top: 21px;
+    }
+    .run-details dt { color: rgba(255,255,255,.5); font-size: 11px; line-height: 1.5; }
+    .run-details dd { margin: 5px 0 0; color: #fff; font-size: 14px; line-height: 1.55; }
+
+    .boundary-grid {
+      display: grid;
+      grid-template-columns: minmax(0,.88fr) minmax(0,1.12fr);
+      gap: clamp(44px, 8vw, 120px);
+      align-items: start;
+    }
+    .boundary-quote {
+      margin: 28px 0 0;
+      font-size: clamp(26px, 3vw, 40px);
+      line-height: 1.5;
+      letter-spacing: 0;
+      font-weight: 600;
+    }
+    .boundary-quote em { color: var(--accent); font-style: normal; }
+    .source-rules { border-top: 1px solid var(--border); }
+    .source-rule {
+      display: grid;
+      grid-template-columns: 110px minmax(0,1fr) auto;
+      align-items: center;
+      gap: 22px;
+      min-height: 92px;
+      padding-block: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .source-rule strong { font-size: 18px; line-height: 1.5; font-weight: 600; }
+    .source-rule span { color: var(--muted); font-size: 14px; line-height: 1.7; }
+    .rule-state {
+      min-width: 66px;
+      padding: 7px 11px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      line-height: 1.3;
+      letter-spacing: .05em;
+    }
+    .source-rule.accepted strong { color: var(--deep); }
+    .source-rule.accepted .rule-state { color: var(--deep); border-color: rgba(18,58,143,.25); background: rgba(47,107,255,.05); }
+    .source-rule.rejected .rule-state { color: var(--muted); background: var(--surface-soft); }
+
+    .next-band {
+      padding-block: clamp(72px, 8vw, 110px);
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+    }
+    .next-inner {
+      display: grid;
+      grid-template-columns: minmax(0,1fr) auto;
+      gap: 48px;
+      align-items: center;
+    }
+    .next-inner h2 { max-width: 760px; }
+    .next-inner p { max-width: 620px; margin: 17px 0 0; color: var(--muted); }
+    .next-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; }
+
+    .site-footer {
+      color: rgba(255,255,255,.72);
+      background: var(--deep);
+      padding: 74px 0 28px;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1.45fr .8fr .8fr 1fr;
+      gap: 44px;
+    }
+    .footer-brand {
+      color: #fff;
+      font-size: 18px;
+      line-height: 1.6;
+      font-weight: 600;
+    }
+    .footer-brand p { max-width: 300px; margin: 14px 0 0; color: rgba(255,255,255,.65); font-size: 14px; line-height: 1.8; font-weight: 400; }
+    .footer-col h3 { margin: 0 0 15px; color: rgba(255,255,255,.52); font-size: 12px; line-height: 1.5; letter-spacing: .06em; font-weight: 500; }
+    .footer-col a { display: block; width: fit-content; padding-block: 5px; font-size: 14px; line-height: 1.7; transition: color .2s ease; }
+    .footer-col a:hover { color: #fff; }
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      margin-top: 64px;
+      padding-top: 22px;
+      border-top: 1px solid rgba(255,255,255,.16);
+      color: rgba(255,255,255,.5);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .motion-ready .reveal {
+      opacity: 0;
+      transform: translateY(22px);
+      transition: opacity .7s var(--ease-out), transform .7s var(--ease-out);
+    }
+    .motion-ready .reveal.is-visible { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 980px) {
+      .nav { display: none; }
+      .header-cta { display: none; }
+      .menu-toggle { display: block; }
+      .header-inner { grid-template-columns: 1fr auto; }
+      .hero { min-height: auto; padding-block: 142px 72px; }
+      .problem-grid, .how-grid, .run-grid, .boundary-grid { grid-template-columns: 1fr; }
+      .problem-grid, .boundary-grid { gap: 42px; }
+      .how-grid { gap: 52px; }
+      .agent-figure { width: min(560px, 100%); }
+      .agent-frame { max-height: none; }
+      .next-inner { grid-template-columns: 1fr; gap: 30px; }
+      .next-actions { justify-content: flex-start; }
+      .footer-grid { grid-template-columns: 1.4fr 1fr 1fr; }
+      .footer-col:last-child { grid-column: 2 / 4; }
+    }
+
+    @media (max-width: 700px) {
+      body { font-size: 16px; }
+      .header-inner { height: 74px; }
+      .mobile-panel { inset-block-start: 73px; }
+      .brand { font-size: 15px; }
+      .hero { padding-block: 124px 52px; }
+      .breadcrumb { margin-bottom: 22px; }
+      .glass-content { padding: 28px 24px 30px; }
+      .hero-actions { align-items: stretch; }
+      .button { width: 100%; }
+      .hero-definition { font-size: 20px; }
+      .hero-support { font-size: 15px; }
+      .hero-facts { grid-template-columns: 1fr; margin-top: 30px; }
+      .hero-fact { padding: 15px 0; border-right: 0; border-bottom: 1px solid rgba(255,255,255,.16); }
+      .hero-fact:last-child { border-bottom: 0; }
+      .handoff { grid-template-columns: 1fr; }
+      .handoff-item { min-height: auto; }
+      .handoff-item strong { margin-top: 13px; }
+      .flow-step { grid-template-columns: 70px minmax(0,1fr); gap: 14px; }
+      .run-details { grid-template-columns: 1fr; gap: 14px; }
+      .source-rule { grid-template-columns: 1fr auto; gap: 8px 16px; }
+      .source-rule span { grid-column: 1 / -1; grid-row: 2; }
+      .next-actions { flex-direction: column; align-items: stretch; }
+      .footer-grid { grid-template-columns: 1fr 1fr; gap: 36px 24px; }
+      .footer-brand { grid-column: 1 / -1; }
+      .footer-col:last-child { grid-column: auto; }
+      .footer-bottom { flex-direction: column; gap: 4px; margin-top: 44px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+      .reveal { opacity: 1 !important; transform: none !important; }
+    }
+  </style>
+<style>
+.inline-figure{margin:56px auto;max-width:1200px;padding-inline:clamp(20px,5vw,64px);box-sizing:border-box}
+.inline-figure .fig-box{border-radius:24px;overflow:hidden;box-shadow:0 28px 70px rgba(48,58,86,.14);border:1px solid #DDE2EA}
+.inline-figure img{display:block;width:100%;height:clamp(220px,30vw,400px);object-fit:cover}
+.inline-figure figcaption{padding:14px 22px;font-size:14px;line-height:1.6;color:#6B7689;background:#fff}
+</style>
+<style>
+html,body{overflow-x:hidden;max-width:100%}
+*,*::before,*::after{box-sizing:border-box}
+img{max-width:100%;height:auto}
+</style>
+<style>
+svg{max-width:100%;vertical-align:middle}
+.button svg,.button--primary svg,.button--glass svg,button svg,a.button svg,.hero-actions svg{width:18px;height:18px;flex:none;display:inline-block}
+</style>
+<style>
+[class*="node"] svg,[class*="icon"] svg,[class*="step"] svg,[class*="badge"] svg,[class*="mark"] svg,[class*="chip"] svg{width:44px;height:44px;flex:none;display:inline-block}
+[class*="number"] svg,[class*="num"] svg{width:32px;height:32px}
+</style>
+<style>
+[class*="hero"] img{object-fit:cover;object-position:center;max-height:96vh}
+</style>
+<style>
+[class*="scene"] img,[class*="media"] img:not(.hero-photo),[class*="shot"] img{height:auto;max-height:520px;object-fit:cover;width:100%}
+</style>
+<style>
+.hero img,section img,figure img{max-width:100%}
+</style>
+<style>
+.hero__media{overflow:hidden;width:100%}
+.hero__image{width:100%;height:100%;object-fit:cover;display:block}
+</style>
+<style>
+.hero__image{transform:none!important}
+</style>
+<style>
+.glass{position:relative;isolation:isolate;
+background:rgba(255,255,255,.10)!important;
+-webkit-backdrop-filter:blur(24px) saturate(180%)!important;
+backdrop-filter:blur(24px) saturate(180%)!important;
+border:1.5px solid rgba(255,255,255,.45)!important;border-radius:28px!important;
+box-shadow:0 28px 90px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.65)!important;
+overflow:hidden;}
+.glass::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+background:linear-gradient(148deg,rgba(255,255,255,.30) 0%,rgba(255,255,255,.06) 30%,rgba(255,255,255,0) 52%);}
+.glass::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),inset 0 24px 48px -24px rgba(255,255,255,.28);}
+.glass > *{position:relative;z-index:1}
+</style>
+</head>
+<body>
+  <header class="site-header" id="site-header" data-od-id="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="brand" aria-label="Astraea Plan 首页">
+        <span class="brand-mark">AP</span>
+        <span>Astraea Plan</span>
+      </a>
+      <nav class="nav" aria-label="主导航">
+        <a href="capabilities.html" class="is-current" aria-current="page">能力</a>
+        <a href="architecture.html">架构</a>
+        <a href="cases.html">案例</a>
+        <a href="pricing.html">投入</a>
+        <a href="about.html">关于</a>
+      </nav>
+      <a href="#contact" class="header-cta">预约演示</a>
+      <button class="menu-toggle" type="button" aria-label="打开导航菜单" aria-expanded="false" aria-controls="mobile-panel"><span></span></button>
+    </div>
+    <div class="mobile-panel" id="mobile-panel">
+      <nav aria-label="移动端导航">
+        <a href="capabilities.html">能力</a>
+        <a href="architecture.html">架构</a>
+        <a href="cases.html">案例</a>
+        <a href="pricing.html">投入</a>
+        <a href="about.html">关于</a>
+        <a href="#contact" class="header-cta">预约演示</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" id="top" data-od-id="dailyclose-hero">
+      <div class="container">
+        <nav class="breadcrumb" aria-label="面包屑" data-od-id="dailyclose-breadcrumb">
+          <a href="index.html">首页</a>
+          <span aria-hidden="true">/</span>
+          <a href="capabilities.html">能力</a>
+          <span aria-hidden="true">/</span>
+          <span aria-current="page">数据日清</span>
+        </nav>
+        <div class="glass" data-od-id="dailyclose-glass-panel">
+          <div class="glass-content">
+            <p class="glass-kicker">CAPABILITY / DAILY CLOSE</p>
+            <h1 data-od-id="dailyclose-h1">数据日清。</h1>
+            <p class="hero-definition">每天 23:55，各部门自己交作业。</p>
+            <p class="hero-support">智能体自动总结当日数据与动作，总控归档，次日晨报汇报管理层。日报不再靠人追，口径也不再各写各的。</p>
+            <div class="hero-actions" data-od-id="dailyclose-hero-actions">
+              <a href="#contact" class="button button-primary" data-od-id="dailyclose-demo-cta">
+                预约演示
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>
+              </a>
+              <a href="architecture.html" class="button button-glass" data-od-id="dailyclose-architecture-cta">
+                看架构
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+              </a>
+            </div>
+            <div class="run-note" aria-label="运行状态：cron 每天在跑，从未停"><i class="run-dot" aria-hidden="true"></i>cron 每天在跑，从未停</div>
+          </div>
+        </div>
+        <div class="hero-facts" aria-label="Astraea Plan 真实体量" data-od-id="dailyclose-hero-facts">
+          <div class="hero-fact"><strong>10 个部门</strong><span>共同进入每天同一套日清流程</span></div>
+          <div class="hero-fact"><strong>182 个定时任务</strong><span>稳定运行的自动化底座</span></div>
+          <div class="hero-fact"><strong>7 个月</strong><span>持续在真实连锁业务中运行</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="problem" data-od-id="dailyclose-problem">
+      <div class="container problem-grid">
+        <div class="reveal">
+          <span class="eyebrow">01 / 问题</span>
+          <h2 class="section-heading">日报靠人写，<br />写完口径还不一样。</h2>
+        </div>
+        <div class="problem-copy reveal">
+          <p class="lead">门店每天都在产生数据，但管理层看到的往往不是现场，而是经过多层转述后的二手信息。</p>
+          <p class="copy">不同部门按各自理解整理日报，格式、时点、计算方式都可能不同。信息一旦被人工转述，异常会被淡化，原因会被遗漏，管理层也很难判断哪些结论真正来自数据。</p>
+          <p class="problem-statement">看到的是一份日报，<br />缺的是一整条可信的事实链。</p>
+          <div class="handoff" aria-label="人工日报的信息折损过程">
+            <div class="handoff-item"><small>01 / 原始现场</small><strong>门店数据与动作</strong><span>分散在多个系统与部门</span></div>
+            <div class="handoff-item"><small>02 / 人工转述</small><strong>各部门写日报</strong><span>各写各的，口径难以统一</span></div>
+            <div class="handoff-item"><small>03 / 管理视角</small><strong>二手信息</strong><span>看到总结，看不到原始链路</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+<figure class="inline-figure"><div class="fig-box"><img src="assets/bokeh-2.jpg" alt="Astraea Plan 运行场景" loading="lazy"></div></figure>
+
+
+    <section class="section how-section" id="how" data-od-id="dailyclose-how">
+      <div class="container how-grid">
+        <div class="reveal">
+          <span class="eyebrow">02 / 怎么做</span>
+          <h2 class="section-heading">同一时点，自动交同一份作业。</h2>
+          <p class="lead how-intro">每天 23:55，各部门智能体开始总结当日数据与动作；总控统一归档，第二天清晨形成管理层晨报。</p>
+          <div class="flow" aria-label="数据日清执行流程">
+            <div class="flow-step">
+              <div class="flow-index">STEP 01<br />23:55</div>
+              <div><h3>各部门智能体自动总结</h3><p class="flow-time">当日数据与动作，到点自动汇总。</p><p>不需要部门临时找人写，也不需要重复追日报。</p></div>
+            </div>
+            <div class="flow-step">
+              <div class="flow-index">STEP 02<br />ARCHIVE</div>
+              <div><h3>总控归档</h3><p>把各部门结果收束为一份完整的日清记录，保留当天动作与数据上下文。</p></div>
+            </div>
+            <div class="flow-step">
+              <div class="flow-index">STEP 03<br />MORNING</div>
+              <div><h3>次日晨报汇报管理层</h3><p>管理层在晨会前拿到同一份事实，不用再从不同版本里拼答案。</p></div>
+            </div>
+          </div>
+        </div>
+        <figure class="agent-figure reveal" data-od-id="dailyclose-agent-figure">
+          <div class="agent-frame"><img src="assets/bluesmoke-1.jpg" width="2000" height="2667" alt="白色智能机械臂在深色背景中运行" loading="lazy" /></div>
+          <figcaption><span>10 个部门 · 各自执行<br />总控统一归档</span><span>每天 23:55<br />自动开始</span></figcaption>
+        </figure>
+      </div>
+    </section>
+<figure class="inline-figure"><div class="fig-box"><img src="assets/kb-c.jpg" alt="Astraea Plan 运行场景" loading="lazy"></div></figure>
+
+
+    <section class="section run-section" id="status" data-od-id="dailyclose-status">
+      <div class="container run-grid">
+        <div class="run-copy reveal">
+          <span class="eyebrow">03 / 状态</span>
+          <h2 class="section-heading">每天自动跑，<br />不是偶尔跑一次。</h2>
+          <p class="copy">这是整套系统的核心闭环。cron 每天在跑，从未停；日清不是一次演示，而是已经进入日常经营节奏的固定动作。</p>
+        </div>
+        <div class="run-panel reveal" data-od-id="dailyclose-run-panel" aria-label="数据日清运行状态">
+          <div class="run-panel-top">
+            <span class="status-live"><i aria-hidden="true"></i>运行中 · 从未停</span>
+            <span class="mono">CRON / DAILY</span>
+          </div>
+          <div class="clock" aria-label="每天 23:55 执行">23:55</div>
+          <p class="clock-label">Daily close · every day</p>
+          <dl class="run-details">
+            <div><dt>调度</dt><dd>cron</dd></div>
+            <div><dt>频率</dt><dd>每天</dd></div>
+            <div><dt>覆盖</dt><dd>各部门</dd></div>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="boundary" data-od-id="dailyclose-boundary">
+      <div class="container boundary-grid">
+        <div class="reveal">
+          <span class="eyebrow">04 / 边界</span>
+          <h2 class="section-heading">口径只有一条。</h2>
+          <p class="boundary-quote">数字以 <em>POS</em> 为唯一基准。<br />其他来源，一律不采。</p>
+        </div>
+        <div class="source-rules reveal" aria-label="数据来源规则" data-od-id="dailyclose-source-rules">
+          <div class="source-rule accepted">
+            <strong>POS</strong>
+            <span>日清中的数字只认这一套基准，保证每天可比较、可追溯。</span>
+            <span class="rule-state">唯一采用</span>
+          </div>
+          <div class="source-rule rejected">
+            <strong>其他来源</strong>
+            <span>无论来自人工整理还是其他系统，都不进入日清口径。</span>
+            <span class="rule-state">一律不采</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="next-band" id="contact" data-od-id="dailyclose-next-step">
+      <div class="container next-inner reveal">
+        <div>
+          <span class="eyebrow">NEXT / 下一步</span>
+          <h2 class="section-heading">让每一天都有据可查。</h2>
+          <p>看看数据日清如何接入你的部门、总控与管理晨会流程。</p>
+        </div>
+        <div class="next-actions">
+          <a href="#top" class="button button-primary" data-od-id="dailyclose-contact-cta">预约数据日清演示</a>
+          <a href="architecture.html" class="button button-outline" data-od-id="dailyclose-next-architecture">查看整体架构</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer" data-od-id="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          Astraea Plan
+          <p>给连锁企业装一套私有化智能体团队，数据不出公司。</p>
+        </div>
+        <div class="footer-col">
+          <h3>能力</h3>
+          <a href="capabilities.html">能力总览</a>
+          <a href="cap-dailyclose.html">数据日清</a>
+          <a href="capabilities.html#monitoring">门店监控</a>
+        </div>
+        <div class="footer-col">
+          <h3>架构</h3>
+          <a href="architecture.html">总体架构</a>
+          <a href="architecture.html#agents">智能体团队</a>
+          <a href="architecture.html#private">私有化边界</a>
+        </div>
+        <div class="footer-col">
+          <h3>联系</h3>
+          <a href="pricing.html">预约演示</a>
+          <a href="cases.html">查看案例</a>
+          <a href="about.html">关于 Astraea Plan</a>
+        </div>
+      </div>
+      <div class="footer-bottom"><span>© 2026 Astraea Plan</span><span>数据不出公司</span></div>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      var header = document.getElementById('site-header');
+      var menuButton = document.querySelector('.menu-toggle');
+      var mobilePanel = document.getElementById('mobile-panel');
+
+      function updateHeader() {
+        header.classList.toggle('is-scrolled', window.scrollY > 32);
+      }
+      updateHeader();
+      window.addEventListener('scroll', updateHeader, { passive: true });
+
+      function closeMenu() {
+        menuButton.setAttribute('aria-expanded', 'false');
+        menuButton.setAttribute('aria-label', '打开导航菜单');
+        mobilePanel.classList.remove('is-open');
+      }
+
+      menuButton.addEventListener('click', function () {
+        var open = menuButton.getAttribute('aria-expanded') !== 'true';
+        menuButton.setAttribute('aria-expanded', String(open));
+        menuButton.setAttribute('aria-label', open ? '关闭导航菜单' : '打开导航菜单');
+        mobilePanel.classList.toggle('is-open', open);
+      });
+      mobilePanel.querySelectorAll('a').forEach(function (link) {
+        link.addEventListener('click', closeMenu);
+      });
+      window.addEventListener('resize', function () {
+        if (window.innerWidth > 980) closeMenu();
+      });
+
+      var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var revealItems = Array.prototype.slice.call(document.querySelectorAll('.reveal'));
+      if (!reduced && 'IntersectionObserver' in window) {
+        document.documentElement.classList.add('motion-ready');
+        var observer = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+        revealItems.forEach(function (item) { observer.observe(item); });
+      } else {
+        revealItems.forEach(function (item) { item.classList.add('is-visible'); });
+      }
+    })();
+  </script>
+</body>
+</html>

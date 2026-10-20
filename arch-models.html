@@ -1,0 +1,976 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Astraea Plan 双模型通道：主力模型承担日常任务，强推理任务临时切换，故障自动降级，恢复后切回。" />
+  <title>双模型通道｜Astraea Plan</title>
+  <style>
+    :root {
+      --bg:#F6F7F9; --surface:#FFFFFF; --surface-soft:#F1F3F7;
+      --fg:#16233A; --muted:#6B7689; --border:#DDE2EA;
+      --accent:#FF5A1F; --blue:#2F6BFF; --blue-soft:#5B8DFF; --deep:#123A8F;
+      --muted-strong:#5D687A;
+      --font-body:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+      --font-mono:"SFMono-Regular","SF Mono",Menlo,Consolas,monospace;
+      --ease-out: cubic-bezier(0.23,1,0.32,1);
+      --container: 1200px;
+      --section: clamp(72px,8vw,120px);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    html,body { overflow-x:hidden; max-width:100%; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--font-body);
+      font-size: 17px;
+      line-height: 1.8;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+    body.menu-open { overflow: hidden; }
+    a { color: inherit; text-decoration: none; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    button { font: inherit; }
+    svg { display: block; }
+    ::selection { background: rgba(47,107,255,.18); color: var(--fg); }
+    :focus-visible { outline: 3px solid var(--blue-soft); outline-offset: 4px; }
+    .sr-only {
+      position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+      overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+    }
+
+    .container {
+      width:100%; max-width:var(--container); margin-inline:auto;
+      padding-inline:clamp(20px,5vw,64px); box-sizing:border-box;
+    }
+    .mono {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 10px;
+      color: var(--blue); font-family: var(--font-mono);
+      font-size: 12px; font-weight: 600; letter-spacing: .08em;
+    }
+    .eyebrow::before {
+      content:""; width:22px; height:1px; background: currentColor; opacity:.68;
+    }
+    .section-title {
+      margin: 14px 0 0; max-width: 760px;
+      font-size: clamp(28px,3vw,42px); line-height: 1.34;
+      letter-spacing: 0; font-weight: 650;
+    }
+    .section-lead {
+      margin: 22px 0 0; max-width: 64ch;
+      color: var(--muted); font-size: 17px; line-height: 1.8;
+    }
+
+    /* Fixed global header */
+    .site-header {
+      position: fixed; inset: 0 0 auto 0; z-index: 1000;
+      background: rgba(12,18,32,.35);
+      border-bottom: 1px solid rgba(255,255,255,.14);
+      -webkit-backdrop-filter: blur(18px);
+      backdrop-filter: blur(18px);
+      color: #fff;
+      transition: background .35s var(--ease-out), color .35s var(--ease-out), border-color .35s var(--ease-out);
+    }
+    .site-header.is-scrolled {
+      background: rgba(255,255,255,.72);
+      color: var(--fg);
+      border-color: rgba(22,35,58,.10);
+    }
+    .header-inner {
+      min-height: 76px; display:grid; grid-template-columns: 1fr auto 1fr;
+      align-items:center; gap:24px;
+    }
+    .brand { display:inline-flex; align-items:center; gap:10px; width:max-content; }
+    .brand-mark {
+      width:28px; height:28px; border:1px solid currentColor; border-radius:50%;
+      display:grid; place-items:center; position:relative; flex:none;
+    }
+    .brand-mark::before, .brand-mark::after {
+      content:""; position:absolute; inset:7px 5px; border:1px solid currentColor;
+      border-radius:50%; transform:rotate(48deg);
+    }
+    .brand-mark::after { transform:rotate(-48deg); }
+    .brand-name { font-size:17px; font-weight:650; letter-spacing:.01em; }
+    .main-nav { display:flex; align-items:center; gap:30px; }
+    .main-nav a {
+      min-height:44px; display:inline-flex; align-items:center; position:relative;
+      font-size:14px; font-weight:550; white-space:nowrap;
+      transition: opacity .2s ease;
+    }
+    .main-nav a::after {
+      content:""; position:absolute; left:0; right:0; bottom:7px; height:2px;
+      background: var(--accent); transform:scaleX(0); transform-origin:left;
+      transition: transform .25s var(--ease-out);
+    }
+    .main-nav a:hover::after, .main-nav a[aria-current="page"]::after { transform:scaleX(1); }
+    .header-action { justify-self:end; }
+    .button {
+      min-height:46px; padding: 0 22px; border-radius:999px; border:1px solid transparent;
+      display:inline-flex; align-items:center; justify-content:center; gap:9px;
+      font-size:14px; font-weight:650; line-height:1; letter-spacing:.02em;
+      cursor:pointer; transition: transform .2s var(--ease-out), background .2s var(--ease-out), color .2s var(--ease-out), border-color .2s var(--ease-out);
+    }
+    .button:hover { transform: translateY(-2px); }
+    .button:active { transform: translateY(0); }
+    .button-primary { background: var(--accent); color:var(--fg); }
+    .button-primary:hover { background:#FF6E3B; color:var(--fg); }
+    .button-secondary {
+      background:rgba(255,255,255,.08); color:#fff; border-color:rgba(255,255,255,.55);
+      -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+    }
+    .button-secondary:hover { background:rgba(255,255,255,.18); color:#fff; border-color:#fff; }
+    .button-blue { background:var(--blue); color:#fff; }
+    .button-blue:hover { background:#2559D9; color:#fff; }
+    .button-ghost { background:transparent; color:var(--fg); border-color:var(--border); }
+    .button-ghost:hover { color:var(--fg); border-color:var(--fg); background:var(--surface-soft); }
+    .menu-toggle {
+      display:none; width:44px; height:44px; border:1px solid currentColor; border-radius:50%;
+      color:inherit; background:transparent; cursor:pointer; place-items:center;
+    }
+    .menu-toggle span, .menu-toggle span::before, .menu-toggle span::after {
+      display:block; width:17px; height:1.5px; background:currentColor; content:"";
+      transition: transform .25s var(--ease-out), opacity .2s ease;
+    }
+    .menu-toggle span { position:relative; }
+    .menu-toggle span::before { position:absolute; top:-5px; }
+    .menu-toggle span::after { position:absolute; top:5px; }
+    .menu-open .menu-toggle span { background:transparent; }
+    .menu-open .menu-toggle span::before { top:0; transform:rotate(45deg); }
+    .menu-open .menu-toggle span::after { top:0; transform:rotate(-45deg); }
+    .mobile-nav {
+      position:fixed; inset:76px 0 auto 0; z-index:999;
+      display:none; background:rgba(246,247,249,.98); color:var(--fg);
+      border-bottom:1px solid var(--border); padding:26px 20px 34px;
+      -webkit-backdrop-filter:blur(20px); backdrop-filter:blur(20px);
+    }
+    .mobile-nav a {
+      min-height:52px; display:flex; align-items:center; border-bottom:1px solid var(--border);
+      font-size:19px; font-weight:600;
+    }
+    .mobile-nav .button { margin-top:24px; width:100%; }
+
+    /* Glass is used only on the photographic hero. */
+    .glass {
+      position:relative; isolation:isolate;
+      background:rgba(255,255,255,.10);
+      -webkit-backdrop-filter:blur(24px) saturate(180%);
+      backdrop-filter:blur(24px) saturate(180%);
+      border:1.5px solid rgba(255,255,255,.45);
+      border-radius:28px;
+      box-shadow:0 28px 90px rgba(0,0,0,.55),
+                 inset 0 1px 0 rgba(255,255,255,.65),
+                 inset 0 -1px 0 rgba(255,255,255,.10);
+      overflow:hidden;
+    }
+    .glass::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+      background:linear-gradient(148deg,rgba(255,255,255,.30) 0%,rgba(255,255,255,.06) 30%,rgba(255,255,255,0) 52%);}
+    .glass::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.12), inset 0 24px 48px -24px rgba(255,255,255,.28);}
+    .glass, .glass h1, .glass h2, .glass h3, .glass p { color:#fff; }
+
+    .hero {
+      position:relative; min-height:min(900px,96vh); display:flex; align-items:center;
+      background:#070A10; color:#fff; overflow:hidden; isolation:isolate;
+    }
+    .hero-image { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:62% center; z-index:-2; }
+    .hero::before {
+      content:""; position:absolute; inset:0; z-index:-1;
+      background:linear-gradient(105deg,rgba(6,10,20,.45),rgba(6,10,20,.12) 60%,transparent);
+    }
+    .hero-inner { padding-top:132px; padding-bottom:72px; width:100%; }
+    .breadcrumb {
+      display:flex; align-items:center; gap:10px; margin-bottom:24px;
+      color:rgba(255,255,255,.74); font-size:13px; letter-spacing:.04em;
+    }
+    .breadcrumb a { min-height:44px; display:inline-flex; align-items:center; }
+    .breadcrumb a:hover { color:#fff; }
+    .breadcrumb .current { color:#fff; }
+    .hero-panel { width:min(610px,100%); padding:clamp(26px,4vw,48px); }
+    .hero-panel > * { position:relative; z-index:1; }
+    .hero-kicker {
+      display:flex; align-items:center; justify-content:space-between; gap:18px;
+      margin-bottom:32px; color:rgba(255,255,255,.72);
+      font-family:var(--font-mono); font-size:11px; letter-spacing:.11em;
+    }
+    .hero-kicker .signal { display:inline-flex; align-items:center; gap:8px; color:#fff; }
+    .signal-dot { width:7px; height:7px; border-radius:50%; background:#71E3A1; box-shadow:0 0 0 5px rgba(113,227,161,.12); }
+    .hero h1 {
+      margin:0; font-size:clamp(38px,4.6vw,64px); line-height:1.3; font-weight:650;
+      letter-spacing:0;
+    }
+    .hero h1 .definition { display:block; margin-top:10px; color:rgba(255,255,255,.82); }
+    .hero-definition {
+      max-width:46ch; margin:24px 0 0; color:rgba(255,255,255,.78) !important;
+      font-size:16px; line-height:1.75;
+    }
+    .hero-actions { display:flex; flex-wrap:wrap; gap:12px; margin-top:32px; }
+    .hero-actions .button { min-width:132px; }
+    .hero-meta {
+      display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px;
+      margin-top:36px; padding-top:24px; border-top:1px solid rgba(255,255,255,.22);
+    }
+    .hero-meta div { min-width:0; }
+    .hero-meta dt { color:rgba(255,255,255,.58); font-family:var(--font-mono); font-size:10px; letter-spacing:.1em; }
+    .hero-meta dd { margin:5px 0 0; color:#fff; font-size:13px; line-height:1.5; }
+
+    .chapter { padding-block:var(--section); }
+    .chapter-white { background:var(--surface); }
+    .chapter-soft { background:var(--surface-soft); --muted:var(--muted-strong); }
+    .chapter-head { display:grid; grid-template-columns:180px minmax(0,1fr); gap:40px; align-items:start; }
+    .chapter-index { color:var(--blue); font-family:var(--font-mono); font-size:13px; letter-spacing:.08em; padding-top:8px; }
+    .chapter-index strong { display:block; font-size:36px; line-height:1; font-weight:500; letter-spacing:-.03em; margin-bottom:8px; }
+    .chapter-copy .section-title { margin-top:0; }
+
+    .problem-grid {
+      display:grid; grid-template-columns:minmax(0,.9fr) minmax(340px,1.1fr); gap:clamp(40px,7vw,96px);
+      margin-top:64px; align-items:center;
+    }
+    .problem-copy p { margin:0; color:var(--muted); max-width:52ch; }
+    .problem-copy p + p { margin-top:16px; }
+    .problem-quote {
+      margin:28px 0 0; padding-top:24px; border-top:1px solid var(--border);
+      color:var(--fg); font-size:20px; line-height:1.65; font-weight:600;
+    }
+    .broken-chain {
+      background:var(--surface); border:1px solid var(--border); border-radius:18px;
+      padding:clamp(24px,4vw,40px); box-shadow:0 20px 60px rgba(18,58,143,.08);
+    }
+    .chain-label { display:flex; justify-content:space-between; color:var(--muted); }
+    .chain-label .status { color:#B33B2D; }
+    .chain-rail { position:relative; display:grid; gap:12px; margin-top:30px; }
+    .chain-rail::before {
+      content:""; position:absolute; top:26px; bottom:26px; left:23px; width:1px;
+      background:linear-gradient(to bottom,var(--blue) 0 49%,#C8CED9 49% 51%,#B33B2D 51% 100%);
+    }
+    .chain-node { display:grid; grid-template-columns:48px minmax(0,1fr) auto; gap:14px; align-items:center; position:relative; }
+    .node-dot {
+      width:48px; height:48px; border-radius:50%; display:grid; place-items:center;
+      background:var(--surface); border:1px solid var(--border); color:var(--blue);
+      font-family:var(--font-mono); font-size:11px; z-index:1;
+    }
+    .chain-node.is-failed .node-dot { border-color:#E6B7AF; color:#B33B2D; background:#FFF7F5; }
+    .node-copy strong { display:block; font-size:15px; font-weight:600; }
+    .node-copy small { display:block; color:var(--muted); font-size:12px; }
+    .node-state { font-family:var(--font-mono); font-size:10px; letter-spacing:.08em; color:var(--muted); }
+    .chain-node.is-failed .node-state { color:#B33B2D; }
+    .chain-break { margin:18px 0 0 62px; padding:14px 16px; background:#FFF7F5; border:1px solid #F0D0C9; border-radius:10px; color:#8B3025; font-size:13px; }
+
+    .structure-head { display:flex; justify-content:space-between; align-items:end; gap:40px; }
+    .scenario-nav {
+      display:flex; flex-wrap:wrap; gap:8px; margin-top:48px;
+      padding:6px; background:var(--surface); border:1px solid var(--border); border-radius:14px; width:max-content; max-width:100%;
+    }
+    .scenario-button {
+      min-height:44px; border:0; border-radius:9px; background:transparent; color:var(--muted);
+      padding:0 16px; cursor:pointer; font-size:13px; font-weight:600;
+      transition:background .2s ease,color .2s ease;
+    }
+    .scenario-button:hover { color:var(--fg); background:var(--surface-soft); }
+    .scenario-button[aria-selected="true"] { color:#fff; background:var(--blue); }
+    .channel-board {
+      margin-top:22px; background:var(--surface); border:1px solid var(--border); border-radius:22px;
+      overflow:hidden; box-shadow:0 24px 70px rgba(18,58,143,.07);
+    }
+    .board-top {
+      display:flex; justify-content:space-between; gap:24px; align-items:center;
+      padding:18px 22px; border-bottom:1px solid var(--border); background:rgba(246,247,249,.7);
+    }
+    .board-top .mono { color:var(--muted); }
+    .scenario-readout { color:var(--deep); font-size:13px; font-weight:600; }
+    .channel-map {
+      display:grid; grid-template-columns:minmax(145px,.85fr) 54px minmax(270px,1.5fr) 54px minmax(145px,.85fr);
+      gap:0; align-items:center; padding:clamp(24px,4vw,48px);
+    }
+    .endpoint {
+      --muted:var(--muted-strong);
+      min-height:128px; display:flex; flex-direction:column; justify-content:center; align-items:center;
+      text-align:center; border:1px solid var(--border); border-radius:16px; padding:20px;
+      background:var(--surface-soft);
+    }
+    .endpoint .icon-box {
+      width:34px; height:34px; border-radius:10px; display:grid; place-items:center;
+      background:var(--surface); color:var(--blue); border:1px solid var(--border); margin-bottom:10px;
+    }
+    .endpoint strong { font-size:14px; font-weight:650; }
+    .endpoint span { color:var(--muted); font-size:12px; }
+    .route-line { height:1px; background:var(--border); position:relative; }
+    .route-line::after {
+      content:""; position:absolute; right:-1px; top:-3px; border-left:7px solid var(--border);
+      border-top:4px solid transparent; border-bottom:4px solid transparent;
+    }
+    .channel-core {
+      padding:20px; border:1px solid rgba(47,107,255,.28); border-radius:18px;
+      background:linear-gradient(180deg,rgba(47,107,255,.055),rgba(47,107,255,.015));
+    }
+    .core-head { display:flex; justify-content:space-between; gap:14px; align-items:center; margin-bottom:14px; }
+    .core-head strong { font-size:14px; font-weight:650; }
+    .core-head span { color:var(--blue); font-family:var(--font-mono); font-size:10px; letter-spacing:.08em; }
+    .models { display:grid; gap:10px; }
+    .model-row {
+      min-height:74px; display:grid; grid-template-columns:minmax(0,1fr) auto; gap:16px; align-items:center;
+      padding:14px 16px; border:1px solid var(--border); border-radius:12px; background:var(--surface);
+      transition:border-color .3s ease, box-shadow .3s ease, transform .3s var(--ease-out), opacity .3s ease;
+    }
+    .model-row .model-name { font-size:14px; font-weight:650; }
+    .model-row .model-desc { color:var(--muted); font-size:12px; line-height:1.5; }
+    .model-badge {
+      display:inline-flex; align-items:center; gap:6px; font-family:var(--font-mono); font-size:10px;
+      color:var(--muted); letter-spacing:.06em; white-space:nowrap;
+    }
+    .model-badge::before { content:""; width:6px; height:6px; border-radius:50%; background:#B7C0CE; }
+    .model-row.is-active { border-color:var(--blue); box-shadow:0 10px 30px rgba(47,107,255,.12); transform:translateY(-1px); }
+    .model-row.is-active .model-badge { color:var(--blue); }
+    .model-row.is-active .model-badge::before { background:#22A06B; box-shadow:0 0 0 4px rgba(34,160,107,.12); }
+    .model-row.is-warm { border-color:rgba(47,107,255,.28); }
+    .model-row.is-warm .model-badge { color:var(--deep); }
+    .model-row.is-warm .model-badge::before { background:var(--blue-soft); }
+    .model-row.is-muted { opacity:.62; }
+    .model-row.is-restored { animation:restorePulse .7s var(--ease-out); }
+    @keyframes restorePulse { 0%{box-shadow:0 0 0 0 rgba(47,107,255,.3)} 100%{box-shadow:0 0 0 18px rgba(47,107,255,0)} }
+    .board-foot {
+      display:flex; justify-content:space-between; gap:24px; border-top:1px solid var(--border);
+      padding:16px 22px; color:var(--muted); font-size:12px;
+    }
+    .board-foot strong { color:var(--fg); font-weight:600; }
+    .flow-steps {
+      display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:1px; margin-top:22px;
+      border:1px solid var(--border); border-radius:16px; overflow:hidden; background:var(--border);
+    }
+    .flow-step { position:relative; background:var(--surface); padding:24px; }
+    .flow-step .step-no { color:var(--blue); font-family:var(--font-mono); font-size:10px; letter-spacing:.08em; }
+    .flow-step h3 { margin:10px 0 6px; font-size:15px; line-height:1.5; font-weight:650; }
+    .flow-step p { margin:0; color:var(--muted); font-size:13px; line-height:1.7; }
+    .flow-step.is-current { background:#F7F9FF; }
+    .flow-step.is-current::after { content:""; position:absolute; left:24px; right:24px; bottom:0; height:2px; background:var(--blue); }
+
+    .decouple-grid {
+      display:grid; grid-template-columns:minmax(0,1fr) minmax(330px,.9fr); gap:clamp(40px,7vw,88px);
+      align-items:center; margin-top:58px;
+    }
+    .decouple-copy .section-title { font-size:clamp(26px,2.7vw,38px); }
+    .decouple-copy p { margin:20px 0 0; color:var(--muted); max-width:54ch; }
+    .contract-note {
+      display:flex; gap:14px; align-items:flex-start; margin-top:28px; padding-top:24px; border-top:1px solid var(--border);
+    }
+    .contract-note svg { color:var(--blue); flex:none; margin-top:3px; }
+    .contract-note strong { display:block; font-size:14px; font-weight:650; }
+    .contract-note span { display:block; margin-top:4px; color:var(--muted); font-size:13px; }
+    .layer-stack { display:grid; gap:12px; }
+    .layer {
+      border:1px solid var(--border); background:var(--surface); border-radius:14px; padding:18px 20px;
+      display:grid; grid-template-columns:42px minmax(0,1fr); gap:14px; align-items:center;
+    }
+    .layer-num { width:42px; height:42px; border-radius:10px; display:grid; place-items:center; background:var(--surface-soft); color:var(--muted); font-family:var(--font-mono); font-size:11px; }
+    .layer strong { display:block; font-size:14px; font-weight:650; }
+    .layer span { display:block; color:var(--muted); font-size:12px; }
+    .layer.contract { background:var(--deep); border-color:var(--deep); color:#fff; transform:translateX(18px); }
+    .layer.contract .layer-num { background:rgba(255,255,255,.13); color:#fff; }
+    .layer.contract span { color:rgba(255,255,255,.68); }
+    .layer-connector { width:1px; height:16px; background:var(--border); margin-inline:auto; }
+
+    .boundary-card {
+      margin-top:60px; display:grid; grid-template-columns:.9fr 1.1fr; gap:0;
+      border:1px solid #E6D8C7; border-radius:20px; overflow:hidden; background:#FFFDF9;
+    }
+    .boundary-lead { padding:clamp(28px,4vw,44px); border-right:1px solid #E6D8C7; }
+    .boundary-lead .eyebrow { color:#9A5423; }
+    .boundary-lead h3 { margin:16px 0 12px; font-size:clamp(24px,2.6vw,34px); line-height:1.4; font-weight:650; }
+    .boundary-lead p { margin:0; color:#705B49; font-size:15px; }
+    .boundary-list { padding:12px clamp(24px,4vw,40px); display:grid; align-content:center; }
+    .boundary-item { display:grid; grid-template-columns:28px minmax(0,1fr); gap:14px; padding:22px 0; border-bottom:1px solid rgba(154,84,35,.15); }
+    .boundary-item:last-child { border-bottom:0; }
+    .boundary-item svg { color:#9A5423; margin-top:4px; }
+    .boundary-item strong { display:block; font-size:15px; font-weight:650; }
+    .boundary-item span { display:block; color:#705B49; font-size:13px; margin-top:4px; }
+
+    .closing {
+      background:var(--surface); padding-block:clamp(64px,7vw,96px);
+    }
+    .closing-inner {
+      --muted:var(--muted-strong);
+      display:flex; align-items:center; justify-content:space-between; gap:40px;
+      padding:clamp(28px,4vw,46px); border:1px solid var(--border); border-radius:20px; background:var(--surface-soft);
+    }
+    .closing h2 { margin:0; max-width:650px; font-size:clamp(26px,3vw,40px); line-height:1.4; font-weight:650; }
+    .closing p { margin:12px 0 0; max-width:60ch; color:var(--muted); font-size:15px; }
+    .closing .button { flex:none; }
+
+    .site-footer { background:var(--deep); color:#fff; padding-top:clamp(58px,7vw,88px); }
+    .footer-grid {
+      display:grid; grid-template-columns:1.35fr .8fr .8fr 1fr; gap:48px;
+      padding-bottom:56px;
+    }
+    .footer-brand .brand { margin-bottom:18px; }
+    .footer-brand p { margin:0; max-width:34ch; color:rgba(255,255,255,.66); font-size:14px; line-height:1.8; }
+    .footer-col h3 { margin:0 0 16px; color:rgba(255,255,255,.48); font-family:var(--font-mono); font-size:10px; font-weight:500; letter-spacing:.1em; }
+    .footer-col a { min-height:38px; display:flex; align-items:center; color:rgba(255,255,255,.82); font-size:13px; width:max-content; }
+    .footer-col a:hover { color:#fff; text-decoration:underline; text-underline-offset:4px; }
+    .footer-bottom {
+      padding:20px 0 24px; border-top:1px solid rgba(255,255,255,.16);
+      display:flex; justify-content:space-between; gap:20px; color:rgba(255,255,255,.54); font-size:11px;
+    }
+
+    .reveal { opacity:0; transform:translateY(24px); transition:opacity .7s var(--ease-out), transform .7s var(--ease-out); }
+    .reveal.is-visible { opacity:1; transform:none; }
+
+    @media (max-width: 980px) {
+      .main-nav { gap:18px; }
+      .main-nav a { font-size:13px; }
+      .header-inner { grid-template-columns:1fr auto; }
+      .main-nav { display:none; }
+      .menu-toggle { display:grid; justify-self:end; }
+      .header-action { display:none; }
+      .mobile-nav.is-open { display:block; }
+      .chapter-head { grid-template-columns:1fr; gap:18px; }
+      .chapter-index { padding-top:0; }
+      .chapter-index strong { display:inline; margin-right:8px; font-size:16px; letter-spacing:.02em; }
+      .problem-grid, .decouple-grid, .boundary-card { grid-template-columns:1fr; }
+      .boundary-lead { border-right:0; border-bottom:1px solid #E6D8C7; }
+      .channel-map { grid-template-columns:1fr; gap:14px; }
+      .route-line { height:34px; width:1px; margin-inline:auto; }
+      .route-line::after { right:-3px; top:auto; bottom:-1px; border-left:4px solid transparent; border-right:4px solid transparent; border-top:7px solid var(--border); border-bottom:0; }
+      .endpoint { width:100%; min-height:100px; }
+      .channel-core { width:100%; }
+      .flow-steps { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .closing-inner { flex-direction:column; align-items:flex-start; }
+      .footer-grid { grid-template-columns:1.3fr 1fr 1fr; }
+      .footer-col:last-child { grid-column:1 / -1; }
+    }
+
+    @media (max-width: 680px) {
+      body { font-size:16px; }
+      .header-inner { min-height:68px; }
+      .mobile-nav { top:68px; }
+      .brand-name { font-size:15px; }
+      .brand-mark { width:25px; height:25px; }
+      .hero { min-height:770px; align-items:flex-start; }
+      .hero-image { object-position:66% center; }
+      .hero::before { background:linear-gradient(180deg,rgba(6,10,20,.28),rgba(6,10,20,.58)); }
+      .hero-inner { padding-top:108px; padding-bottom:48px; }
+      .breadcrumb { margin-bottom:16px; }
+      .hero-panel { padding:24px; border-radius:24px; }
+      .hero-kicker { margin-bottom:24px; }
+      .hero h1 { font-size:clamp(36px,10vw,48px); line-height:1.36; }
+      .hero-definition { font-size:15px; }
+      .hero-actions { display:grid; grid-template-columns:1fr 1fr; }
+      .hero-actions .button { padding-inline:14px; min-width:0; }
+      .hero-meta { grid-template-columns:1fr; gap:10px; }
+      .chapter-head { margin-bottom:0; }
+      .problem-grid { margin-top:42px; }
+      .broken-chain { padding:22px 18px; }
+      .chain-node { grid-template-columns:44px minmax(0,1fr); }
+      .node-dot { width:44px; height:44px; }
+      .node-state { grid-column:2; }
+      .chain-rail::before { left:21px; }
+      .chain-break { margin-left:0; }
+      .structure-head { display:block; }
+      .scenario-nav { width:100%; display:grid; grid-template-columns:1fr 1fr; }
+      .scenario-button { padding-inline:10px; }
+      .board-top { align-items:flex-start; flex-direction:column; gap:6px; }
+      .channel-map { padding:20px 16px; }
+      .board-foot { flex-direction:column; gap:6px; }
+      .flow-steps { grid-template-columns:1fr; }
+      .layer.contract { transform:none; }
+      .footer-grid { grid-template-columns:1fr 1fr; gap:36px 24px; }
+      .footer-brand { grid-column:1 / -1; }
+      .footer-col:last-child { grid-column:auto; }
+      .footer-bottom { flex-direction:column; gap:4px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior:auto; }
+      *, *::before, *::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
+      .reveal { opacity:1; transform:none; }
+    }
+  </style>
+<style>
+.inline-figure{margin:56px auto;max-width:1200px;padding-inline:clamp(20px,5vw,64px);box-sizing:border-box}
+.inline-figure .fig-box{border-radius:24px;overflow:hidden;box-shadow:0 28px 70px rgba(48,58,86,.14);border:1px solid #DDE2EA}
+.inline-figure img{display:block;width:100%;height:clamp(220px,30vw,400px);object-fit:cover}
+.inline-figure figcaption{padding:14px 22px;font-size:14px;line-height:1.6;color:#6B7689;background:#fff}
+</style>
+<style>
+svg{max-width:100%;vertical-align:middle}
+.button svg,.button--primary svg,.button--glass svg,button svg,a.button svg,.hero-actions svg{width:18px;height:18px;flex:none;display:inline-block}
+</style>
+<style>
+[class*="node"] svg,[class*="icon"] svg,[class*="step"] svg,[class*="badge"] svg,[class*="mark"] svg,[class*="chip"] svg{width:44px;height:44px;flex:none;display:inline-block}
+[class*="number"] svg,[class*="num"] svg{width:32px;height:32px}
+</style>
+<style>
+[class*="hero"] img{object-fit:cover;object-position:center;max-height:96vh}
+</style>
+<style>
+[class*="scene"] img,[class*="media"] img:not(.hero-photo),[class*="shot"] img{height:auto;max-height:520px;object-fit:cover;width:100%}
+</style>
+<style>
+.hero img,section img,figure img{max-width:100%}
+</style>
+<style>
+.hero__media{overflow:hidden;width:100%}
+.hero__image{width:100%;height:100%;object-fit:cover;display:block}
+</style>
+<style>
+.hero__image{transform:none!important}
+</style>
+<style>
+.glass{position:relative;isolation:isolate;
+background:rgba(255,255,255,.10)!important;
+-webkit-backdrop-filter:blur(24px) saturate(180%)!important;
+backdrop-filter:blur(24px) saturate(180%)!important;
+border:1.5px solid rgba(255,255,255,.45)!important;border-radius:28px!important;
+box-shadow:0 28px 90px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.65)!important;
+overflow:hidden;}
+.glass::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+background:linear-gradient(148deg,rgba(255,255,255,.30) 0%,rgba(255,255,255,.06) 30%,rgba(255,255,255,0) 52%);}
+.glass::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),inset 0 24px 48px -24px rgba(255,255,255,.28);}
+.glass > *{position:relative;z-index:1}
+</style>
+</head>
+<body>
+  <a class="sr-only" href="#main">跳到主要内容</a>
+  <header class="site-header" data-site-header>
+    <div class="container header-inner">
+      <a class="brand" href="index.html" aria-label="Astraea Plan 首页">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-name">Astraea Plan</span>
+      </a>
+      <nav class="main-nav" aria-label="主导航">
+        <a href="capabilities.html">能力</a>
+        <a href="architecture.html" aria-current="page">架构</a>
+        <a href="cases.html">案例</a>
+        <a href="pricing.html">投入</a>
+        <a href="about.html">关于</a>
+      </nav>
+      <a class="button button-primary header-action" href="capabilities.html#contact">预约演示</a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-navigation" aria-label="打开导航" data-menu-toggle><span></span></button>
+    </div>
+  </header>
+  <nav class="mobile-nav" id="mobile-navigation" aria-label="移动端主导航" data-mobile-nav>
+    <a href="capabilities.html">能力</a>
+    <a href="architecture.html">架构</a>
+    <a href="cases.html">案例</a>
+    <a href="pricing.html">投入</a>
+    <a href="about.html">关于</a>
+    <a class="button button-primary" href="capabilities.html#contact">预约演示</a>
+  </nav>
+
+  <main id="main">
+    <section class="hero" data-od-id="arch-models-hero" aria-labelledby="arch-models-title">
+      <img class="hero-image" src="assets/light-4.jpg" width="2000" height="2667" alt="深色背景中的白色智能机械臂设备，镜头发出蓝色光环" fetchpriority="high" />
+      <div class="container hero-inner">
+        <nav class="breadcrumb" aria-label="面包屑">
+          <a href="architecture.html">架构</a>
+          <span aria-hidden="true">/</span>
+          <span class="current" aria-current="page">双模型通道</span>
+        </nav>
+        <div class="glass hero-panel" data-od-id="arch-models-hero-panel">
+          <div class="hero-kicker">
+            <span>CHANNEL 02 / ARCHITECTURE</span>
+            <span class="signal"><span class="signal-dot" aria-hidden="true"></span>双通道待命</span>
+          </div>
+          <h1 id="arch-models-title">双模型通道。<span class="definition">定义：主力模型挂了，业务不能跟着挂。</span></h1>
+          <p class="hero-definition">把模型接入从一次性的接口调用，抬升为独立运行通道。日常任务有主力承接，强推理任务临时切换，故障时自动降级，恢复后安全回切。</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="capabilities.html#contact" data-od-id="arch-models-hero-demo">预约演示</a>
+            <a class="button button-secondary" href="#contact" data-od-id="arch-models-hero-contact">联系我们</a>
+          </div>
+          <dl class="hero-meta">
+            <div>
+              <dt>ROUTE</dt>
+              <dd>按任务能力选择通道</dd>
+            </div>
+            <div>
+              <dt>FAILOVER</dt>
+              <dd>故障自动降级到兜底模型</dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <section class="chapter chapter-white" data-od-id="arch-models-problem" aria-labelledby="problem-title">
+      <div class="container">
+        <div class="chapter-head reveal">
+          <div class="chapter-index"><strong>01</strong>THE BREAK</div>
+          <div class="chapter-copy">
+            <span class="eyebrow">问题</span>
+            <h2 class="section-title" id="problem-title">单一模型服务中断，整条自动化链断掉。</h2>
+          </div>
+        </div>
+        <div class="problem-grid">
+          <div class="problem-copy reveal">
+            <p>当读单、判断、执行、回写共用同一个模型入口，一次限流、一次服务异常，就会从模型调用扩散成业务停摆。人工临时接管只能止损，不能消除下一次中断。</p>
+            <p>更隐蔽的损耗发生在恢复阶段：任务积压、状态不一致、重复执行，往往比最初那次失败更耗时。</p>
+            <p class="problem-quote">通道层要解决的不是“换个模型再试一次”，而是让业务连续性与模型可用性脱钩。</p>
+          </div>
+          <div class="broken-chain reveal" aria-label="单模型链路中断示意">
+            <div class="chain-label mono"><span>BUSINESS CHAIN</span><span class="status">ROUTE LOST</span></div>
+            <div class="chain-rail">
+              <div class="chain-node">
+                <span class="node-dot">01</span>
+                <span class="node-copy"><strong>读取业务输入</strong><small>订单、库存、门店状态</small></span>
+                <span class="node-state">READY</span>
+              </div>
+              <div class="chain-node">
+                <span class="node-dot">02</span>
+                <span class="node-copy"><strong>模型判断与编排</strong><small>统一入口，无备用路由</small></span>
+                <span class="node-state">CALLING</span>
+              </div>
+              <div class="chain-node is-failed">
+                <span class="node-dot">03</span>
+                <span class="node-copy"><strong>模型服务中断</strong><small>限流、超时或不可用</small></span>
+                <span class="node-state">FAILED</span>
+              </div>
+              <div class="chain-node is-failed">
+                <span class="node-dot">04</span>
+                <span class="node-copy"><strong>执行与回写停摆</strong><small>上下游任务被动等待</small></span>
+                <span class="node-state">BLOCKED</span>
+              </div>
+            </div>
+            <p class="chain-break">风险不在单次请求失败，而在故障沿自动化链继续传播。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+<figure class="inline-figure"><div class="fig-box"><img src="assets/ai-ill-1.jpg" alt="Astraea Plan 运行场景" loading="lazy"></div></figure>
+
+
+    <section class="chapter chapter-soft" data-od-id="arch-models-structure" aria-labelledby="structure-title">
+      <div class="container">
+        <div class="structure-head reveal">
+          <div>
+            <span class="eyebrow">结构</span>
+            <h2 class="section-title" id="structure-title">以任务为中心路由，以通道保障连续。</h2>
+          </div>
+          <p class="section-lead">主力模型承担日常任务；强推理任务临时切换；故障自动降级到兜底模型；恢复后切回。四个状态，一套稳定入口。</p>
+        </div>
+
+        <div class="scenario-nav reveal" role="tablist" aria-label="双模型通道运行状态" data-od-id="arch-models-scenarios">
+          <button class="scenario-button" type="button" role="tab" aria-selected="true" data-scenario="normal">日常运行</button>
+          <button class="scenario-button" type="button" role="tab" aria-selected="false" data-scenario="reasoning">强推理任务</button>
+          <button class="scenario-button" type="button" role="tab" aria-selected="false" data-scenario="failover">主力中断</button>
+          <button class="scenario-button" type="button" role="tab" aria-selected="false" data-scenario="recover">恢复切回</button>
+        </div>
+
+        <div class="channel-board reveal" data-od-id="arch-models-channel-board">
+          <div class="board-top">
+            <span class="mono">MODEL ROUTING CONSOLE</span>
+            <span class="scenario-readout" aria-live="polite" data-scenario-readout>日常任务由主力模型承接，兜底模型保持待命。</span>
+          </div>
+          <div class="channel-map" aria-label="业务请求经通道层进入主力模型或兜底模型">
+            <div class="endpoint">
+              <span class="icon-box" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v11H7l-3 3V5Z"/><path d="M8 9h8M8 12h5"/></svg>
+              </span>
+              <strong>业务请求</strong>
+              <span>意图 · 上下文 · 约束</span>
+            </div>
+            <div class="route-line" aria-hidden="true"></div>
+            <div class="channel-core">
+              <div class="core-head"><strong>模型通道层</strong><span>ROUTE / HEALTH / FALLBACK</span></div>
+              <div class="models">
+                <div class="model-row is-active" data-model="primary">
+                  <div><div class="model-name">主力模型</div><div class="model-desc">承担高频日常任务与稳定路径</div></div>
+                  <span class="model-badge" data-primary-badge>ACTIVE</span>
+                </div>
+                <div class="model-row is-warm" data-model="fallback">
+                  <div><div class="model-name">兜底模型</div><div class="model-desc">在故障或降级策略触发时接管</div></div>
+                  <span class="model-badge" data-fallback-badge>STANDBY</span>
+                </div>
+                <div class="model-row is-muted" data-model="reasoning">
+                  <div><div class="model-name">强推理通道</div><div class="model-desc">仅对复杂判断任务临时启用</div></div>
+                  <span class="model-badge" data-reasoning-badge>ON DEMAND</span>
+                </div>
+              </div>
+            </div>
+            <div class="route-line" aria-hidden="true"></div>
+            <div class="endpoint">
+              <span class="icon-box" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 4h14v16H5z"/><path d="m8 12 2.5 2.5L16 9"/></svg>
+              </span>
+              <strong>统一任务结果</strong>
+              <span>业务层只接收稳定契约</span>
+            </div>
+          </div>
+          <div class="board-foot">
+            <span><strong>策略：</strong>按任务复杂度、健康状态与重试预算路由</span>
+            <span data-policy-foot>默认：主力承接 · 兜底热备</span>
+          </div>
+        </div>
+
+        <div class="flow-steps reveal" aria-label="双模型通道四步结构" data-od-id="arch-models-flow">
+          <article class="flow-step is-current" data-step="normal">
+            <span class="step-no">01 / DAILY</span>
+            <h3>日常任务</h3>
+            <p>主力模型承担稳定、高频、格式明确的业务任务。</p>
+          </article>
+          <article class="flow-step" data-step="reasoning">
+            <span class="step-no">02 / ESCALATE</span>
+            <h3>强推理切换</h3>
+            <p>复杂判断临时进入强推理通道，不侵入业务流程。</p>
+          </article>
+          <article class="flow-step" data-step="failover">
+            <span class="step-no">03 / FAILOVER</span>
+            <h3>故障降级</h3>
+            <p>健康检查失败后，请求自动转交兜底模型。</p>
+          </article>
+          <article class="flow-step" data-step="recover">
+            <span class="step-no">04 / RESTORE</span>
+            <h3>恢复切回</h3>
+            <p>主力恢复后按策略回到默认通道，兜底继续待命。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+<figure class="inline-figure"><div class="fig-box"><img src="assets/smoke-1.jpg" alt="Astraea Plan 运行场景" loading="lazy"></div></figure>
+
+
+    <section class="chapter chapter-white" data-od-id="arch-models-decouple" aria-labelledby="decouple-title">
+      <div class="container">
+        <div class="chapter-head reveal">
+          <div class="chapter-index"><strong>03</strong>DECOUPLING</div>
+          <div class="chapter-copy">
+            <span class="eyebrow">要点</span>
+            <h2 class="section-title">通道与业务解耦，换模型不改业务逻辑。</h2>
+          </div>
+        </div>
+        <div class="decouple-grid">
+          <div class="decouple-copy reveal">
+            <h3 class="section-title" id="decouple-title">业务只描述目标，通道负责选择执行者。</h3>
+            <p>任务定义、输入输出、重试与权限留在业务层；模型选择、健康探测、降级与回切留在通道层。两条边界清楚，模型更换才不会变成一轮业务改造。</p>
+            <p>对上层保持同一套任务契约，意味着换供应商、换模型规格、调整路由权重时，流程、审批与数据口径都不必重写。</p>
+            <div class="contract-note">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M8 3h8v4H8zM6 7h12v14H6z"/><path d="M9 12h6M9 16h4"/></svg>
+              <div><strong>稳定的是业务契约</strong><span>可变的是模型实现</span></div>
+            </div>
+          </div>
+          <div class="layer-stack reveal" aria-label="业务层、通道契约与模型实现分层">
+            <div class="layer">
+              <span class="layer-num">01</span>
+              <div><strong>业务逻辑层</strong><span>任务、规则、审批、数据权限</span></div>
+            </div>
+            <div class="layer-connector" aria-hidden="true"></div>
+            <div class="layer contract">
+              <span class="layer-num">02</span>
+              <div><strong>稳定通道契约</strong><span>统一输入输出 · 错误语义 · 回退边界</span></div>
+            </div>
+            <div class="layer-connector" aria-hidden="true"></div>
+            <div class="layer">
+              <span class="layer-num">03</span>
+              <div><strong>可替换模型实现</strong><span>主力 · 强推理 · 兜底</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="chapter chapter-soft" data-od-id="arch-models-boundary" aria-labelledby="boundary-title">
+      <div class="container">
+        <div class="chapter-head reveal">
+          <div class="chapter-index"><strong>04</strong>BOUNDARY</div>
+          <div class="chapter-copy">
+            <span class="eyebrow">边界</span>
+            <h2 class="section-title" id="boundary-title">降级保障连续性，不承诺能力等价。</h2>
+          </div>
+        </div>
+        <div class="boundary-card reveal">
+          <div class="boundary-lead">
+            <span class="eyebrow">人工复核仍然必要</span>
+            <h3>模型能力有差异，关键任务仍要人工复核。</h3>
+            <p>兜底模型适合维持流程连续、完成可控范围内的替代任务，不应被默认为主力模型的完全镜像。</p>
+          </div>
+          <div class="boundary-list">
+            <div class="boundary-item">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3 3.5 7.5 12 12l8.5-4.5L12 3Z"/><path d="m3.5 12 8.5 4.5 8.5-4.5M3.5 16.5 12 21l8.5-4.5"/></svg>
+              <div><strong>任务分级</strong><span>先按风险、可逆性和影响范围决定哪些任务允许自动降级。</span></div>
+            </div>
+            <div class="boundary-item">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/><circle cx="12" cy="12" r="5"/></svg>
+              <div><strong>结果校验</strong><span>关键字段、业务规则与输出格式继续由确定性校验兜住。</span></div>
+            </div>
+            <div class="boundary-item">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 20v-8h4v8M10 20V7h4v13M15 20v-5h4v5M3 20h18"/></svg>
+              <div><strong>人工兜底</strong><span>审批、资金、对外承诺与不可逆动作，保留人工确认节点。</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="closing" id="contact" data-od-id="arch-models-contact">
+      <div class="container">
+        <div class="closing-inner reveal">
+          <div>
+            <h2>把模型故障拦在通道层，把业务连续性留给流程。</h2>
+            <p>围绕你的任务分级、数据边界与现有系统，设计一套可启用、可观测、可回退的双模型通道。</p>
+          </div>
+          <a class="button button-blue" href="capabilities.html#contact">预约演示</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer" data-od-id="arch-models-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a class="brand" href="index.html" aria-label="Astraea Plan 首页">
+            <span class="brand-mark" aria-hidden="true"></span>
+            <span class="brand-name">Astraea Plan</span>
+          </a>
+          <p>给连锁企业装一套私有化智能体团队，数据不出公司。</p>
+        </div>
+        <div class="footer-col">
+          <h3>能力</h3>
+          <a href="capabilities.html#store-ops">门店运营</a>
+          <a href="capabilities.html#collaboration">跨部门协同</a>
+          <a href="capabilities.html#automation">定时任务</a>
+        </div>
+        <div class="footer-col">
+          <h3>架构</h3>
+          <a href="architecture.html">私有化架构</a>
+          <a href="arch-models.html">双模型通道</a>
+          <a href="architecture.html#a2a">A2A 协作</a>
+        </div>
+        <div class="footer-col">
+          <h3>联系</h3>
+          <a href="capabilities.html#contact">预约演示</a>
+          <a href="about.html">合作咨询</a>
+          <a href="architecture.html#data-boundary">数据边界</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 Astraea Plan · 数据不出公司</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      var header = document.querySelector('[data-site-header]');
+      var menuToggle = document.querySelector('[data-menu-toggle]');
+      var mobileNav = document.querySelector('[data-mobile-nav]');
+      var body = document.body;
+
+      function syncHeader() {
+        if (!header) return;
+        header.classList.toggle('is-scrolled', window.scrollY > 36);
+      }
+      syncHeader();
+      window.addEventListener('scroll', syncHeader, { passive: true });
+
+      function closeMenu() {
+        body.classList.remove('menu-open');
+        mobileNav.classList.remove('is-open');
+        menuToggle.setAttribute('aria-expanded', 'false');
+        menuToggle.setAttribute('aria-label', '打开导航');
+      }
+
+      if (menuToggle && mobileNav) {
+        menuToggle.addEventListener('click', function () {
+          var opening = menuToggle.getAttribute('aria-expanded') !== 'true';
+          body.classList.toggle('menu-open', opening);
+          mobileNav.classList.toggle('is-open', opening);
+          menuToggle.setAttribute('aria-expanded', String(opening));
+          menuToggle.setAttribute('aria-label', opening ? '关闭导航' : '打开导航');
+        });
+        mobileNav.querySelectorAll('a').forEach(function (link) { link.addEventListener('click', closeMenu); });
+        window.addEventListener('resize', function () { if (window.innerWidth > 980) closeMenu(); });
+      }
+
+      var revealItems = document.querySelectorAll('.reveal');
+      if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        var observer = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.12, rootMargin: '0px 0px -32px' });
+        revealItems.forEach(function (item) { observer.observe(item); });
+      } else {
+        revealItems.forEach(function (item) { item.classList.add('is-visible'); });
+      }
+
+      var scenarios = {
+        normal: {
+          readout: '日常任务由主力模型承接，兜底模型保持待命。',
+          foot: '默认：主力承接 · 兜底热备',
+          primary: ['ACTIVE', ''],
+          fallback: ['STANDBY', 'is-warm'],
+          reasoning: ['ON DEMAND', 'is-muted']
+        },
+        reasoning: {
+          readout: '识别到强推理任务，仅该任务临时切换到强推理通道。',
+          foot: '临时路由：强推理任务 · 其余任务仍走主力',
+          primary: ['ACTIVE', ''],
+          fallback: ['STANDBY', 'is-warm'],
+          reasoning: ['ACTIVE', 'is-active']
+        },
+        failover: {
+          readout: '主力健康检查失败，任务自动降级到兜底模型。',
+          foot: '降级中：兜底接管 · 失败原因留痕',
+          primary: ['DEGRADED', 'is-muted'],
+          fallback: ['ACTIVE', 'is-active'],
+          reasoning: ['PAUSED', 'is-muted']
+        },
+        recover: {
+          readout: '主力恢复通过健康检查，通道按策略切回默认路径。',
+          foot: '已恢复：主力承接 · 兜底继续待命',
+          primary: ['RESTORED', 'is-active is-restored'],
+          fallback: ['STANDBY', 'is-warm'],
+          reasoning: ['ON DEMAND', 'is-muted']
+        }
+      };
+
+      var tabs = document.querySelectorAll('[data-scenario]');
+      var readout = document.querySelector('[data-scenario-readout]');
+      var policyFoot = document.querySelector('[data-policy-foot]');
+      var primaryRow = document.querySelector('[data-model="primary"]');
+      var fallbackRow = document.querySelector('[data-model="fallback"]');
+      var reasoningRow = document.querySelector('[data-model="reasoning"]');
+      var primaryBadge = document.querySelector('[data-primary-badge]');
+      var fallbackBadge = document.querySelector('[data-fallback-badge]');
+      var reasoningBadge = document.querySelector('[data-reasoning-badge]');
+
+      function setRow(row, badge, config) {
+        row.className = 'model-row ' + config[1];
+        badge.textContent = config[0];
+      }
+
+      function activateScenario(name) {
+        var data = scenarios[name];
+        if (!data) return;
+        tabs.forEach(function (tab) {
+          tab.setAttribute('aria-selected', String(tab.getAttribute('data-scenario') === name));
+        });
+        document.querySelectorAll('[data-step]').forEach(function (step) {
+          step.classList.toggle('is-current', step.getAttribute('data-step') === name);
+        });
+        readout.textContent = data.readout;
+        policyFoot.textContent = data.foot;
+        setRow(primaryRow, primaryBadge, data.primary);
+        setRow(fallbackRow, fallbackBadge, data.fallback);
+        setRow(reasoningRow, reasoningBadge, data.reasoning);
+      }
+
+      tabs.forEach(function (tab) {
+        tab.addEventListener('click', function () { activateScenario(tab.getAttribute('data-scenario')); });
+      });
+    })();
+  </script>
+</body>
+</html>
