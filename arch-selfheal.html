@@ -1102,6 +1102,30 @@ table{max-width:100%;}
 [class*="run-panel"] pre,[class*="run-panel"] code{white-space:pre-wrap!important;word-break:break-all;}
 @media (max-width:768px){.glass-panel{padding:16px 12px!important;font-size:15px!important;}.glass-panel h1{font-size:26px!important;}}
 </style>
+<style id="typo-fix">
+h1,h2,h3,h4,figcaption,[class*="title"],[class*="heading"]{text-wrap:balance;text-wrap:balance;}
+p,li,blockquote,[class*="desc"],[class*="lead"]{text-wrap:pretty;}
+[class*="card"],[class*="item"],[class*="panel"],[class*="tile"]{align-self:stretch;}
+[class*="grid"]>*,[class*="cards"]>*{min-width:0;}
+nav a,[class*="nav"] a,[class*="tab"]{padding-bottom:6px;}
+[class*="button"],[class*="btn"]{min-height:46px;line-height:1.2;}
+</style>
+<style id="polish-fix">
+p,li,dd,dt,blockquote{line-height:1.78!important;}
+[class*="desc"],[class*="caption"],[class*="note"],[class*="meta"],[class*="sub"],[class*="hint"]{font-size:max(14px,0.88em)!important;line-height:1.68!important;opacity:.88;}
+[class*="eyebrow"],[class*="label"],[class*="tag"],[class*="badge"]{font-size:max(12.5px,0.8em)!important;letter-spacing:.02em;}
+[class*="watermark"],[class*="bg-text"],[class*="ghost"],[class*="bgword"]{opacity:.28!important;z-index:0!important;pointer-events:none!important;}
+[class*="card"],[class*="tile"],[class*="item"]{height:100%;}
+[class*="grid"],[class*="cards"],[class*="cols"]{align-items:stretch;}
+h1,h2,h3{letter-spacing:-.012em;}
+img{image-rendering:auto;}
+</style>
+<style id="body-type">
+p:not([class*="eyebrow"]):not([class*="label"]):not([class*="tag"]):not([class*="meta"]):not([class*="caption"]):not([class*="badge"]):not([class*="num"]):not([class*="index"]):not([class*="kicker"]):not([class*="chip"]),
+li:not([class*="tag"]):not([class*="chip"]),
+dd,dt,blockquote{font-size:max(16px,1em)!important;line-height:1.8!important;}
+[class*="desc"]:not([class*="eyebrow"]),[class*="sub"]:not([class*="title"]){font-size:max(15px,0.92em)!important;line-height:1.75!important;}
+</style>
 </head>
 <body>
   <a class="skip-link" href="#main">跳到正文</a>
