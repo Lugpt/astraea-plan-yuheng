@@ -863,7 +863,7 @@ s.parentNode.insertBefore(el, s);
 
   /* ── 真实星球：3D 贴图球体 + 自转 + 公转 ── */
   const PLANET_TEXTURES = {
-    earth: 'textures/earth.jpg', jupiter: 'textures/jupiter.jpg',
+    earth: '../textures/earth.jpg', jupiter: '../textures/jupiter.jpg',
   };
   const IMG_CACHE = {};
   function loadTexture(src) {
@@ -915,7 +915,7 @@ s.parentNode.insertBefore(el, s);
   });
   // 土星环纹理
   let saturnRingImg = null;
-  loadTexture('textures/saturn_ring.jpg').then((img) => { saturnRingImg = img; }).catch(() => {});
+  loadTexture('../textures/saturn_ring.jpg').then((img) => { saturnRingImg = img; }).catch(() => {});
 
   const COLORS = ['0, 212, 255', '123, 97, 255', '0, 180, 255'];
 
