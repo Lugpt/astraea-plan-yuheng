@@ -839,6 +839,27 @@ box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),inset 0 24px 48px -24px rgba(25
   li:not([class*="tag"]),dd,dt,blockquote{font-size:16px!important;line-height:1.72!important;}
 }
 </style>
+<style id="overflow-fix">
+*,*::before,*::after{overflow-wrap:break-word;word-break:break-word;}
+[class*="media"],[class*="panel"],[class*="card"],[class*="box"],[class*="frame"]{max-width:100%;}
+[class*="media"] img,[class*="panel"] img{max-width:100%;height:auto;}
+table{max-width:100%;}
+@media (max-width:768px){
+  [class*="panel"],[class*="box"],[class*="card"]{padding-inline:16px!important;}
+  pre,code,[class*="code"]{white-space:pre-wrap!important;word-break:break-all;}
+}
+</style>
+<style id="clip-fix">
+[class*="ownership-media"],[class*="run-panel"],[class*="glass-panel"]{max-width:100%!important;}
+[class*="ownership-media"]{overflow:visible!important;}
+@media (max-width:768px){ .glass-panel{padding:18px 14px!important;} .glass-panel *{max-width:100%!important;} }
+</style>
+<style id="panel-fix">
+[class*="run-panel"]{overflow-x:auto!important;-webkit-overflow-scrolling:touch;max-width:100%!important;}
+[class*="run-panel"] *{max-width:100%;}
+[class*="run-panel"] pre,[class*="run-panel"] code{white-space:pre-wrap!important;word-break:break-all;}
+@media (max-width:768px){.glass-panel{padding:16px 12px!important;font-size:15px!important;}.glass-panel h1{font-size:26px!important;}}
+</style>
 </head>
 <body>
   <a class="skip-link" href="#main">跳到主要内容</a>
@@ -903,7 +924,7 @@ box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),inset 0 24px 48px -24px rgba(25
         </div>
       </div>
     </section>
-<figure class="inline-figure"><div class="fig-box"><img src="assets/code-6.jpg" alt="Astraea Plan 运行场景" loading="lazy"></div></figure>
+<figure class="inline-figure"><div class="fig-box"><img src="assets/code-6.jpg" alt="Astraea Plan 运行场景"></div></figure>
 
 
     <section class="section mechanism" data-od-id="a2a-mechanism">
@@ -967,11 +988,11 @@ box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),inset 0 24px 48px -24px rgba(25
         </div>
       </div>
     </section>
-<figure class="inline-figure"><div class="fig-box"><img src="assets/grad-1.jpg" alt="Astraea Plan 运行场景" loading="lazy"></div></figure>
+<figure class="inline-figure"><div class="fig-box"><img src="assets/grad-1.jpg" alt="Astraea Plan 运行场景"></div></figure>
 
 
     <section class="interlude" data-od-id="a2a-record">
-      <img class="interlude-photo" src="assets/light-4.jpg" width="2000" height="3000" alt="" loading="lazy" />
+      <img class="interlude-photo" src="assets/wave-1.jpg" width="2000" height="3000" alt="" />
       <div class="container interlude-inner reveal">
         <blockquote>协作链路会留下记录，不靠群里一句“收到”。</blockquote>
         <cite>Astraea Plan · Traceable agent work</cite>

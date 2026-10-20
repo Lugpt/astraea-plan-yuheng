@@ -855,6 +855,27 @@ box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),inset 0 24px 48px -24px rgba(25
   li:not([class*="tag"]),dd,dt,blockquote{font-size:16px!important;line-height:1.72!important;}
 }
 </style>
+<style id="overflow-fix">
+*,*::before,*::after{overflow-wrap:break-word;word-break:break-word;}
+[class*="media"],[class*="panel"],[class*="card"],[class*="box"],[class*="frame"]{max-width:100%;}
+[class*="media"] img,[class*="panel"] img{max-width:100%;height:auto;}
+table{max-width:100%;}
+@media (max-width:768px){
+  [class*="panel"],[class*="box"],[class*="card"]{padding-inline:16px!important;}
+  pre,code,[class*="code"]{white-space:pre-wrap!important;word-break:break-all;}
+}
+</style>
+<style id="clip-fix">
+[class*="ownership-media"],[class*="run-panel"],[class*="glass-panel"]{max-width:100%!important;}
+[class*="ownership-media"]{overflow:visible!important;}
+@media (max-width:768px){ .glass-panel{padding:18px 14px!important;} .glass-panel *{max-width:100%!important;} }
+</style>
+<style id="panel-fix">
+[class*="run-panel"]{overflow-x:auto!important;-webkit-overflow-scrolling:touch;max-width:100%!important;}
+[class*="run-panel"] *{max-width:100%;}
+[class*="run-panel"] pre,[class*="run-panel"] code{white-space:pre-wrap!important;word-break:break-all;}
+@media (max-width:768px){.glass-panel{padding:16px 12px!important;font-size:15px!important;}.glass-panel h1{font-size:26px!important;}}
+</style>
 </head>
 <body>
   <a class="skip-link" href="#main-content">跳到主要内容</a>
@@ -929,7 +950,7 @@ box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),inset 0 24px 48px -24px rgba(25
           <article class="case-card reveal" id="case-mofang" data-od-id="case-card-mofang">
             <a class="case-link" href="case-mofang.html" aria-label="查看连锁书店的智能体改造案例" data-od-id="case-link-mofang">
               <figure class="case-media">
-                <img src="assets/kb-e.jpg" alt="" width="2000" height="3000" loading="lazy" decoding="async" />
+                <img src="assets/keyboard-1.jpg" alt="" width="2000" height="3000" decoding="async" />
                 <span class="case-number" aria-hidden="true">01</span>
                 <span class="case-type">连锁零售 / 智能体改造</span>
               </figure>
@@ -975,7 +996,7 @@ box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),inset 0 24px 48px -24px rgba(25
           <article class="case-card reveal" id="case-efficiency" data-od-id="case-card-efficiency">
             <a class="case-link" href="case-efficiency.html" aria-label="查看运营效率账案例" data-od-id="case-link-efficiency">
               <figure class="case-media">
-                <img src="assets/code-6.jpg" alt="" width="2000" height="2500" loading="lazy" decoding="async" />
+                <img src="assets/code-6.jpg" alt="" width="2000" height="2500" decoding="async" />
                 <span class="case-number" aria-hidden="true">02</span>
                 <span class="case-type">总部运营 / 重复动作</span>
               </figure>
@@ -1019,7 +1040,7 @@ box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),inset 0 24px 48px -24px rgba(25
           <article class="case-card reveal" id="case-tech" data-od-id="case-card-tech">
             <a class="case-link" href="case-tech.html" aria-label="查看技术验证案例" data-od-id="case-link-tech">
               <figure class="case-media">
-                <img src="assets/grad-1.jpg" alt="" width="2000" height="2667" loading="lazy" decoding="async" />
+                <img src="assets/grad-1.jpg" alt="" width="2000" height="2667" decoding="async" />
                 <span class="case-number" aria-hidden="true">03</span>
                 <span class="case-type">技术验证 / 现场边界</span>
               </figure>
@@ -1067,7 +1088,7 @@ box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),inset 0 24px 48px -24px rgba(25
         </div>
       </div>
     </section>
-<figure class="inline-figure"><div class="fig-box"><img src="assets/light-4.jpg" alt="Astraea Plan 运行场景" loading="lazy"></div></figure>
+<figure class="inline-figure"><div class="fig-box"><img src="assets/line-1.jpg" alt="Astraea Plan 运行场景"></div></figure>
 
   </main>
 

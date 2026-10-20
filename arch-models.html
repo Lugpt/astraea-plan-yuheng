@@ -563,6 +563,27 @@ box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),inset 0 24px 48px -24px rgba(25
   li:not([class*="tag"]),dd,dt,blockquote{font-size:16px!important;line-height:1.72!important;}
 }
 </style>
+<style id="overflow-fix">
+*,*::before,*::after{overflow-wrap:break-word;word-break:break-word;}
+[class*="media"],[class*="panel"],[class*="card"],[class*="box"],[class*="frame"]{max-width:100%;}
+[class*="media"] img,[class*="panel"] img{max-width:100%;height:auto;}
+table{max-width:100%;}
+@media (max-width:768px){
+  [class*="panel"],[class*="box"],[class*="card"]{padding-inline:16px!important;}
+  pre,code,[class*="code"]{white-space:pre-wrap!important;word-break:break-all;}
+}
+</style>
+<style id="clip-fix">
+[class*="ownership-media"],[class*="run-panel"],[class*="glass-panel"]{max-width:100%!important;}
+[class*="ownership-media"]{overflow:visible!important;}
+@media (max-width:768px){ .glass-panel{padding:18px 14px!important;} .glass-panel *{max-width:100%!important;} }
+</style>
+<style id="panel-fix">
+[class*="run-panel"]{overflow-x:auto!important;-webkit-overflow-scrolling:touch;max-width:100%!important;}
+[class*="run-panel"] *{max-width:100%;}
+[class*="run-panel"] pre,[class*="run-panel"] code{white-space:pre-wrap!important;word-break:break-all;}
+@media (max-width:768px){.glass-panel{padding:16px 12px!important;font-size:15px!important;}.glass-panel h1{font-size:26px!important;}}
+</style>
 </head>
 <body>
   <a class="sr-only" href="#main">跳到主要内容</a>
@@ -594,7 +615,7 @@ box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),inset 0 24px 48px -24px rgba(25
 
   <main id="main">
     <section class="hero" data-od-id="arch-models-hero" aria-labelledby="arch-models-title">
-      <img class="hero-image" src="assets/light-4.jpg" width="2000" height="2667" alt="深色背景中的白色智能机械臂设备，镜头发出蓝色光环" fetchpriority="high" />
+      <img class="hero-image" src="assets/wave-1.jpg" width="2000" height="2667" alt="深色背景中的白色智能机械臂设备，镜头发出蓝色光环" fetchpriority="high" />
       <div class="container hero-inner">
         <nav class="breadcrumb" aria-label="面包屑">
           <a href="architecture.html">架构</a>
@@ -670,7 +691,7 @@ box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),inset 0 24px 48px -24px rgba(25
         </div>
       </div>
     </section>
-<figure class="inline-figure"><div class="fig-box"><img src="assets/ai-ill-1.jpg" alt="Astraea Plan 运行场景" loading="lazy"></div></figure>
+<figure class="inline-figure"><div class="fig-box"><img src="assets/ai-ill-1.jpg" alt="Astraea Plan 运行场景"></div></figure>
 
 
     <section class="chapter chapter-soft" data-od-id="arch-models-structure" aria-labelledby="structure-title">
@@ -760,7 +781,7 @@ box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),inset 0 24px 48px -24px rgba(25
         </div>
       </div>
     </section>
-<figure class="inline-figure"><div class="fig-box"><img src="assets/smoke-1.jpg" alt="Astraea Plan 运行场景" loading="lazy"></div></figure>
+<figure class="inline-figure"><div class="fig-box"><img src="assets/bluesmoke-2.jpg" alt="Astraea Plan 运行场景"></div></figure>
 
 
     <section class="chapter chapter-white" data-od-id="arch-models-decouple" aria-labelledby="decouple-title">

@@ -1904,6 +1904,27 @@ box-shadow:0 28px 90px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.65)!impor
   li:not([class*="tag"]),dd,dt,blockquote{font-size:16px!important;line-height:1.72!important;}
 }
 </style>
+<style id="overflow-fix">
+*,*::before,*::after{overflow-wrap:break-word;word-break:break-word;}
+[class*="media"],[class*="panel"],[class*="card"],[class*="box"],[class*="frame"]{max-width:100%;}
+[class*="media"] img,[class*="panel"] img{max-width:100%;height:auto;}
+table{max-width:100%;}
+@media (max-width:768px){
+  [class*="panel"],[class*="box"],[class*="card"]{padding-inline:16px!important;}
+  pre,code,[class*="code"]{white-space:pre-wrap!important;word-break:break-all;}
+}
+</style>
+<style id="clip-fix">
+[class*="ownership-media"],[class*="run-panel"],[class*="glass-panel"]{max-width:100%!important;}
+[class*="ownership-media"]{overflow:visible!important;}
+@media (max-width:768px){ .glass-panel{padding:18px 14px!important;} .glass-panel *{max-width:100%!important;} }
+</style>
+<style id="panel-fix">
+[class*="run-panel"]{overflow-x:auto!important;-webkit-overflow-scrolling:touch;max-width:100%!important;}
+[class*="run-panel"] *{max-width:100%;}
+[class*="run-panel"] pre,[class*="run-panel"] code{white-space:pre-wrap!important;word-break:break-all;}
+@media (max-width:768px){.glass-panel{padding:16px 12px!important;font-size:15px!important;}.glass-panel h1{font-size:26px!important;}}
+</style>
 </head>
 <body>
   <a class="skip-link" href="#main">跳到主要内容</a>
@@ -2018,7 +2039,7 @@ box-shadow:0 28px 90px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.65)!impor
               </ul>
             </div>
             <figure class="capability-media">
-              <img src="assets/keyboard-1.jpg" width="2000" height="3000" alt="黑色机械键盘键帽与蓝紫色背光特写" loading="lazy" decoding="async">
+              <img src="assets/keyboard-1.jpg" width="2000" height="3000" alt="黑色机械键盘键帽与蓝紫色背光特写" decoding="async">
             </figure>
           </article>
 
@@ -2033,7 +2054,7 @@ box-shadow:0 28px 90px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.65)!impor
               </ul>
             </div>
             <figure class="capability-media">
-              <img src="assets/line-1.jpg" width="2000" height="2500" alt="Command 键白色背光特写" loading="lazy" decoding="async">
+              <img src="assets/line-1.jpg" width="2000" height="2500" alt="Command 键白色背光特写" decoding="async">
             </figure>
           </article>
 
@@ -2049,7 +2070,7 @@ box-shadow:0 28px 90px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.65)!impor
               </ul>
             </div>
             <figure class="capability-media">
-              <img src="assets/bokeh-2.jpg" width="2000" height="2667" alt="白色桌面智能机器人蓝色屏幕特写" loading="lazy" decoding="async">
+              <img src="assets/bokeh-2.jpg" width="2000" height="2667" alt="白色桌面智能机器人蓝色屏幕特写" decoding="async">
             </figure>
           </article>
 
@@ -2088,7 +2109,7 @@ box-shadow:0 28px 90px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.65)!impor
 
         <div class="architecture-board" data-reveal style="--reveal-delay: 60ms">
           <figure class="architecture-photo">
-            <img src="assets/bluesmoke-1.jpg" width="2000" height="2667" alt="两台白色智能机器人在室内协同作业" loading="lazy" decoding="async">
+            <img src="assets/grad-1.jpg" width="2000" height="2667" alt="两台白色智能机器人在室内协同作业" decoding="async">
           </figure>
           <div class="private-boundary">
             <span class="boundary-label">企业自有网络</span>
