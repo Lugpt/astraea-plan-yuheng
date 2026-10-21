@@ -1,0 +1,1083 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Astraea Plan 长期记忆：让智能体记得上次做过什么，把决策、经验和口径留在组织里。">
+  <title>长期记忆｜能力｜Astraea Plan</title>
+  <script>document.documentElement.classList.add('js');</script>
+  <style>
+    :root {
+      --bg:#F6F7F9; --surface:#FFFFFF; --surface-soft:#F1F3F7;
+      --fg:#16233A; --muted:#6B7689; --border:#DDE2EA;
+      --accent:#FF5A1F; --blue:#2F6BFF; --blue-soft:#5B8DFF; --deep:#123A8F;
+      --font-body:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+      --font-mono:"SFMono-Regular","SF Mono",Menlo,Consolas,monospace;
+      --font-display:"Songti SC","STSong","Noto Serif CJK SC",serif;
+      --ease-out:cubic-bezier(0.23,1,0.32,1);
+      --header-height:76px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    html, body { overflow-x: hidden; max-width: 100%; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--font-body);
+      font-size: 17px;
+      line-height: 1.8;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+    img { display: block; max-width: 100%; }
+    a { color: inherit; text-decoration: none; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    button { font: inherit; }
+    ::selection { background: rgba(255,90,31,.2); color: var(--fg); }
+    :focus-visible { outline: 3px solid var(--blue); outline-offset: 4px; }
+
+    .container {
+      max-width: 1200px;
+      margin-inline: auto;
+      padding-inline: clamp(20px, 5vw, 64px);
+    }
+    .section { padding-block: clamp(72px, 8vw, 120px); }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 22px;
+      color: var(--deep);
+      font: 600 12px/1.4 var(--font-mono);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .eyebrow::before {
+      content: "";
+      width: 24px;
+      height: 1px;
+      background: currentColor;
+    }
+    h1, h2, h3, p { margin-top: 0; }
+    h1, h2, h3 { text-wrap: balance; }
+    h2 {
+      margin-bottom: 22px;
+      font-family: var(--font-display);
+      font-size: clamp(28px, 3vw, 42px);
+      font-weight: 600;
+      line-height: 1.38;
+      letter-spacing: 0;
+    }
+    h3 {
+      font-size: 21px;
+      line-height: 1.45;
+      font-weight: 600;
+      letter-spacing: 0;
+    }
+    p { color: var(--muted); }
+    .skip-link {
+      position: fixed;
+      left: 20px;
+      top: 12px;
+      z-index: 2000;
+      padding: 10px 16px;
+      background: var(--surface);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      transform: translateY(-150%);
+      transition: transform .2s var(--ease-out);
+    }
+    .skip-link:focus { transform: translateY(0); }
+
+    /* Shared site header */
+    .site-header {
+      position: fixed;
+      inset: 0 0 auto;
+      z-index: 1000;
+      height: var(--header-height);
+      color: #fff;
+      background: rgba(12,18,32,.35);
+      -webkit-backdrop-filter: blur(18px);
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid rgba(255,255,255,.14);
+      transition: background .35s var(--ease-out), color .35s var(--ease-out), box-shadow .35s var(--ease-out), border-color .35s var(--ease-out);
+    }
+    .site-header.is-light {
+      color: var(--fg);
+      background: rgba(255,255,255,.72);
+      -webkit-backdrop-filter: blur(14px);
+      backdrop-filter: blur(14px);
+      border-bottom-color: rgba(221,226,234,.9);
+      box-shadow: 0 12px 40px rgba(22,35,58,.07);
+    }
+    .nav-inner {
+      height: 100%;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 24px;
+    }
+    .brand {
+      justify-self: start;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 44px;
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: .01em;
+      white-space: nowrap;
+    }
+    .brand-mark {
+      display: grid;
+      width: 24px;
+      height: 24px;
+      place-items: center;
+      border: 1px solid currentColor;
+      border-radius: 50%;
+      font: 600 11px/1 var(--font-mono);
+    }
+    .main-nav { display: flex; align-items: center; gap: clamp(20px, 3vw, 40px); }
+    .main-nav a {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      font-size: 14px;
+      font-weight: 500;
+      white-space: nowrap;
+      opacity: .88;
+      transition: opacity .2s ease;
+    }
+    .main-nav a:hover { opacity: 1; }
+    .main-nav a.current { opacity: 1; }
+    .main-nav a.current::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 3px;
+      height: 2px;
+      background: var(--accent);
+    }
+    .nav-actions { justify-self: end; display: flex; align-items: center; gap: 10px; }
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 20px;
+      border-radius: 999px;
+      background: var(--accent);
+      color: var(--fg);
+      font-size: 14px;
+      font-weight: 600;
+      box-shadow: 0 10px 26px rgba(255,90,31,.22);
+      transition: transform .25s var(--ease-out), filter .25s var(--ease-out);
+    }
+    .nav-cta:hover { transform: translateY(-2px); filter: brightness(1.06); }
+    .nav-toggle {
+      display: none;
+      width: 44px;
+      height: 44px;
+      padding: 0;
+      color: inherit;
+      background: transparent;
+      border: 1px solid currentColor;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+    .nav-toggle span, .nav-toggle span::before, .nav-toggle span::after {
+      display: block;
+      width: 17px;
+      height: 1.5px;
+      margin: auto;
+      background: currentColor;
+      content: "";
+      transition: transform .25s var(--ease-out), opacity .2s ease;
+    }
+    .nav-toggle span::before { transform: translateY(-6px); }
+    .nav-toggle span::after { transform: translateY(4.5px); }
+    .nav-toggle[aria-expanded="true"] span { background: transparent; }
+    .nav-toggle[aria-expanded="true"] span::before { transform: translateY(0) rotate(45deg); }
+    .nav-toggle[aria-expanded="true"] span::after { transform: translateY(-1.5px) rotate(-45deg); }
+    .mobile-panel {
+      display: none;
+      position: absolute;
+      top: calc(100% + 1px);
+      left: 0;
+      right: 0;
+      padding: 12px clamp(20px,5vw,64px) 26px;
+      background: rgba(12,18,32,.96);
+      color: #fff;
+      border-bottom: 1px solid rgba(255,255,255,.14);
+      -webkit-backdrop-filter: blur(18px);
+      backdrop-filter: blur(18px);
+    }
+    .site-header.is-light .mobile-panel {
+      background: rgba(255,255,255,.98);
+      color: var(--fg);
+      border-bottom-color: var(--border);
+    }
+    .mobile-panel a {
+      display: flex;
+      min-height: 52px;
+      align-items: center;
+      border-bottom: 1px solid rgba(255,255,255,.12);
+      font-size: 16px;
+      font-weight: 500;
+    }
+    .site-header.is-light .mobile-panel a { border-bottom-color: var(--border); }
+    .mobile-panel a:last-child { border-bottom: 0; }
+
+    /* Memory hero */
+    .memory-hero {
+      position: relative;
+      min-height: max(760px, 100svh);
+      overflow: hidden;
+      background: #060a14;
+      color: #fff;
+    }
+    .memory-hero__media { position: absolute; inset: 0; }
+    .memory-hero__media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+    .memory-hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background: linear-gradient(105deg,rgba(6,10,20,.45),rgba(6,10,20,.12) 60%,transparent);
+    }
+    .memory-hero__inner {
+      position: relative;
+      z-index: 2;
+      min-height: max(760px, 100svh);
+      display: grid;
+      grid-template-rows: auto 1fr;
+      padding-top: calc(var(--header-height) + 28px);
+      padding-bottom: clamp(42px,6vh,70px);
+    }
+    .breadcrumbs {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 44px;
+      color: rgba(255,255,255,.72);
+      font-size: 13px;
+    }
+    .breadcrumbs a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      color: rgba(255,255,255,.76);
+      transition: color .2s ease;
+    }
+    .breadcrumbs a:hover { color: #fff; }
+    .breadcrumbs span[aria-hidden="true"] { color: rgba(255,255,255,.36); }
+    .breadcrumbs [aria-current="page"] { color: #fff; }
+    .memory-hero__body {
+      display: grid;
+      grid-template-columns: minmax(280px,.74fr) minmax(0,1.26fr);
+      gap: clamp(36px,6vw,88px);
+      align-items: end;
+      padding-top: clamp(56px,8vh,92px);
+    }
+    .memory-title { align-self: center; }
+    .memory-title .eyebrow { color: rgba(255,255,255,.64); }
+    .memory-title h1 {
+      margin-bottom: 22px;
+      color: #fff;
+      font-family: var(--font-display);
+      font-size: clamp(38px,4.6vw,64px);
+      font-weight: 600;
+      line-height: 1.38;
+      letter-spacing: 0;
+    }
+    .memory-title p {
+      max-width: 22ch;
+      margin-bottom: 0;
+      color: rgba(255,255,255,.64);
+      font-size: 16px;
+      line-height: 1.8;
+    }
+
+    .glass {
+      position:relative; isolation:isolate;
+      background:rgba(255,255,255,.10);
+      -webkit-backdrop-filter:blur(24px) saturate(180%);
+      backdrop-filter:blur(24px) saturate(180%);
+      border:1.5px solid rgba(255,255,255,.45);
+      border-radius:28px;
+      box-shadow:0 28px 90px rgba(0,0,0,.55),
+                 inset 0 1px 0 rgba(255,255,255,.65),
+                 inset 0 -1px 0 rgba(255,255,255,.10);
+      overflow:hidden;
+    }
+    .glass::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+      background:linear-gradient(148deg,rgba(255,255,255,.30) 0%,rgba(255,255,255,.06) 30%,rgba(255,255,255,0) 52%);}
+    .glass::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.12), inset 0 24px 48px -24px rgba(255,255,255,.28);}
+    .glass, .glass h1, .glass h2, .glass h3, .glass p { color:#fff; }
+    .glass > * { position: relative; z-index: 1; }
+    .memory-definition {
+      justify-self: end;
+      width: min(100%, 680px);
+      padding: clamp(28px,4vw,48px);
+    }
+    .definition-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding-bottom: 22px;
+      border-bottom: 1px solid rgba(255,255,255,.22);
+      color: rgba(255,255,255,.62);
+      font: 500 11px/1.3 var(--font-mono);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .definition-label span:first-child {
+      color: #fff;
+      font-family: var(--font-body);
+      font-size: 12px;
+      letter-spacing: .04em;
+    }
+    .definition-sentence {
+      margin: 32px 0 34px;
+      font-family: var(--font-display);
+      font-size: clamp(25px,2.7vw,38px);
+      font-weight: 500;
+      line-height: 1.42;
+      letter-spacing: 0;
+      text-wrap: balance;
+    }
+    .definition-meta {
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      gap: 16px;
+      padding-top: 22px;
+      border-top: 1px solid rgba(255,255,255,.22);
+    }
+    .definition-meta span {
+      color: rgba(255,255,255,.62);
+      font: 500 11px/1.5 var(--font-mono);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    /* Problem */
+    .problem-section { background: var(--surface); }
+    .problem-grid {
+      display: grid;
+      grid-template-columns: minmax(260px,.72fr) minmax(0,1.28fr);
+      gap: clamp(44px,8vw,120px);
+      align-items: start;
+    }
+    .problem-intro { position: sticky; top: calc(var(--header-height) + 40px); }
+    .problem-intro h2 { max-width: 12ch; }
+    .problem-intro p { max-width: 32ch; margin-bottom: 0; }
+    .problem-list { border-top: 1px solid var(--border); }
+    .problem-item {
+      display: grid;
+      grid-template-columns: 52px minmax(150px,.45fr) minmax(0,1fr);
+      gap: clamp(18px,3vw,38px);
+      align-items: start;
+      padding: 30px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .problem-item > span { color: var(--deep); font: 500 12px/1.6 var(--font-mono); letter-spacing: .08em; }
+    .problem-item h3 { margin: 0; font-size: clamp(20px,2.2vw,26px); }
+    .problem-item p { margin: 0; font-size: 16px; line-height: 1.75; }
+
+    /* Memory flow */
+    .flow-section { background: var(--surface-soft); }
+    .flow-head {
+      display: grid;
+      grid-template-columns: minmax(0,1fr) minmax(280px,.46fr);
+      gap: 44px;
+      align-items: end;
+      margin-bottom: clamp(46px,6vw,78px);
+    }
+    .flow-head h2 { max-width: 17ch; margin-bottom: 0; }
+    .flow-head p { max-width: 42ch; margin-bottom: 3px; }
+    .memory-flow {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      border-top: 1px solid rgba(18,58,143,.28);
+    }
+    .flow-step { position: relative; padding: 34px clamp(24px,3vw,40px) 0 0; }
+    .flow-step:not(:first-child) { padding-left: clamp(24px,3vw,40px); }
+    .flow-step::before {
+      content: "";
+      position: absolute;
+      top: -5px;
+      left: 0;
+      width: 9px;
+      height: 9px;
+      border: 2px solid var(--surface-soft);
+      border-radius: 50%;
+      background: var(--blue);
+    }
+    .flow-step:not(:first-child)::before { left: clamp(24px,3vw,40px); }
+    .flow-step__index { color: var(--deep); font: 500 12px/1.4 var(--font-mono); letter-spacing: .08em; }
+    .flow-step h3 { margin: 48px 0 18px; font-size: clamp(24px,2.5vw,30px); }
+    .flow-step p { margin-bottom: 0; font-size: 16px; line-height: 1.75; }
+    .flow-step .flow-token {
+      display: inline-flex;
+      margin-top: 28px;
+      padding: 5px 10px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: var(--deep);
+      font: 500 11px/1.4 var(--font-mono);
+      letter-spacing: .04em;
+      background: rgba(255,255,255,.6);
+    }
+    .registry-note {
+      display: grid;
+      grid-template-columns: 190px minmax(0,1fr);
+      gap: clamp(24px,5vw,72px);
+      align-items: center;
+      margin-top: clamp(50px,7vw,84px);
+      padding: clamp(26px,4vw,42px);
+      background: var(--deep);
+      color: #fff;
+      border-radius: 4px;
+    }
+    .registry-note__label { color: rgba(255,255,255,.72); font: 500 11px/1.5 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; }
+    .registry-note p { margin: 0; color: rgba(255,255,255,.84); font-size: clamp(17px,1.8vw,21px); line-height: 1.7; }
+
+    /* Real scenarios */
+    .scene-section { background: var(--surface); }
+    .scene-head {
+      display: grid;
+      grid-template-columns: minmax(0,1fr) minmax(300px,.52fr);
+      gap: 44px;
+      align-items: end;
+      margin-bottom: clamp(44px,6vw,72px);
+    }
+    .scene-head h2 { max-width: 17ch; margin-bottom: 0; }
+    .scene-head p { margin-bottom: 3px; }
+    .scene-list { border-top: 2px solid var(--deep); }
+    .scene-item {
+      display: grid;
+      grid-template-columns: 70px minmax(210px,.55fr) minmax(0,1fr);
+      gap: clamp(20px,4vw,52px);
+      align-items: center;
+      min-height: 140px;
+      padding: 28px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .scene-item > span { color: var(--deep); font: 500 12px/1.6 var(--font-mono); letter-spacing: .08em; }
+    .scene-item h3 { margin: 0; font-size: clamp(21px,2.3vw,28px); }
+    .scene-item p { max-width: 46ch; margin: 0; font-size: 16px; line-height: 1.75; }
+
+    /* Boundary */
+    .boundary-section { background: var(--deep); color: #fff; }
+    .boundary-grid {
+      display: grid;
+      grid-template-columns: minmax(260px,.78fr) minmax(0,1.22fr);
+      gap: clamp(44px,8vw,116px);
+      align-items: start;
+    }
+    .boundary-section .eyebrow { color: rgba(255,255,255,.58); }
+    .boundary-section h2 { max-width: 15ch; margin-bottom: 26px; color: #fff; }
+    .boundary-lead { max-width: 36ch; margin-bottom: 0; color: rgba(255,255,255,.68); font-size: 17px; }
+    .boundary-list { border-top: 1px solid rgba(255,255,255,.24); }
+    .boundary-item {
+      display: grid;
+      grid-template-columns: 48px minmax(130px,.38fr) minmax(0,1fr);
+      gap: clamp(16px,3vw,36px);
+      align-items: start;
+      padding: 28px 0;
+      border-bottom: 1px solid rgba(255,255,255,.24);
+    }
+    .boundary-item > span { color: rgba(255,255,255,.46); font: 500 12px/1.6 var(--font-mono); letter-spacing: .08em; }
+    .boundary-item h3 { margin: 0; color: #fff; font-size: 20px; }
+    .boundary-item p { margin: 0; color: rgba(255,255,255,.66); font-size: 15px; line-height: 1.75; }
+
+    /* Related capabilities */
+    .related-section { background: var(--surface); }
+    .related-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 30px;
+      margin-bottom: clamp(36px,5vw,58px);
+    }
+    .related-head h2 { margin-bottom: 0; }
+    .related-head > a { flex: 0 0 auto; }
+    .related-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border-top: 1px solid var(--border); }
+    .related-link {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 22px;
+      align-items: center;
+      min-height: 190px;
+      padding: 30px clamp(24px,3vw,38px) 30px 0;
+      border-bottom: 1px solid var(--border);
+      transition: background .3s var(--ease-out), padding .3s var(--ease-out);
+    }
+    .related-link + .related-link { padding-left: clamp(24px,3vw,38px); border-left: 1px solid var(--border); }
+    .related-link:hover { background: var(--surface-soft); }
+    .related-link:hover + .related-link { background: var(--surface-soft); }
+    .related-link h3 { margin: 0 0 10px; font-size: clamp(22px,2.5vw,30px); }
+    .related-link p { margin: 0; font-size: 15px; line-height: 1.7; }
+    .related-link__icon {
+      display: grid;
+      width: 42px;
+      height: 42px;
+      place-items: center;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      color: var(--deep);
+      transition: transform .25s var(--ease-out), background .25s ease, color .25s ease;
+    }
+    .related-link:hover .related-link__icon { transform: translateX(5px); background: var(--deep); color: #fff; }
+
+    .text-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 44px;
+      color: var(--deep);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .text-link:hover { text-decoration: underline; text-underline-offset: 5px; }
+    .text-link svg { width: 18px; height: 18px; }
+
+    /* Shared site footer */
+    .site-footer { background: var(--deep); color: #fff; }
+    .footer-main {
+      display: grid;
+      grid-template-columns: 1.4fr .72fr .72fr .9fr;
+      gap: clamp(32px,5vw,72px);
+      padding-block: clamp(64px,7vw,92px) clamp(48px,6vw,72px);
+    }
+    .footer-brand { max-width: 28ch; }
+    .footer-brand .brand { color: #fff; }
+    .footer-brand p { margin: 24px 0 0; color: rgba(255,255,255,.68); font-size: 15px; line-height: 1.8; }
+    .footer-col h3 {
+      margin: 0 0 20px;
+      color: rgba(255,255,255,.62);
+      font: 500 12px/1.3 var(--font-mono);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .footer-col a {
+      display: flex;
+      min-height: 44px;
+      align-items: center;
+      color: rgba(255,255,255,.8);
+      font-size: 14px;
+      transition: color .2s ease, transform .2s var(--ease-out);
+    }
+    .footer-col a:hover { color: #fff; transform: translateX(3px); }
+    .footer-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      min-height: 64px;
+      padding-block: 16px;
+      border-top: 1px solid rgba(255,255,255,.18);
+      color: rgba(255,255,255,.62);
+      font-size: 12px;
+    }
+
+    /* Scroll reveal */
+    .js .reveal { opacity: 0; transform: translateY(24px); transition: opacity .75s var(--ease-out) var(--delay,0ms), transform .75s var(--ease-out) var(--delay,0ms); }
+    .js .reveal.is-visible { opacity: 1; transform: translateY(0); }
+    .flow-section .flow-head p,
+    .flow-section .flow-step p { color: var(--fg); }
+
+    @media (max-width: 1000px) {
+      .main-nav { display: none; }
+      .nav-inner { grid-template-columns: 1fr auto; }
+      .nav-toggle { display: grid; place-items: center; }
+      .mobile-panel[data-open="true"] { display: block; }
+      .memory-hero__body { grid-template-columns: 1fr; align-items: end; gap: 44px; }
+      .memory-title { align-self: auto; max-width: 620px; }
+      .memory-title p { max-width: 34ch; }
+      .memory-definition { justify-self: start; width: min(100%, 640px); }
+      .problem-grid, .boundary-grid { grid-template-columns: 1fr; }
+      .problem-intro { position: static; }
+      .problem-intro h2, .boundary-section h2 { max-width: 20ch; }
+      .flow-head, .scene-head { grid-template-columns: 1fr; gap: 22px; }
+      .flow-head h2, .scene-head h2 { max-width: 22ch; }
+      .memory-flow { grid-template-columns: 1fr; border-top: 0; border-left: 1px solid rgba(18,58,143,.28); }
+      .flow-step, .flow-step:not(:first-child) { padding: 22px 0 30px 30px; }
+      .flow-step::before, .flow-step:not(:first-child)::before { top: 28px; left: -5px; }
+      .flow-step h3 { margin: 10px 0 12px; }
+      .flow-step .flow-token { margin-top: 18px; }
+      .scene-item { grid-template-columns: 52px minmax(180px,.54fr) minmax(0,1fr); }
+      .footer-main { grid-template-columns: 1.3fr .7fr .7fr; }
+      .footer-col:last-child { grid-column: 2 / -1; }
+    }
+    @media (max-width: 760px) {
+      :root { --header-height:68px; }
+      body { font-size: 16px; }
+      .nav-cta { padding-inline: 16px; font-size: 13px; }
+      .memory-hero, .memory-hero__inner { min-height: 860px; }
+      .memory-hero__inner { padding-top: calc(var(--header-height) + 18px); }
+      .memory-hero__body { padding-top: 40px; gap: 34px; }
+      .memory-title h1 { margin-bottom: 16px; }
+      .memory-definition { width: 100%; }
+      .definition-sentence { margin: 24px 0 28px; }
+      .definition-meta { gap: 8px; }
+      .problem-item, .scene-item, .boundary-item {
+        grid-template-columns: 44px minmax(0,1fr);
+        gap: 12px 18px;
+      }
+      .problem-item h3, .scene-item h3, .boundary-item h3 { grid-column: 2; }
+      .problem-item p, .scene-item p, .boundary-item p { grid-column: 2; grid-row: 2; }
+      .scene-item { min-height: 0; padding-block: 28px; }
+      .registry-note { grid-template-columns: 1fr; gap: 14px; }
+      .related-grid { grid-template-columns: 1fr; }
+      .related-link, .related-link + .related-link { min-height: 158px; padding: 26px 0; border-left: 0; }
+      .related-head { display: block; }
+      .related-head > a { margin-top: 20px; }
+      .footer-main { grid-template-columns: 1fr 1fr; gap: 34px 28px; }
+      .footer-brand { grid-column: 1 / -1; }
+      .footer-col:last-child { grid-column: 1 / -1; }
+      .footer-bottom { display: block; padding-block: 22px; }
+    }
+    @media (max-width: 480px) {
+      .brand { font-size: 14px; gap: 8px; }
+      .brand-mark { width: 22px; height: 22px; }
+      .nav-inner { gap: 10px; }
+      .nav-actions { gap: 8px; }
+      .nav-cta { padding-inline: 13px; min-height: 44px; }
+      .memory-hero, .memory-hero__inner { min-height: 900px; }
+      .definition-label { align-items: flex-start; }
+      .definition-meta { grid-template-columns: 1fr; gap: 6px; }
+      .footer-main { grid-template-columns: 1fr; }
+      .footer-col:last-child { grid-column: auto; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+      .js .reveal { opacity: 1; transform: none; }
+    }
+  </style>
+<style>
+.inline-figure{margin:56px auto;max-width:1200px;padding-inline:clamp(20px,5vw,64px);box-sizing:border-box}
+.inline-figure .fig-box{border-radius:24px;overflow:hidden;box-shadow:0 28px 70px rgba(48,58,86,.14);border:1px solid #DDE2EA}
+.inline-figure img{display:block;width:100%;height:clamp(220px,30vw,400px);object-fit:cover}
+.inline-figure figcaption{padding:14px 22px;font-size:14px;line-height:1.6;color:#6B7689;background:#fff}
+</style>
+<style>
+html,body{overflow-x:hidden;max-width:100%}
+*,*::before,*::after{box-sizing:border-box}
+img{max-width:100%;height:auto}
+</style>
+<style>
+svg{max-width:100%;vertical-align:middle}
+.button svg,.button--primary svg,.button--glass svg,button svg,a.button svg,.hero-actions svg{width:18px;height:18px;flex:none;display:inline-block}
+</style>
+<style>
+[class*="node"] svg,[class*="icon"] svg,[class*="step"] svg,[class*="badge"] svg,[class*="mark"] svg,[class*="chip"] svg{width:44px;height:44px;flex:none;display:inline-block}
+[class*="number"] svg,[class*="num"] svg{width:32px;height:32px}
+</style>
+<style>
+[class*="hero"] img{object-fit:cover;object-position:center;max-height:96vh}
+</style>
+<style>
+[class*="scene"] img,[class*="media"] img:not(.hero-photo),[class*="shot"] img{height:auto;max-height:520px;object-fit:cover;width:100%}
+</style>
+<style>
+.hero img,section img,figure img{max-width:100%}
+</style>
+<style>
+.hero__media{overflow:hidden;width:100%}
+.hero__image{width:100%;height:100%;object-fit:cover;display:block}
+</style>
+<style>
+.hero__image{transform:none!important}
+</style>
+<style>
+.glass{position:relative;isolation:isolate;
+background:rgba(255,255,255,.10)!important;
+-webkit-backdrop-filter:blur(24px) saturate(180%)!important;
+backdrop-filter:blur(24px) saturate(180%)!important;
+border:1.5px solid rgba(255,255,255,.45)!important;border-radius:28px!important;
+box-shadow:0 28px 90px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.65)!important;
+overflow:hidden;}
+.glass::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+background:linear-gradient(148deg,rgba(255,255,255,.30) 0%,rgba(255,255,255,.06) 30%,rgba(255,255,255,0) 52%);}
+.glass::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),inset 0 24px 48px -24px rgba(255,255,255,.28);}
+.glass > *{position:relative;z-index:1}
+</style>
+<style>
+.glass-panel,.memory-title{position:relative;isolation:isolate;
+background:rgba(255,255,255,.14)!important;
+-webkit-backdrop-filter:blur(24px) saturate(180%)!important;
+backdrop-filter:blur(24px) saturate(180%)!important;
+border:1.5px solid rgba(255,255,255,.45)!important;border-radius:28px!important;
+padding:clamp(22px,2.6vw,40px)!important;
+box-shadow:0 28px 90px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.65)!important;}
+</style>
+<link rel="stylesheet" href="assets/mobile.css">
+<link rel="stylesheet" href="assets/gidx.css">
+<link rel="stylesheet" href="assets/cap-layout.css">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">跳到主要内容</a>
+
+  <header class="site-header" data-site-header>
+    <div class="container nav-inner">
+      <a class="brand" href="index.html" aria-label="Astraea Plan 首页">
+        <span class="brand-mark" aria-hidden="true">A</span>
+        <span>Astraea Plan</span>
+      </a>
+      <nav class="main-nav" aria-label="主导航">
+        <a class="current" href="capabilities.html" aria-current="page">能力</a>
+        <a href="architecture.html">架构</a>
+        <a href="cases.html">案例</a>
+        <a href="pricing.html">投入</a>
+        <a href="about.html">关于</a>
+      </nav>
+      <div class="nav-actions">
+        <a class="nav-cta" href="pricing.html#contact">预约演示</a>
+        <button class="nav-toggle" type="button" aria-label="打开导航菜单" aria-expanded="false" aria-controls="mobile-menu" data-nav-toggle>
+          <span aria-hidden="true"></span>
+        </button>
+      </div>
+    </div>
+    <nav class="mobile-panel" id="mobile-menu" aria-label="移动端主导航" data-open="false" data-mobile-menu>
+      <a href="capabilities.html" aria-current="page">能力</a>
+      <a href="architecture.html">架构</a>
+      <a href="cases.html">案例</a>
+      <a href="pricing.html">投入</a>
+      <a href="about.html">关于</a>
+    </nav>
+  </header>
+
+  <main id="main-content">
+    <section class="memory-hero" data-hero data-od-id="memory-hero">
+      <div class="memory-hero__media">
+        <img decoding="async" fetchpriority="high" src="data:image/jpeg;base64,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" width="2000" height="1333" alt="暗调环境中发着蓝色微光的键盘特写">
+      </div>
+      <div class="container memory-hero__inner">
+        <nav class="breadcrumbs" aria-label="面包屑" data-od-id="memory-breadcrumbs">
+          <a href="capabilities.html">能力</a>
+          <span aria-hidden="true">/</span>
+          <span aria-current="page">长期记忆</span>
+        </nav>
+        <div class="memory-hero__body">
+          <div class="memory-title" data-od-id="memory-title">
+            <p class="eyebrow">Organizational memory / 能力</p>
+            <h1>长期记忆</h1>
+            <p>让组织做过的事，成为下一次任务的起点。</p>
+          </div>
+          <aside class="glass memory-definition" aria-labelledby="memory-definition-label" data-od-id="memory-definition-glass">
+            <p class="definition-label" id="memory-definition-label"><span>定义</span><span>Definition</span></p>
+            <p class="definition-sentence">智能体不是每次从零开始，<br>它记得上次做过什么。</p>
+            <div class="definition-meta" aria-label="长期记忆覆盖内容">
+              <span>决策 / Decision</span>
+              <span>经验 / Experience</span>
+              <span>口径 / Registry</span>
+            </div><nav class="gidx" aria-label="其他能力"><div class="gidx__h">其他能力</div><div class="gidx__list"><a class="gidx__i" href="cap-hiring.html"><span class="gidx__n">01</span><span class="gidx__t">自主招聘</span><span class="gidx__a" aria-hidden="true">→</span></a><a class="gidx__i" href="cap-qa.html"><span class="gidx__n">02</span><span class="gidx__t">企业问答客服</span><span class="gidx__a" aria-hidden="true">→</span></a><a class="gidx__i" href="cap-vision.html"><span class="gidx__n">03</span><span class="gidx__t">门店读帧监控</span><span class="gidx__a" aria-hidden="true">→</span></a><a class="gidx__i" href="cap-intel.html"><span class="gidx__n">04</span><span class="gidx__t">第三方平台情报</span><span class="gidx__a" aria-hidden="true">→</span></a><a class="gidx__i" href="cap-attendance.html"><span class="gidx__n">05</span><span class="gidx__t">考勤监察</span><span class="gidx__a" aria-hidden="true">→</span></a><a class="gidx__i" href="cap-dailyclose.html"><span class="gidx__n">06</span><span class="gidx__t">数据日清</span><span class="gidx__a" aria-hidden="true">→</span></a></div></nav>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="section problem-section" id="problem" data-od-id="memory-problem">
+      <div class="container problem-grid">
+        <div class="problem-intro reveal">
+          <p class="eyebrow">Problem / 问题</p>
+          <h2>经验留在人身上，组织就会反复付学费。</h2>
+          <p>同一个任务换一个人做，就像重新启动一次系统：背景要找、口径要问、结论要再证明一遍。</p>
+        </div>
+        <div class="problem-list">
+          <article class="problem-item reveal" data-od-id="problem-handover">
+            <span>01</span>
+            <h3>新人离职带走经验</h3>
+            <p>做过什么判断、为什么这样做、后来结果如何，如果没有被记录，就只能靠下一个人重新摸索。</p>
+          </article>
+          <article class="problem-item reveal" style="--delay:60ms" data-od-id="problem-repeat">
+            <span>02</span>
+            <h3>同一个问题反复问</h3>
+            <p>缺少可检索的历史，每次任务都从零开始。时间花在重新理解问题，而不是继续推进答案。</p>
+          </article>
+          <article class="problem-item reveal" style="--delay:120ms" data-od-id="problem-metric">
+            <span>03</span>
+            <h3>同一份口径算出来不一样</h3>
+            <p>指标定义散落在个人表格和聊天记录里，部门各自维护一套算法，最后只能在对数会上寻找共识。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+<figure class="inline-figure"><div class="fig-box"><img loading="lazy" decoding="async" src="assets/keyboard-1.jpg" alt="Astraea Plan 运行场景"></div></figure>
+
+
+    <section class="section flow-section" id="how-it-works" data-od-id="memory-how-it-works">
+      <div class="container">
+        <div class="flow-head reveal">
+          <div>
+            <p class="eyebrow">How it works / 怎么做</p>
+            <h2>把做过的事，变成下一次的起点。</h2>
+          </div>
+          <p>长期记忆不是把所有内容堆起来，而是让相关内容在任务发生时，被准确地找回来。</p>
+        </div>
+        <div class="memory-flow">
+          <article class="flow-step reveal" data-od-id="memory-write">
+            <span class="flow-step__index">01 / WRITE</span>
+            <h3>决策与经验写入知识库</h3>
+            <p>把任务背景、判断依据、处理动作与结果留下来，形成下一次可以继续使用的上下文。</p>
+            <span class="flow-token">决策记录 · 处理经验</span>
+          </article>
+          <article class="flow-step reveal" style="--delay:70ms" data-od-id="memory-recall">
+            <span class="flow-step__index">02 / RECALL</span>
+            <h3>下次任务自动调出相关历史</h3>
+            <p>智能体先找回相似任务、已有结论与处理路径，再开始新的判断，而不是重新问一遍。</p>
+            <span class="flow-token">相似任务 · 历史结论</span>
+          </article>
+          <article class="flow-step reveal" style="--delay:140ms" data-od-id="memory-registry">
+            <span class="flow-step__index">03 / UNIFY</span>
+            <h3>口径按注册表统一</h3>
+            <p>指标定义、负责人和适用范围由注册表管理，让不同部门的答案从同一个定义出发。</p>
+            <span class="flow-token">定义 · 负责人 · 生效范围</span>
+          </article>
+        </div>
+        <div class="registry-note reveal" data-od-id="memory-registry-note">
+          <span class="registry-note__label">Registry principle / 注册表原则</span>
+          <p>记忆负责保留做过的事；注册表负责说明事情应该按什么口径被理解。两者一起，才构成可复用的组织上下文。</p>
+        </div>
+      </div>
+    </section>
+<figure class="inline-figure"><div class="fig-box"><img loading="lazy" decoding="async" src="assets/line-1.jpg" alt="Astraea Plan 运行场景"></div></figure>
+
+
+    <section class="section scene-section" id="scenarios" data-od-id="memory-scenarios">
+      <div class="container">
+        <div class="scene-head reveal">
+          <div>
+            <p class="eyebrow">Real scenarios / 真实场景</p>
+            <h2>场景不新，难的是每次都得到同一答案。</h2>
+          </div>
+          <p>长期记忆的价值，不在存储本身，而在下一次任务开始得更快、判断更稳。</p>
+        </div>
+        <div class="scene-list">
+          <article class="scene-item reveal" data-od-id="scenario-metric">
+            <span>01</span>
+            <h3>门店数据查询口径统一</h3>
+            <p>同一个门店指标，从总部到区域都沿着注册表里的定义计算，减少会议里对不齐的数。</p>
+          </article>
+          <article class="scene-item reveal" style="--delay:60ms" data-od-id="scenario-incident">
+            <span>02</span>
+            <h3>异常处理记录可追溯</h3>
+            <p>问题如何判断、采取了什么动作、由谁确认，都留下可回看的过程，而不是只留下最终结果。</p>
+          </article>
+          <article class="scene-item reveal" style="--delay:120ms" data-od-id="scenario-handover">
+            <span>03</span>
+            <h3>部门经验在人员变动后仍在</h3>
+            <p>流程与判断不再只存在某个人的脑中。交接从重新讲一遍，变成直接调用已有历史。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section boundary-section" id="boundary" data-od-id="memory-boundary">
+      <div class="container boundary-grid">
+        <div class="reveal">
+          <p class="eyebrow">Boundary / 边界</p>
+          <h2>记忆需要维护，脏数据会进去，所以要有人管口径。</h2>
+          <p class="boundary-lead">长期记忆不是自动正确。它是一套需要制度、负责人和持续维护的内容系统。</p>
+        </div>
+        <div class="boundary-list reveal" style="--delay:80ms">
+          <article class="boundary-item" data-od-id="boundary-maintenance">
+            <span>01</span>
+            <h3>记忆需要维护</h3>
+            <p>过期、冲突和失效的经验必须被清理与更新，否则历史会反过来误导当下。</p>
+          </article>
+          <article class="boundary-item" data-od-id="boundary-dirty-data">
+            <span>02</span>
+            <h3>脏数据会进去</h3>
+            <p>错误前提一旦被写入知识库，就会被下一次任务继续沿用。入口需要校验，过程需要留痕。</p>
+          </article>
+          <article class="boundary-item" data-od-id="boundary-ownership">
+            <span>03</span>
+            <h3>要有人管口径</h3>
+            <p>每个关键指标都应有明确负责人、定义和适用范围。统一不是一次性动作，而是持续治理。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section related-section" id="related" data-od-id="memory-related">
+      <div class="container">
+        <div class="related-head reveal">
+          <div>
+            <p class="eyebrow">Related capabilities / 相关能力</p>
+            <h2>记忆之外，还需要把当天的数据和部门的知识管好。</h2>
+          </div>
+          <a class="text-link" href="capabilities.html">查看全部能力 <span aria-hidden="true">→</span></a>
+        </div>
+        <div class="related-grid">
+          <a class="related-link reveal" href="capabilities.html#capability-data-daily" data-od-id="related-data-daily">
+            <div>
+              <h3>数据日清</h3>
+              <p>把每日经营数据整理成可继续使用的状态，减少重复核对与临时取数。</p>
+            </div>
+            <span class="related-link__icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+          </a>
+          <a class="related-link reveal" style="--delay:60ms" href="capabilities.html#capability-knowledge" data-od-id="related-knowledge-base">
+            <div>
+              <h3>部门知识库</h3>
+              <p>把流程、判断与异常处理留在部门内部，人员变动后仍能被检索和调用。</p>
+            </div>
+            <span class="related-link__icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer" data-od-id="site-footer">
+    <div class="container">
+      <div class="footer-main">
+        <div class="footer-brand">
+          <a class="brand" href="index.html" aria-label="Astraea Plan 首页"><span class="brand-mark" aria-hidden="true">A</span><span>Astraea Plan</span></a>
+          <p>给连锁企业装一套私有化智能体团队，数据不出公司。</p>
+        </div>
+        <div class="footer-col">
+          <h3>能力</h3>
+          <a href="capabilities.html">能力总览</a>
+          <a href="cap-memory.html">长期记忆</a>
+          <a href="capabilities.html#capability-list">数据日清</a>
+          <a href="capabilities.html#capability-list">部门知识库</a>
+        </div>
+        <div class="footer-col">
+          <h3>架构</h3>
+          <a href="architecture.html">架构总览</a>
+          <a href="architecture.html#a2a">A2A 协同</a>
+          <a href="architecture.html#private">私有化部署</a>
+        </div>
+        <div class="footer-col">
+          <h3>联系</h3>
+          <a href="pricing.html#contact">预约演示</a>
+          <a href="about.html">了解 Astraea Plan</a>
+          <a href="about.html#contact">联系项目团队</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 Astraea Plan · 数据不出公司</span>
+        <span>Private agent team for chain businesses</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      var header = document.querySelector('[data-site-header]');
+      var hero = document.querySelector('[data-hero]');
+      var toggle = document.querySelector('[data-nav-toggle]');
+      var menu = document.querySelector('[data-mobile-menu]');
+      var closeMenu = function () {
+        if (!toggle || !menu) return;
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.setAttribute('aria-label', '打开导航菜单');
+        menu.setAttribute('data-open', 'false');
+      };
+      if (toggle && menu) {
+        toggle.addEventListener('click', function () {
+          var isOpen = toggle.getAttribute('aria-expanded') === 'true';
+          toggle.setAttribute('aria-expanded', String(!isOpen));
+          toggle.setAttribute('aria-label', isOpen ? '打开导航菜单' : '关闭导航菜单');
+          menu.setAttribute('data-open', String(!isOpen));
+        });
+        menu.querySelectorAll('a').forEach(function (link) { link.addEventListener('click', closeMenu); });
+        window.addEventListener('keydown', function (event) {
+          if (event.key === 'Escape') closeMenu();
+        });
+      }
+      var syncHeader = function () {
+        if (!header || !hero) return;
+        var limit = hero.offsetHeight - 96;
+        header.classList.toggle('is-light', window.scrollY > Math.max(220, limit));
+      };
+      var ticking = false;
+      window.addEventListener('scroll', function () {
+        if (ticking) return;
+        ticking = true;
+        window.requestAnimationFrame(function () { syncHeader(); ticking = false; });
+      }, { passive: true });
+      window.addEventListener('resize', syncHeader);
+      syncHeader();
+
+      var items = document.querySelectorAll('.reveal');
+      var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduced || !('IntersectionObserver' in window)) {
+        items.forEach(function (item) { item.classList.add('is-visible'); });
+      } else {
+        var observer = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+        items.forEach(function (item) { observer.observe(item); });
+      }
+    })();
+  </script>
+
+
+
+
+<script id="menu-final-js">
+(function(){
+  if(window.__menuFinal)return; window.__menuFinal=true;
+  function build(){
+    var old=document.getElementById('__menuPanel'); if(old)old.remove();
+    var p=document.createElement('div'); p.id='__menuPanel';
+    var links=[];
+    var src=document.querySelector('header nav, .mobile-panel, .mobile-menu, nav');
+    if(src){src.querySelectorAll('a').forEach(function(a){
+      var t=(a.textContent||'').trim(); if(!t||t.length>16)return;
+      var h=a.getAttribute('href')||'#'; if(h==='#'||h.charAt(0)==='#')return;
+      if(/演示|预约/.test(t))return;
+      if(links.some(function(x){return x[0]===t;}))return;
+      links.push([t,h]);});}
+    if(links.length<3){
+      links=[['能力','capabilities.html'],['架构','architecture.html'],['案例','cases.html'],['投入','pricing.html'],['关于','about.html']];
+    }
+    if(!links.some(function(x){return x[0]==='首页';})) links.unshift(['首页','index.html']);
+    var html='<div class="__close"><span id="__menuClose">✕</span></div>';
+    links.forEach(function(l){ html+='<a href="'+l[1]+'">'+l[0]+'</a>'; });
+    html+='<a href="pricing.html" class="__cta">预约演示</a>';
+    p.innerHTML=html; document.body.appendChild(p);
+    p.addEventListener('click',function(e){ if(e.target.id==='__menuClose'||e.target.tagName==='A'){p.classList.remove('__open');document.documentElement.classList.remove('__navopen');} });
+  }
+  function toggle(){
+    var p=document.getElementById('__menuPanel'); if(!p){build();p=document.getElementById('__menuPanel');}
+    var open=p.classList.toggle('__open');
+    document.documentElement.classList.toggle('__navopen',open);
+    var btn=document.querySelector('[class*="menu-toggle"],[class*="nav-toggle"]');
+    if(btn)btn.setAttribute('aria-expanded',open?'true':'false');
+  }
+  document.addEventListener('click',function(e){
+    var btn=e.target.closest('[class*="menu-toggle"],[class*="nav-toggle"]');
+    if(!btn)return;
+    e.preventDefault(); e.stopImmediatePropagation(); e.stopPropagation();
+    toggle();
+  },true);
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',build); else build();
+})();
+</script>
+
+</body>
+</html>

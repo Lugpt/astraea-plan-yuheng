@@ -1,0 +1,1639 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Astraea Plan 架构总览：总控集群、双模型通道、部门知识库、A2A 与自愈组成一套私有化智能体编排系统。" />
+  <title>架构｜Astraea Plan</title>
+  <style>
+    :root {
+      --bg:#F6F7F9; --surface:#FFFFFF; --surface-soft:#F1F3F7;
+      --fg:#16233A; --muted:#6B7689; --border:#DDE2EA;
+      --accent:#FF5A1F; --blue:#2F6BFF; --blue-soft:#5B8DFF; --deep:#123A8F;
+      --font-body:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+      --font-mono:"SFMono-Regular","SF Mono",Menlo,Consolas,monospace;
+      --ease-out:cubic-bezier(0.23,1,0.32,1);
+      --section-space:clamp(72px,8vw,120px);
+      --container:1200px;
+    }
+
+    *,
+    *::before,
+    *::after { box-sizing:border-box; }
+
+    html { scroll-behavior:smooth; }
+    html,
+    body {
+      overflow-x:hidden;
+      max-width:100%;
+    }
+
+    body {
+      margin:0;
+      background:var(--bg);
+      color:var(--fg);
+      font-family:var(--font-body);
+      font-size:17px;
+      line-height:1.8;
+      -webkit-font-smoothing:antialiased;
+      text-rendering:optimizeLegibility;
+    }
+
+    body.nav-open { overflow:hidden; }
+    a { color:inherit; text-decoration:none; }
+    button { font:inherit; }
+    img { display:block; max-width:100%; }
+    h1,
+    h2,
+    h3,
+    p,
+    ol,
+    ul,
+    dl,
+    dd { margin:0; }
+    ol,
+    ul { padding:0; list-style:none; }
+
+    ::selection {
+      background:var(--deep);
+      color:#fff;
+    }
+
+    :focus-visible {
+      outline:3px solid var(--blue-soft);
+      outline-offset:4px;
+    }
+
+    .skip-link {
+      position:fixed;
+      left:20px;
+      top:-80px;
+      z-index:2000;
+      padding:12px 18px;
+      border-radius:999px;
+      background:var(--surface);
+      color:var(--fg);
+      box-shadow:0 12px 40px rgba(18,58,143,.18);
+      transition:top .2s var(--ease-out);
+    }
+
+    .skip-link:focus { top:16px; }
+
+    .container {
+      width:100%;
+      max-width:var(--container);
+      margin-inline:auto;
+      padding-inline:clamp(20px,5vw,64px);
+    }
+
+    .section {
+      padding-block:var(--section-space);
+    }
+
+    .eyebrow {
+      display:flex;
+      align-items:center;
+      gap:12px;
+      color:var(--blue);
+      font-family:var(--font-mono);
+      font-size:12px;
+      font-weight:600;
+      line-height:1.5;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+    }
+
+    .eyebrow::before {
+      content:"";
+      width:28px;
+      height:1px;
+      background:currentColor;
+    }
+
+    .display-title {
+      color:var(--fg);
+      font-size:clamp(28px,3vw,42px);
+      font-weight:600;
+      line-height:1.34;
+      letter-spacing:0;
+    }
+
+    .body-copy {
+      color:var(--muted);
+      font-size:17px;
+      line-height:1.8;
+      max-width:65ch;
+    }
+
+    .reveal {
+      opacity:1;
+      transform:none;
+    }
+
+    .js .reveal {
+      opacity:0;
+      transform:translateY(24px);
+      transition:opacity .8s var(--ease-out), transform .8s var(--ease-out);
+    }
+
+    .js .reveal.is-visible {
+      opacity:1;
+      transform:translateY(0);
+    }
+
+    /* Header */
+    .site-header {
+      position:fixed;
+      inset:0 0 auto;
+      z-index:1000;
+      color:#fff;
+      background:rgba(12,18,32,.35);
+      border-bottom:1px solid rgba(255,255,255,.12);
+      -webkit-backdrop-filter:blur(18px) saturate(140%);
+      backdrop-filter:blur(18px) saturate(140%);
+      transition:background .4s var(--ease-out), color .4s var(--ease-out), border-color .4s var(--ease-out), box-shadow .4s var(--ease-out);
+    }
+
+    .site-header.is-scrolled {
+      color:var(--fg);
+      background:rgba(255,255,255,.72);
+      border-bottom-color:rgba(221,226,234,.8);
+      box-shadow:0 8px 28px rgba(22,35,58,.06);
+      -webkit-backdrop-filter:blur(14px) saturate(150%);
+      backdrop-filter:blur(14px) saturate(150%);
+    }
+
+    .header-inner {
+      min-height:76px;
+      display:grid;
+      grid-template-columns:1fr auto 1fr;
+      align-items:center;
+      gap:28px;
+    }
+
+    .brand {
+      justify-self:start;
+      display:inline-flex;
+      align-items:center;
+      min-height:44px;
+      color:inherit;
+      font-size:17px;
+      font-weight:600;
+      letter-spacing:.01em;
+    }
+
+    .brand-mark {
+      width:8px;
+      height:8px;
+      margin-right:10px;
+      border:1.5px solid currentColor;
+      border-radius:50%;
+      box-shadow:0 0 0 4px rgba(255,255,255,.10);
+    }
+
+    .site-header.is-scrolled .brand-mark { box-shadow:0 0 0 4px rgba(47,107,255,.08); }
+
+    .site-nav {
+      justify-self:center;
+      display:flex;
+      align-items:center;
+      gap:30px;
+    }
+
+    .site-nav a {
+      position:relative;
+      display:inline-flex;
+      align-items:center;
+      min-height:44px;
+      color:inherit;
+      font-size:14px;
+      font-weight:500;
+      letter-spacing:.02em;
+      white-space:nowrap;
+    }
+
+    .site-nav a::after {
+      content:"";
+      position:absolute;
+      left:50%;
+      right:50%;
+      bottom:6px;
+      height:2px;
+      border-radius:2px;
+      background:var(--accent);
+      transition:left .28s var(--ease-out), right .28s var(--ease-out);
+    }
+
+    .site-nav a:hover::after,
+    .site-nav a:focus-visible::after,
+    .site-nav a[aria-current="page"]::after {
+      left:0;
+      right:0;
+    }
+
+    .site-nav a[aria-current="page"] { font-weight:600; }
+
+    .nav-cta {
+      justify-self:end;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:44px;
+      padding:0 20px;
+      border-radius:999px;
+      background:var(--accent);
+      color:#fff;
+      font-size:14px;
+      font-weight:600;
+      letter-spacing:.02em;
+      box-shadow:0 10px 28px rgba(255,90,31,.24);
+      transition:background .2s var(--ease-out), transform .2s var(--ease-out), box-shadow .2s var(--ease-out);
+    }
+
+    .nav-cta:hover {
+      background:oklch(from var(--accent) calc(l - .06) c h);
+      transform:translateY(-1px);
+      box-shadow:0 14px 32px rgba(255,90,31,.30);
+    }
+
+    .nav-cta:active { transform:translateY(0); }
+
+    .nav-toggle {
+      display:none;
+      justify-self:end;
+      width:44px;
+      height:44px;
+      padding:0;
+      border:1px solid rgba(255,255,255,.34);
+      border-radius:50%;
+      background:transparent;
+      color:inherit;
+      cursor:pointer;
+    }
+
+    .site-header.is-scrolled .nav-toggle { border-color:var(--border); }
+
+    .nav-toggle span,
+    .nav-toggle::before,
+    .nav-toggle::after {
+      content:"";
+      display:block;
+      width:17px;
+      height:1.5px;
+      margin:0 auto;
+      background:currentColor;
+      transition:transform .25s var(--ease-out), opacity .2s var(--ease-out);
+    }
+
+    .nav-toggle span { margin-block:4px; }
+    .nav-toggle[aria-expanded="true"]::before { transform:translateY(5.5px) rotate(45deg); }
+    .nav-toggle[aria-expanded="true"] span { opacity:0; }
+    .nav-toggle[aria-expanded="true"]::after { transform:translateY(-5.5px) rotate(-45deg); }
+
+    /* Hero */
+    .hero {
+      position:relative;
+      min-height:100svh;
+      display:grid;
+      align-items:center;
+      isolation:isolate;
+      overflow:hidden;
+      background-color:#070b13;
+    }
+
+    .hero::before {
+      content:"";
+      position:absolute;
+      inset:0;
+      z-index:-2;
+      background-image:linear-gradient(105deg,rgba(6,10,20,.45),rgba(6,10,20,.12) 60%,transparent),url("assets/bluesmoke-1.jpg");
+      background-size:cover;
+      background-position:center;
+      transform:scale(1.015);
+    }
+
+    .hero-inner {
+      padding-top:clamp(124px,14vh,164px);
+      padding-bottom:clamp(56px,8vh,92px);
+    }
+
+    .glass {
+      position:relative; isolation:isolate;
+      background:rgba(255,255,255,.10);
+      -webkit-backdrop-filter:blur(24px) saturate(180%);
+      backdrop-filter:blur(24px) saturate(180%);
+      border:1.5px solid rgba(255,255,255,.45);
+      border-radius:28px;
+      box-shadow:0 28px 90px rgba(0,0,0,.55),
+                 inset 0 1px 0 rgba(255,255,255,.65),
+                 inset 0 -1px 0 rgba(255,255,255,.10);
+      overflow:hidden;
+    }
+
+    .glass::before {
+      content:"";
+      position:absolute;
+      inset:0;
+      border-radius:inherit;
+      pointer-events:none;
+      background:linear-gradient(148deg,rgba(255,255,255,.30) 0%,rgba(255,255,255,.06) 30%,rgba(255,255,255,0) 52%);
+    }
+
+    .glass::after {
+      content:"";
+      position:absolute;
+      inset:0;
+      border-radius:inherit;
+      pointer-events:none;
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.12), inset 0 24px 48px -24px rgba(255,255,255,.28);
+    }
+
+    .glass,
+    .glass h1,
+    .glass h2,
+    .glass h3,
+    .glass p { color:#fff; }
+
+    .hero-panel {
+      width:min(760px,100%);
+      padding:clamp(30px,4.2vw,56px);
+      border-radius:28px;
+    }
+
+    .hero-panel > * { position:relative; z-index:1; }
+
+    .hero-kicker {
+      display:flex;
+      align-items:center;
+      gap:12px;
+      color:rgba(255,255,255,.76);
+      font-family:var(--font-mono);
+      font-size:11px;
+      font-weight:600;
+      line-height:1.5;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+    }
+
+    .hero-kicker::before {
+      content:"";
+      width:26px;
+      height:1px;
+      background:rgba(255,255,255,.64);
+    }
+
+    .hero h1 {
+      margin-top:20px;
+      font-size:clamp(38px,4.6vw,64px);
+      font-weight:600;
+      line-height:1.3;
+      letter-spacing:0;
+      text-shadow:0 2px 24px rgba(0,0,0,.18);
+    }
+
+    .hero-subtitle {
+      max-width:17em;
+      margin-top:18px;
+      font-size:clamp(24px,2.4vw,34px);
+      font-weight:500;
+      line-height:1.45;
+      letter-spacing:0;
+    }
+
+    .hero-lede {
+      max-width:34em;
+      margin-top:18px;
+      color:rgba(255,255,255,.78) !important;
+      font-size:16px;
+      line-height:1.8;
+    }
+
+    .hero-bottom {
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:28px;
+      margin-top:42px;
+      padding-top:22px;
+      border-top:1px solid rgba(255,255,255,.22);
+    }
+
+    .hero-proof {
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px 28px;
+    }
+
+    .hero-proof span {
+      display:inline-flex;
+      align-items:baseline;
+      gap:7px;
+      color:rgba(255,255,255,.76);
+      font-size:13px;
+      line-height:1.5;
+    }
+
+    .hero-proof strong {
+      color:#fff;
+      font-family:var(--font-mono);
+      font-size:15px;
+      font-weight:600;
+      letter-spacing:-.02em;
+    }
+
+    .hero-scroll {
+      display:inline-flex;
+      align-items:center;
+      gap:14px;
+      min-height:44px;
+      color:rgba(255,255,255,.82);
+      font-size:12px;
+      letter-spacing:.08em;
+      white-space:nowrap;
+    }
+
+    .hero-scroll-line {
+      position:relative;
+      width:52px;
+      height:1px;
+      background:rgba(255,255,255,.38);
+      overflow:hidden;
+    }
+
+    .hero-scroll-line::after {
+      content:"";
+      position:absolute;
+      inset:0;
+      background:#fff;
+      transform:translateX(-100%);
+      animation:scrollLine 2.8s var(--ease-out) infinite;
+    }
+
+    @keyframes scrollLine {
+      0%, 18% { transform:translateX(-100%); }
+      62%, 100% { transform:translateX(100%); }
+    }
+
+    /* Intro */
+    .intro { background:var(--bg); }
+
+    .intro-grid {
+      display:grid;
+      grid-template-columns:minmax(0,.9fr) minmax(360px,1.1fr);
+      gap:clamp(48px,8vw,128px);
+      align-items:start;
+    }
+
+    .intro-copy h2 { margin-top:18px; max-width:12em; }
+    .intro-copy .body-copy { margin-top:26px; }
+
+    .loop-wrap {
+      padding-top:8px;
+    }
+
+    .loop-caption {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:24px;
+      padding-bottom:18px;
+      border-bottom:1px solid var(--border);
+      color:var(--muted);
+      font-family:var(--font-mono);
+      font-size:11px;
+      letter-spacing:.1em;
+      text-transform:uppercase;
+    }
+
+    .loop-caption strong {
+      color:var(--deep);
+      font-weight:600;
+    }
+
+    .control-loop {
+      position:relative;
+      display:grid;
+      grid-template-columns:repeat(5,minmax(0,1fr));
+      margin-top:26px;
+    }
+
+    .control-loop::before {
+      content:"";
+      position:absolute;
+      left:11px;
+      right:11px;
+      top:11px;
+      height:1px;
+      background:linear-gradient(90deg,var(--deep),var(--blue-soft));
+    }
+
+    .loop-step {
+      position:relative;
+      padding-top:34px;
+      padding-right:14px;
+    }
+
+    .loop-step::before {
+      content:"";
+      position:absolute;
+      top:4px;
+      left:0;
+      width:15px;
+      height:15px;
+      border:1px solid var(--blue);
+      border-radius:50%;
+      background:var(--bg);
+      box-shadow:0 0 0 5px var(--bg);
+    }
+
+    .loop-step:first-child::before { background:var(--deep); border-color:var(--deep); }
+
+    .loop-step span {
+      display:block;
+      color:var(--fg);
+      font-size:15px;
+      font-weight:600;
+      line-height:1.55;
+    }
+
+    .loop-step small {
+      display:block;
+      margin-top:7px;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.6;
+    }
+
+    .loop-note {
+      display:grid;
+      grid-template-columns:auto 1fr;
+      gap:14px;
+      margin-top:36px;
+      padding-top:22px;
+      border-top:1px solid var(--border);
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.75;
+    }
+
+    .loop-note strong {
+      color:var(--deep);
+      font-family:var(--font-mono);
+      font-size:12px;
+      font-weight:600;
+      letter-spacing:.08em;
+    }
+
+    /* Modules */
+    .modules {
+      padding-top:0;
+      background:var(--bg);
+    }
+
+    .modules::before {
+      content:"";
+      display:block;
+      height:1px;
+      margin-bottom:var(--section-space);
+      background:var(--border);
+    }
+
+    .modules-layout {
+      display:grid;
+      grid-template-columns:245px minmax(0,1fr);
+      gap:clamp(48px,7vw,104px);
+      align-items:start;
+    }
+
+    .module-index {
+      position:sticky;
+      top:110px;
+    }
+
+    .module-index h2 {
+      margin-top:16px;
+      color:var(--fg);
+      font-size:32px;
+      font-weight:600;
+      line-height:1.35;
+    }
+
+    .module-index > p {
+      margin-top:16px;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.75;
+    }
+
+    .index-list {
+      margin-top:32px;
+      border-top:1px solid var(--border);
+    }
+
+    .index-list a {
+      position:relative;
+      display:grid;
+      grid-template-columns:42px 1fr;
+      gap:10px;
+      align-items:center;
+      min-height:48px;
+      padding:8px 0;
+      border-bottom:1px solid var(--border);
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.5;
+      transition:color .2s var(--ease-out), padding-left .2s var(--ease-out);
+    }
+
+    .index-list a::before {
+      content:"";
+      position:absolute;
+      left:0;
+      bottom:-1px;
+      width:0;
+      height:1px;
+      background:var(--blue);
+      transition:width .3s var(--ease-out);
+    }
+
+    .index-list a:hover,
+    .index-list a:focus-visible,
+    .index-list a.is-current { color:var(--fg); }
+
+    .index-list a:hover::before,
+    .index-list a:focus-visible::before,
+    .index-list a.is-current::before { width:100%; }
+
+    .index-list a span:first-child {
+      color:var(--blue);
+      font-family:var(--font-mono);
+      font-size:11px;
+      letter-spacing:.06em;
+    }
+
+    .index-list a.is-current span:first-child { color:var(--deep); }
+
+    .module-list {
+      position:relative;
+    }
+
+    .module-list::before {
+      content:"";
+      position:absolute;
+      top:34px;
+      bottom:34px;
+      left:31px;
+      width:1px;
+      background:linear-gradient(180deg,var(--deep),var(--blue-soft) 72%,var(--border));
+    }
+
+    .module {
+      position:relative;
+      scroll-margin-top:112px;
+    }
+
+    .module-row {
+      position:relative;
+      display:grid;
+      grid-template-columns:64px minmax(0,1fr) 230px;
+      gap:clamp(24px,3.5vw,48px);
+      align-items:center;
+      min-height:202px;
+      padding:34px 0;
+      border-bottom:1px solid var(--border);
+      transition:transform .3s var(--ease-out);
+    }
+
+    .module:first-child .module-row { border-top:1px solid var(--border); }
+
+    .module-row:hover,
+    .module-row:focus-visible {
+      transform:translateX(6px);
+    }
+
+    .module-node {
+      position:relative;
+      z-index:1;
+      display:grid;
+      place-items:center;
+      width:64px;
+      height:64px;
+      border:1px solid var(--border);
+      border-radius:50%;
+      background:var(--bg);
+      color:var(--deep);
+      font-family:var(--font-mono);
+      font-size:12px;
+      font-weight:600;
+      letter-spacing:.05em;
+      transition:border-color .25s var(--ease-out), background .25s var(--ease-out), color .25s var(--ease-out), box-shadow .25s var(--ease-out);
+    }
+
+    .module-row:hover .module-node,
+    .module-row:focus-visible .module-node {
+      border-color:var(--blue);
+      background:var(--surface);
+      box-shadow:0 0 0 7px rgba(47,107,255,.08);
+    }
+
+    .module-eyebrow {
+      display:flex;
+      align-items:center;
+      flex-wrap:wrap;
+      gap:10px 14px;
+      color:var(--blue);
+      font-family:var(--font-mono);
+      font-size:10px;
+      font-weight:600;
+      line-height:1.5;
+      letter-spacing:.09em;
+      text-transform:uppercase;
+    }
+
+    .module-tag {
+      display:inline-flex;
+      align-items:center;
+      min-height:24px;
+      padding:1px 9px;
+      border:1px solid var(--border);
+      border-radius:999px;
+      background:var(--surface-soft);
+      color:var(--muted);
+      font-family:var(--font-body);
+      font-size:11px;
+      font-weight:500;
+      letter-spacing:.02em;
+    }
+
+    .module-copy h3 {
+      margin-top:10px;
+      color:var(--fg);
+      font-size:clamp(26px,2.4vw,34px);
+      font-weight:600;
+      line-height:1.35;
+      letter-spacing:0;
+    }
+
+    .module-copy p {
+      max-width:38em;
+      margin-top:10px;
+      color:var(--muted);
+      font-size:16px;
+      line-height:1.8;
+    }
+
+    .module-meta {
+      align-self:stretch;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      padding:4px 0;
+    }
+
+    .module-meta-label {
+      color:var(--muted);
+      font-family:var(--font-mono);
+      font-size:10px;
+      line-height:1.5;
+      letter-spacing:.1em;
+      text-transform:uppercase;
+    }
+
+    .module-action {
+      display:inline-flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      min-height:44px;
+      padding-top:16px;
+      border-top:1px solid var(--border);
+      color:var(--deep);
+      font-size:13px;
+      font-weight:600;
+    }
+
+    .module-action svg {
+      width:18px;
+      height:18px;
+      fill:none;
+      stroke:currentColor;
+      stroke-width:1.7;
+      transition:transform .25s var(--ease-out);
+    }
+
+    .module-row:hover .module-action svg,
+    .module-row:focus-visible .module-action svg { transform:translate(3px,-3px); }
+
+    .module-note {
+      display:flex;
+      align-items:flex-start;
+      gap:14px;
+      margin-top:32px;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.75;
+    }
+
+    .module-note::before {
+      content:"";
+      flex:0 0 auto;
+      width:7px;
+      height:7px;
+      margin-top:7px;
+      border-radius:50%;
+      background:var(--blue);
+    }
+
+    /* Scale */
+    .scale {
+      padding-block:clamp(76px,8vw,116px);
+      background:var(--surface);
+      border-block:1px solid var(--border);
+    }
+
+    .scale-head {
+      display:grid;
+      grid-template-columns:minmax(0,1fr) minmax(320px,.8fr);
+      gap:clamp(32px,6vw,96px);
+      align-items:end;
+    }
+
+    .scale-head h2 { margin-top:16px; max-width:11em; }
+    .scale-head p { justify-self:end; color:var(--muted); font-size:15px; line-height:1.8; }
+
+    .scale-grid {
+      display:grid;
+      grid-template-columns:repeat(6,minmax(0,1fr));
+      margin-top:clamp(44px,5vw,64px);
+      border-top:1px solid var(--border);
+      border-left:1px solid var(--border);
+    }
+
+    .scale-item {
+      min-height:154px;
+      padding:28px 20px 24px;
+      border-right:1px solid var(--border);
+      border-bottom:1px solid var(--border);
+    }
+
+    .scale-value {
+      color:var(--deep);
+      font-family:var(--font-mono);
+      font-size:clamp(32px,3.6vw,48px);
+      font-weight:500;
+      line-height:1.1;
+      letter-spacing:-.05em;
+    }
+
+    .scale-label {
+      display:block;
+      margin-top:20px;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.5;
+    }
+
+    /* Boundary */
+    .boundary { background:var(--bg); }
+
+    .boundary-inner {
+      display:grid;
+      grid-template-columns:280px minmax(0,1fr);
+      gap:clamp(36px,7vw,100px);
+      align-items:start;
+    }
+
+    .boundary-label {
+      color:var(--blue);
+      font-family:var(--font-mono);
+      font-size:11px;
+      font-weight:600;
+      line-height:1.6;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+    }
+
+    .boundary-quote {
+      padding-top:0;
+    }
+
+    .boundary-quote h2 {
+      max-width:15em;
+      color:var(--fg);
+      font-size:clamp(28px,3vw,42px);
+      font-weight:500;
+      line-height:1.45;
+      letter-spacing:0;
+    }
+
+    .boundary-quote p {
+      max-width:48em;
+      margin-top:24px;
+      color:var(--muted);
+      font-size:16px;
+      line-height:1.85;
+    }
+
+    .boundary-rule {
+      margin-top:38px;
+      padding:22px 0;
+      border-top:1px solid var(--border);
+      border-bottom:1px solid var(--border);
+      color:var(--fg);
+      font-size:15px;
+      line-height:1.8;
+    }
+
+    .boundary-rule strong {
+      color:var(--deep);
+      font-weight:600;
+    }
+
+    /* Contact */
+    .contact-band {
+      padding-block:var(--section-space);
+      background:var(--surface);
+      border-top:1px solid var(--border);
+    }
+
+    .contact-inner {
+      display:grid;
+      grid-template-columns:minmax(0,1fr) auto;
+      gap:48px;
+      align-items:end;
+    }
+
+    .contact-inner h2 {
+      max-width:13em;
+      color:var(--fg);
+      font-size:clamp(28px,3vw,42px);
+      font-weight:600;
+      line-height:1.38;
+    }
+
+    .contact-inner p {
+      max-width:42em;
+      margin-top:18px;
+      color:var(--muted);
+      font-size:15px;
+      line-height:1.8;
+    }
+
+    .contact-link {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:52px;
+      padding:0 26px;
+      border-radius:999px;
+      background:var(--accent);
+      color:#fff;
+      font-size:15px;
+      font-weight:600;
+      letter-spacing:.02em;
+      box-shadow:0 14px 36px rgba(255,90,31,.22);
+      transition:background .2s var(--ease-out), transform .2s var(--ease-out), box-shadow .2s var(--ease-out);
+    }
+
+    .contact-link:hover {
+      background:oklch(from var(--accent) calc(l - .06) c h);
+      transform:translateY(-2px);
+      box-shadow:0 18px 40px rgba(255,90,31,.28);
+    }
+
+    /* Footer */
+    .site-footer {
+      background:var(--deep);
+      color:#fff;
+      padding-top:clamp(64px,7vw,92px);
+    }
+
+    .footer-grid {
+      display:grid;
+      grid-template-columns:1.35fr .8fr .9fr .8fr;
+      gap:clamp(32px,5vw,72px);
+      padding-bottom:56px;
+    }
+
+    .footer-brand {
+      font-size:20px;
+      font-weight:600;
+      line-height:1.5;
+    }
+
+    .footer-brand p {
+      max-width:22em;
+      margin-top:18px;
+      color:rgba(255,255,255,.68);
+      font-size:14px;
+      font-weight:400;
+      line-height:1.8;
+    }
+
+    .footer-col h2 {
+      color:rgba(255,255,255,.54);
+      font-size:11px;
+      font-weight:500;
+      line-height:1.5;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+    }
+
+    .footer-col ul {
+      display:grid;
+      gap:10px;
+      margin-top:20px;
+    }
+
+    .footer-col a,
+    .footer-col span {
+      display:inline-flex;
+      align-items:center;
+      min-height:32px;
+      color:rgba(255,255,255,.82);
+      font-size:14px;
+      line-height:1.6;
+    }
+
+    .footer-col a:hover { color:#fff; text-decoration:underline; text-underline-offset:4px; }
+
+    .footer-bottom {
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:24px;
+      min-height:72px;
+      border-top:1px solid rgba(255,255,255,.18);
+      color:rgba(255,255,255,.58);
+      font-family:var(--font-mono);
+      font-size:11px;
+      line-height:1.6;
+      letter-spacing:.04em;
+    }
+
+    @media (max-width:1080px) {
+      .module-row { grid-template-columns:64px minmax(0,1fr) 190px; }
+      .scale-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
+    }
+
+    @media (max-width:900px) {
+      .header-inner { grid-template-columns:1fr auto; }
+      .site-nav {
+        position:fixed;
+        inset:76px 16px auto;
+        display:none;
+        flex-direction:column;
+        align-items:stretch;
+        gap:0;
+        padding:12px 20px;
+        border:1px solid var(--border);
+        border-radius:20px;
+        background:rgba(255,255,255,.96);
+        color:var(--fg);
+        box-shadow:0 24px 60px rgba(22,35,58,.16);
+        -webkit-backdrop-filter:blur(18px);
+        backdrop-filter:blur(18px);
+      }
+
+      .site-nav.is-open { display:flex; }
+      .site-nav a { min-height:48px; border-bottom:1px solid var(--border); }
+      .site-nav a:last-child { border-bottom:0; }
+      .site-nav a::after { bottom:9px; }
+      .nav-cta { display:none; }
+      .nav-toggle { display:block; }
+      .hero-bottom { align-items:flex-start; flex-direction:column; }
+      .intro-grid,
+      .scale-head,
+      .boundary-inner { grid-template-columns:1fr; }
+      .scale-head p { justify-self:start; }
+      .modules-layout { grid-template-columns:1fr; }
+      .module-index { position:static; }
+      .index-list { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); border-bottom:1px solid var(--border); }
+      .index-list a { grid-template-columns:1fr; gap:2px; padding:10px 6px; text-align:center; }
+      .index-list a::before { bottom:-1px; }
+      .index-list a span:first-child { display:block; }
+      .module-row { grid-template-columns:64px minmax(0,1fr); }
+      .module-meta { grid-column:2; align-self:auto; flex-direction:row; align-items:center; gap:20px; padding:0; }
+      .module-meta-label { display:none; }
+      .module-action { flex:1; padding-top:0; border-top:0; }
+      .contact-inner { grid-template-columns:1fr; align-items:start; }
+      .contact-link { justify-self:start; }
+      .footer-grid { grid-template-columns:1.25fr 1fr 1fr; }
+      .footer-col:last-child { grid-column:2 / 4; }
+    }
+
+    @media (max-width:680px) {
+      body { font-size:16px; }
+      .header-inner { min-height:70px; }
+      .site-nav { top:70px; }
+      .brand { font-size:16px; }
+      .hero { min-height:780px; }
+      .hero-inner { padding-top:110px; padding-bottom:44px; }
+      .hero-panel { padding:28px 22px 24px; border-radius:28px; }
+      .hero h1 { margin-top:16px; }
+      .hero-subtitle { font-size:23px; line-height:1.5; }
+      .hero-lede { font-size:14px; }
+      .hero-bottom { margin-top:30px; gap:14px; }
+      .hero-proof { gap:6px 18px; }
+      .hero-scroll { min-height:36px; }
+      .intro-grid { gap:44px; }
+      .control-loop { grid-template-columns:1fr; gap:0; }
+      .control-loop::before { top:10px; bottom:22px; left:7px; right:auto; width:1px; height:auto; background:linear-gradient(180deg,var(--deep),var(--blue-soft)); }
+      .loop-step { min-height:74px; padding:0 0 28px 36px; }
+      .loop-step::before { top:7px; left:0; }
+      .loop-step:last-child { min-height:0; padding-bottom:0; }
+      .index-list { grid-template-columns:repeat(5,minmax(0,1fr)); }
+      .index-list a span:last-child { font-size:11px; }
+      .module-list::before { left:22px; }
+      .module-row { grid-template-columns:46px minmax(0,1fr); gap:18px; min-height:0; padding:30px 0; }
+      .module-node { width:46px; height:46px; font-size:10px; }
+      .module-copy h3 { font-size:25px; }
+      .module-copy p { font-size:15px; }
+      .module-meta { grid-column:2; }
+      .module-action { font-size:12px; }
+      .scale-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .scale-item { min-height:136px; padding:24px 16px 20px; }
+      .scale-value { font-size:34px; }
+      .boundary-inner { gap:20px; }
+      .boundary-quote h2 { font-size:29px; }
+      .contact-link { width:100%; }
+      .footer-grid { grid-template-columns:1fr 1fr; gap:38px 24px; }
+      .footer-brand { grid-column:1 / -1; }
+      .footer-col:last-child { grid-column:1 / -1; }
+      .footer-bottom { align-items:flex-start; flex-direction:column; justify-content:center; padding-block:18px; }
+    }
+
+    @media (max-width:400px) {
+      .hero-proof span { font-size:12px; }
+      .hero-proof strong { font-size:13px; }
+      .index-list a { padding-inline:2px; }
+      .index-list a span:last-child { font-size:10px; }
+    }
+
+    @media (prefers-reduced-motion:reduce) {
+      html { scroll-behavior:auto; }
+      *,
+      *::before,
+      *::after {
+        animation-duration:.01ms !important;
+        animation-iteration-count:1 !important;
+        transition-duration:.01ms !important;
+      }
+
+      .js .reveal,
+      .js .reveal.is-visible {
+        opacity:1;
+        transform:none;
+      }
+    }
+  </style>
+  <script>document.documentElement.classList.add('js');</script>
+<style>
+.inline-figure{margin:56px auto;max-width:1200px;padding-inline:clamp(20px,5vw,64px);box-sizing:border-box}
+.inline-figure .fig-box{border-radius:24px;overflow:hidden;box-shadow:0 28px 70px rgba(48,58,86,.14);border:1px solid #DDE2EA}
+.inline-figure img{display:block;width:100%;height:clamp(220px,30vw,400px);object-fit:cover}
+.inline-figure figcaption{padding:14px 22px;font-size:14px;line-height:1.6;color:#6B7689;background:#fff}
+</style>
+<style>
+svg{max-width:100%;vertical-align:middle}
+.button svg,.button--primary svg,.button--glass svg,button svg,a.button svg,.hero-actions svg{width:18px;height:18px;flex:none;display:inline-block}
+</style>
+<style>
+[class*="node"] svg,[class*="icon"] svg,[class*="step"] svg,[class*="badge"] svg,[class*="mark"] svg,[class*="chip"] svg{width:44px;height:44px;flex:none;display:inline-block}
+[class*="number"] svg,[class*="num"] svg{width:32px;height:32px}
+</style>
+<style>
+[class*="hero"] img{object-fit:cover;object-position:center;max-height:96vh}
+</style>
+<style>
+[class*="scene"] img,[class*="media"] img:not(.hero-photo),[class*="shot"] img{height:auto;max-height:520px;object-fit:cover;width:100%}
+</style>
+<style>
+.hero img,section img,figure img{max-width:100%}
+</style>
+<style>
+.hero__media{overflow:hidden;width:100%}
+.hero__image{width:100%;height:100%;object-fit:cover;display:block}
+</style>
+<style>
+.hero__image{transform:none!important}
+</style>
+<style>
+.glass{position:relative;isolation:isolate;
+background:rgba(255,255,255,.10)!important;
+-webkit-backdrop-filter:blur(24px) saturate(180%)!important;
+backdrop-filter:blur(24px) saturate(180%)!important;
+border:1.5px solid rgba(255,255,255,.45)!important;border-radius:28px!important;
+box-shadow:0 28px 90px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.65)!important;
+overflow:hidden;}
+.glass::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+background:linear-gradient(148deg,rgba(255,255,255,.30) 0%,rgba(255,255,255,.06) 30%,rgba(255,255,255,0) 52%);}
+.glass::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),inset 0 24px 48px -24px rgba(255,255,255,.28);}
+.glass > *{position:relative;z-index:1}
+</style>
+<link rel="stylesheet" href="assets/mobile.css">
+<link rel="stylesheet" href="assets/gidx.css">
+<link rel="stylesheet" href="assets/cap-layout.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主要内容</a>
+
+  <header class="site-header" id="site-header" data-od-id="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="index.html" aria-label="Astraea Plan 首页">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>Astraea Plan</span>
+      </a>
+
+      <nav class="site-nav" id="site-nav" aria-label="主导航">
+        <a href="capabilities.html">能力</a>
+        <a href="architecture.html" aria-current="page">架构</a>
+        <a href="cases.html">案例</a>
+        <a href="pricing.html">投入</a>
+        <a href="about.html">关于</a>
+      </nav>
+
+      <a class="nav-cta" href="about.html#contact">预约演示</a>
+
+      <button class="nav-toggle" type="button" aria-label="打开导航" aria-expanded="false" aria-controls="site-nav">
+        <span aria-hidden="true"></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" data-od-id="architecture-hero" aria-labelledby="hero-title">
+      <div class="container hero-inner">
+        <div class="glass hero-panel">
+          <p class="hero-kicker">Architecture / 架构总览</p>
+          <h1 id="hero-title">架构</h1>
+          <p class="hero-subtitle">五个部件，让智能体像一支有编制的队伍。</p>
+          <p class="hero-lede">不是把模型和工具摆在一起，而是把总控、模型、知识、协作与自愈编成一条可调度、可隔离、可恢复的工作链。</p>
+          <div class="hero-bottom">
+            <div class="hero-proof" aria-label="系统规模">
+              <span><strong>10</strong> 个部门</span>
+              <span><strong>14</strong> 个智能体</span>
+              <span><strong>182</strong> 个定时任务</span>
+            <nav class="gidx" aria-label="架构部件"><div class="gidx__h">架构部件</div><div class="gidx__list"><a class="gidx__i" href="arch-cluster.html"><span class="gidx__n">01</span><span class="gidx__t">总控集群</span><span class="gidx__a" aria-hidden="true">→</span></a><a class="gidx__i" href="arch-models.html"><span class="gidx__n">02</span><span class="gidx__t">双模型通道</span><span class="gidx__a" aria-hidden="true">→</span></a><a class="gidx__i" href="arch-knowledge.html"><span class="gidx__n">03</span><span class="gidx__t">部门知识库</span><span class="gidx__a" aria-hidden="true">→</span></a><a class="gidx__i" href="arch-a2a.html"><span class="gidx__n">04</span><span class="gidx__t">A2A 协议</span><span class="gidx__a" aria-hidden="true">→</span></a><a class="gidx__i" href="arch-selfheal.html"><span class="gidx__n">05</span><span class="gidx__t">自愈</span><span class="gidx__a" aria-hidden="true">→</span></a></div></nav></div>
+            <span class="hero-scroll">向下查看编排关系 <i class="hero-scroll-line" aria-hidden="true"></i></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section intro" data-od-id="architecture-overview" aria-labelledby="overview-title">
+      <div class="container intro-grid">
+        <div class="intro-copy reveal">
+          <p class="eyebrow">The orchestration map</p>
+          <h2 class="display-title" id="overview-title">五个部件，不是五座孤岛。</h2>
+          <p class="body-copy">总控集群负责拆解与派发，部门智能体执行具体任务。知识库给出业务依据，模型通道完成生成与判断，自愈机制守住任务闭环。协作协议只在需要跨部门时被启用。</p>
+        </div>
+
+        <div class="loop-wrap reveal" data-od-id="task-orchestration-loop">
+          <div class="loop-caption">
+            <span>单次任务的编排路径</span>
+            <strong>Closed loop</strong>
+          </div>
+          <ol class="control-loop" aria-label="单次任务编排路径">
+            <li class="loop-step"><span>任务下发</span><small>总控识别意图与责任部门</small></li>
+            <li class="loop-step"><span>部门执行</span><small>对应智能体接单并拆解动作</small></li>
+            <li class="loop-step"><span>依据检索</span><small>部门知识库提供私有上下文</small></li>
+            <li class="loop-step"><span>模型生成</span><small>主力通道执行，兜底随时接管</small></li>
+            <li class="loop-step"><span>校验回流</span><small>失败重试、告警与结果归档</small></li>
+          </ol>
+          <div class="loop-note">
+            <strong>Control</strong>
+            <span>编排关系固定，启用方式按场景变化。A2A 只在跨部门协作真正发生时接入。</span>
+          </div>
+        </div>
+      </div>
+    </section>
+<figure class="inline-figure"><div class="fig-box"><img decoding="async" fetchpriority="high" src="data:image/jpeg;base64,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kw9MKQAEAQAQogESwBAAihEAIBKEACEEoBBEsBEEoBCxAQQREspLEEsEQQCxEARCxAQQSwQEoRARAEsEANOMXTQARAEApAQAEBLALCAQAQCKESwCASgQgEQgEoEQpBEEEEsoRBLBEAQsRAEQpBBEEoRBKBEBLEEAsQANPDF0gEAQCoESwEAEsApAEAEBCwQCkARAEEECKEQKQRAQRAEsEBLARCkEQEESywQEQSrBEKQRLARAELEsBALNPDF0RFqABAEBABLAKgQQCkBAEQBChAEQEsBKEQLEBBCAShEEQKgRAQsQRAIQSgRCkEQELBARAELBACCwg08MXQBUAgsAgASyhCwBALEBAEApBBABAEsEBASywRAQBLBARAsQELEAhBASwQBELEsBASwQBEASwQAQsQANKTFvqAFIoAgsAgAIoQsBAEQKgEsAELEsEEEBLAEAhBKEQSgRAQRChEEBECkESywQAhLAEESwEsAQEEEoEgNKMe8gBSCwCAKEACAQsKQBEAQBALEBAIQSgEEIBLEASwBBCKEQQEQKgEESywQAQsQRAEAsQEsBEEoEQANITHuqAKIAUgAIBCwogAQQQAQoQEQBChARLAQsEEEEoEQBLBAQEQKQRAEsAgELEEEBAEQoQBIKQQQCiDSDHtIACAAihFsEAQCAFIQSrAQBASywCARAELCBAEoEQQihARBABCwRBKAQRCkEEAEESyhAEQpBBABCwDRkybKgBSAQsAAgELAEoAgEBCwoRAEAhBKsBAQQigRAIoRBAQCxAEQKgEEQpLEEARChAEQEsoRAEASwADREya7AEWwBCwAEKELAEACKEAEARLAQBKESwEKIQQsBCwQEBECkEEApASxBKEQBBEsBKBEAQEsAQBLABADRIyagBKsFAIACAQsASrAQBAAgESwpAELCxAQBCwsQCARBALEAQCxAIBLBAEQBAKQQQEQKQBAEQoQAA0IyaQtgAIABAAQoBAQUCBEACCgSAQpAQAEECoCBEBCxAAgELAILECAQQBCgIEgAskABAQQKQAAP/8QAFBABAAAAAAAAAAAAAAAAAAAAwP/aAAgBAQABBQJeH//EABQRAQAAAAAAAAAAAAAAAAAAAKD/2gAIAQMBAT8BY5//xAAUEQEAAAAAAAAAAAAAAAAAAACg/9oACAECAQE/AWOf/8QAFBABAAAAAAAA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" alt="Astraea Plan 运行场景"></div></figure>
+
+
+    <section class="section modules" data-od-id="architecture-modules" aria-labelledby="modules-title">
+      <div class="container modules-layout">
+        <aside class="module-index reveal">
+          <p class="eyebrow">Module index</p>
+          <h2 id="modules-title">编排轴</h2>
+          <p>从调度到恢复，每个部件只回答一个明确问题。</p>
+          <ol class="index-list">
+            <li><a href="#module-cluster" data-index-target="module-cluster"><span>01</span><span>总控集群</span></a></li>
+            <li><a href="#module-models" data-index-target="module-models"><span>02</span><span>双模型通道</span></a></li>
+            <li><a href="#module-knowledge" data-index-target="module-knowledge"><span>03</span><span>部门知识库</span></a></li>
+            <li><a href="#module-a2a" data-index-target="module-a2a"><span>04</span><span>A2A 协议</span></a></li>
+            <li><a href="#module-selfheal" data-index-target="module-selfheal"><span>05</span><span>自愈</span></a></li>
+          </ol>
+        </aside>
+
+        <div class="module-list">
+          <article class="module reveal" id="module-cluster" data-od-id="module-cluster">
+            <a class="module-row" href="arch-cluster.html" aria-label="查看总控集群模块">
+              <span class="module-node" aria-hidden="true">01</span>
+              <div class="module-copy">
+                <div class="module-eyebrow"><span>Control plane</span><span class="module-tag">统一调度</span></div>
+                <h3>总控集群</h3>
+                <p>一个总控调度多个部门智能体，把任务分给正确的人、正确的知识域和正确的执行链。</p>
+              </div>
+              <div class="module-meta">
+                <span class="module-meta-label">Role / 调度中枢</span>
+                <span class="module-action">查看模块
+                  <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5.5 14.5 14.5 5.5M7 5.5h7.5V13"/></svg>
+                </span>
+              </div>
+            </a>
+          </article>
+
+          <article class="module reveal" id="module-models" data-od-id="module-models">
+            <a class="module-row" href="arch-models.html" aria-label="查看双模型通道模块">
+              <span class="module-node" aria-hidden="true">02</span>
+              <div class="module-copy">
+                <div class="module-eyebrow"><span>Model channel</span><span class="module-tag">故障切换</span></div>
+                <h3>双模型通道</h3>
+                <p>主力模型与兜底模型并行配置。主通道异常时自动切换，任务不因单点故障停在半途。</p>
+              </div>
+              <div class="module-meta">
+                <span class="module-meta-label">Role / 连续执行</span>
+                <span class="module-action">查看模块
+                  <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5.5 14.5 14.5 5.5M7 5.5h7.5V13"/></svg>
+                </span>
+              </div>
+            </a>
+          </article>
+
+          <article class="module reveal" id="module-knowledge" data-od-id="module-knowledge">
+            <a class="module-row" href="arch-knowledge.html" aria-label="查看部门知识库模块">
+              <span class="module-node" aria-hidden="true">03</span>
+              <div class="module-copy">
+                <div class="module-eyebrow"><span>Knowledge boundary</span><span class="module-tag">部门隔离</span></div>
+                <h3>部门知识库</h3>
+                <p>每个部门拥有独立知识库，数据边界与权限边界同时隔离。智能体只调用职责范围以内的知识。</p>
+              </div>
+              <div class="module-meta">
+                <span class="module-meta-label">Role / 私有上下文</span>
+                <span class="module-action">查看模块
+                  <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5.5 14.5 14.5 5.5M7 5.5h7.5V13"/></svg>
+                </span>
+              </div>
+            </a>
+          </article>
+
+          <article class="module reveal" id="module-a2a" data-od-id="module-a2a">
+            <a class="module-row" href="arch-a2a.html" aria-label="查看 A2A 智能体间协议模块">
+              <span class="module-node" aria-hidden="true">04</span>
+              <div class="module-copy">
+                <div class="module-eyebrow"><span>Agent to agent</span><span class="module-tag">按需启用</span></div>
+                <h3>A2A 智能体间协议</h3>
+                <p>能力已具备，按场景启用。跨部门任务需要直接协商、交接或联合判断时，再由总控打开协作链路。</p>
+              </div>
+              <div class="module-meta">
+                <span class="module-meta-label">Role / 跨部门协作</span>
+                <span class="module-action">查看模块
+                  <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5.5 14.5 14.5 5.5M7 5.5h7.5V13"/></svg>
+                </span>
+              </div>
+            </a>
+          </article>
+
+          <article class="module reveal" id="module-selfheal" data-od-id="module-selfheal">
+            <a class="module-row" href="arch-selfheal.html" aria-label="查看自愈模块">
+              <span class="module-node" aria-hidden="true">05</span>
+              <div class="module-copy">
+                <div class="module-eyebrow"><span>Resilience</span><span class="module-tag">失败重试</span></div>
+                <h3>自愈</h3>
+                <p>定时任务失败后自动重试并触发告警。系统记录失败上下文，把不可恢复的问题交给对应负责人。</p>
+              </div>
+              <div class="module-meta">
+                <span class="module-meta-label">Role / 闭环恢复</span>
+                <span class="module-action">查看模块
+                  <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5.5 14.5 14.5 5.5M7 5.5h7.5V13"/></svg>
+                </span>
+              </div>
+            </a>
+          </article>
+
+          <p class="module-note reveal">五个模块共同构成一条可运行的指挥链，不以工具数量衡量复杂度，而以职责是否清楚、边界是否稳定、故障是否可恢复来判断系统成熟度。</p>
+        </div>
+      </div>
+    </section>
+<figure class="inline-figure"><div class="fig-box"><img loading="lazy" decoding="async" src="assets/wave-1.jpg" alt="Astraea Plan 运行场景"></div></figure>
+
+
+    <section class="scale" data-od-id="architecture-scale" aria-labelledby="scale-title">
+      <div class="container">
+        <div class="scale-head reveal">
+          <div>
+            <p class="eyebrow">Operating scale</p>
+            <h2 class="display-title" id="scale-title">七个多月，验证同一套编排方式。</h2>
+          </div>
+          <p>不是概念演示。系统已经在连锁零售的真实组织、门店和任务节奏中运行。</p>
+        </div>
+
+        <dl class="scale-grid reveal" aria-label="真实运行体量">
+          <div class="scale-item"><dd class="scale-value">200+</dd><dt class="scale-label">门店</dt></div>
+          <div class="scale-item"><dd class="scale-value">49</dd><dt class="scale-label">城市</dt></div>
+          <div class="scale-item"><dd class="scale-value">10</dd><dt class="scale-label">部门</dt></div>
+          <div class="scale-item"><dd class="scale-value">14</dd><dt class="scale-label">智能体</dt></div>
+          <div class="scale-item"><dd class="scale-value">182</dd><dt class="scale-label">定时任务</dt></div>
+          <div class="scale-item"><dd class="scale-value">7</dd><dt class="scale-label">个月</dt></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="section boundary" data-od-id="architecture-boundary" aria-labelledby="boundary-title">
+      <div class="container boundary-inner">
+        <p class="boundary-label reveal">Deployment boundary / 部署边界</p>
+        <div class="boundary-quote reveal">
+          <h2 id="boundary-title">智能体在总部编排，数据留在公司边界内。</h2>
+          <p>总控、模型通道、知识库与自动化任务都在私有化环境里协同。门店监控由总部运营智能体直连门店读帧，不在门店端额外部署智能体，也不把一线设备改造成另一套系统。</p>
+          <div class="boundary-rule"><strong>门店监控：</strong>总部运营智能体直连门店读帧，统一判断、统一调度、统一留痕。</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="contact-band" id="contact" data-od-id="architecture-contact" aria-labelledby="contact-title">
+      <div class="container contact-inner reveal">
+        <div>
+          <h2 id="contact-title">把智能体编成队伍，而不是堆成工具。</h2>
+          <p>如果你的组织已经有多个模型、多个部门和大量定时任务，下一步不是再加一个入口，而是让它们共用一条可治理的指挥链。</p>
+        </div>
+        <a class="contact-link" href="about.html#contact">预约演示</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer" data-od-id="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          Astraea Plan
+          <p>给连锁企业装一套私有化智能体团队，数据不出公司。</p>
+        </div>
+
+        <nav class="footer-col" aria-label="能力页脚导航">
+          <h2>能力</h2>
+          <ul>
+            <li><a href="capabilities.html">能力总览</a></li>
+            <li><a href="capabilities.html#store-monitoring">门店监控</a></li>
+            <li><a href="capabilities.html#automation">定时任务</a></li>
+            <li><a href="cases.html">客户案例</a></li>
+          </ul>
+        </nav>
+
+        <nav class="footer-col" aria-label="架构页脚导航">
+          <h2>架构</h2>
+          <ul>
+            <li><a href="arch-cluster.html">总控集群</a></li>
+            <li><a href="arch-models.html">双模型通道</a></li>
+            <li><a href="arch-knowledge.html">部门知识库</a></li>
+            <li><a href="arch-a2a.html">A2A 协议</a></li>
+            <li><a href="arch-selfheal.html">自愈</a></li>
+          </ul>
+        </nav>
+
+        <div class="footer-col">
+          <h2>联系</h2>
+          <ul>
+            <li><a href="about.html#contact">预约演示</a></li>
+            <li><a href="about.html">关于 Astraea Plan</a></li>
+            <li><a href="pricing.html">投入方式</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>© 2026 Astraea Plan · 数据不出公司</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      var header = document.getElementById('site-header');
+      var nav = document.getElementById('site-nav');
+      var toggle = document.querySelector('.nav-toggle');
+      var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      function syncHeader() {
+        var threshold = Math.max(120, window.innerHeight - 80);
+        header.classList.toggle('is-scrolled', window.scrollY > threshold);
+      }
+
+      function closeNav() {
+        nav.classList.remove('is-open');
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.setAttribute('aria-label', '打开导航');
+        document.body.classList.remove('nav-open');
+      }
+
+      toggle.addEventListener('click', function () {
+        var open = toggle.getAttribute('aria-expanded') === 'true';
+        if (open) {
+          closeNav();
+        } else {
+          nav.classList.add('is-open');
+          toggle.setAttribute('aria-expanded', 'true');
+          toggle.setAttribute('aria-label', '关闭导航');
+          document.body.classList.add('nav-open');
+        }
+      });
+
+      nav.addEventListener('click', function (event) {
+        if (event.target.closest('a')) closeNav();
+      });
+
+      document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && nav.classList.contains('is-open')) {
+          closeNav();
+          toggle.focus();
+        }
+      });
+
+      window.addEventListener('resize', function () {
+        if (window.innerWidth > 900) closeNav();
+        syncHeader();
+      });
+
+      window.addEventListener('scroll', syncHeader, { passive: true });
+      syncHeader();
+
+      var revealItems = document.querySelectorAll('.reveal');
+      if (reduceMotion || !('IntersectionObserver' in window)) {
+        revealItems.forEach(function (item) { item.classList.add('is-visible'); });
+      } else {
+        var revealObserver = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add('is-visible');
+            revealObserver.unobserve(entry.target);
+          });
+        }, { threshold: 0.14, rootMargin: '0px 0px -7% 0px' });
+        revealItems.forEach(function (item) { revealObserver.observe(item); });
+      }
+
+      var moduleSections = document.querySelectorAll('.module[id]');
+      var indexLinks = document.querySelectorAll('[data-index-target]');
+      if ('IntersectionObserver' in window && moduleSections.length) {
+        var moduleObserver = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (!entry.isIntersecting) return;
+            indexLinks.forEach(function (link) {
+              var active = link.getAttribute('data-index-target') === entry.target.id;
+              link.classList.toggle('is-current', active);
+              if (active) link.setAttribute('aria-current', 'location');
+              else link.removeAttribute('aria-current');
+            });
+          });
+        }, { rootMargin: '-34% 0px -52% 0px', threshold: 0 });
+        moduleSections.forEach(function (section) { moduleObserver.observe(section); });
+      }
+    })();
+  </script>
+
+
+
+
+<script id="menu-final-js">
+(function(){
+  if(window.__menuFinal)return; window.__menuFinal=true;
+  function build(){
+    var old=document.getElementById('__menuPanel'); if(old)old.remove();
+    var p=document.createElement('div'); p.id='__menuPanel';
+    var links=[];
+    var src=document.querySelector('header nav, .mobile-panel, .mobile-menu, nav');
+    if(src){src.querySelectorAll('a').forEach(function(a){
+      var t=(a.textContent||'').trim(); if(!t||t.length>16)return;
+      var h=a.getAttribute('href')||'#'; if(h==='#'||h.charAt(0)==='#')return;
+      if(/演示|预约/.test(t))return;
+      if(links.some(function(x){return x[0]===t;}))return;
+      links.push([t,h]);});}
+    if(links.length<3){
+      links=[['能力','capabilities.html'],['架构','architecture.html'],['案例','cases.html'],['投入','pricing.html'],['关于','about.html']];
+    }
+    if(!links.some(function(x){return x[0]==='首页';})) links.unshift(['首页','index.html']);
+    var html='<div class="__close"><span id="__menuClose">✕</span></div>';
+    links.forEach(function(l){ html+='<a href="'+l[1]+'">'+l[0]+'</a>'; });
+    html+='<a href="pricing.html" class="__cta">预约演示</a>';
+    p.innerHTML=html; document.body.appendChild(p);
+    p.addEventListener('click',function(e){ if(e.target.id==='__menuClose'||e.target.tagName==='A'){p.classList.remove('__open');document.documentElement.classList.remove('__navopen');} });
+  }
+  function toggle(){
+    var p=document.getElementById('__menuPanel'); if(!p){build();p=document.getElementById('__menuPanel');}
+    var open=p.classList.toggle('__open');
+    document.documentElement.classList.toggle('__navopen',open);
+    var btn=document.querySelector('[class*="menu-toggle"],[class*="nav-toggle"]');
+    if(btn)btn.setAttribute('aria-expanded',open?'true':'false');
+  }
+  document.addEventListener('click',function(e){
+    var btn=e.target.closest('[class*="menu-toggle"],[class*="nav-toggle"]');
+    if(!btn)return;
+    e.preventDefault(); e.stopImmediatePropagation(); e.stopPropagation();
+    toggle();
+  },true);
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',build); else build();
+})();
+</script>
+
+</body>
+</html>
