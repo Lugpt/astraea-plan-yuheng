@@ -67,3 +67,17 @@
   .section.capabilities .capability p { font-size: 15px !important; }
   .section.capabilities .capability-points li { font-size: 14px !important; }
 }
+
+/* 架构区：去掉中间突兀的竖版摄影图，示意图占满右栏 */
+.section.architecture .architecture-board {
+  display: block !important; max-width: 100% !important;
+}
+.section.architecture figure.architecture-photo,
+.section.architecture .architecture-photo { display: none !important; }
+.section.architecture .private-boundary {
+  width: 100% !important; max-width: 100% !important; margin: 0 !important;
+  padding: 28px 30px !important; box-sizing: border-box !important;
+}
+@media (max-width: 768px) {
+  .section.architecture .private-boundary { padding: 20px 18px !important; }
+}
