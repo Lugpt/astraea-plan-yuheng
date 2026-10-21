@@ -1042,27 +1042,26 @@ box-shadow:0 28px 90px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.65)!impor
   function build(){
     var old=document.getElementById('__menuPanel'); if(old)old.remove();
     var p=document.createElement('div'); p.id='__menuPanel';
-    var src=document.querySelector('header nav, .mobile-panel, .mobile-menu, nav');
     var links=[];
+    var src=document.querySelector('header nav, .mobile-panel, .mobile-menu, nav');
     if(src){src.querySelectorAll('a').forEach(function(a){
-      if(a.closest('#__menuPanel'))return;
       var t=(a.textContent||'').trim(); if(!t||t.length>16)return;
       var h=a.getAttribute('href')||'#'; if(h==='#'||h.charAt(0)==='#')return;
+      if(/演示|预约/.test(t))return;
       if(links.some(function(x){return x[0]===t;}))return;
       links.push([t,h]);});}
     if(links.length<3){
-      links=[['首页','index.html'],['能力','capabilities.html'],['架构','architecture.html'],['案例','cases.html'],['投入','pricing.html'],['关于','about.html']];
+      links=[['能力','capabilities.html'],['架构','architecture.html'],['案例','cases.html'],['投入','pricing.html'],['关于','about.html']];
     }
+    if(!links.some(function(x){return x[0]==='首页';})) links.unshift(['首页','index.html']);
     var html='<div class="__close"><span id="__menuClose">✕</span></div>';
-    links.forEach(function(l){
-      var isCta=/演示|预约/.test(l[0]);
-      html+='<a href="'+l[1]+'"'+(isCta?' class="__cta"':'')+'>'+l[0]+'</a>';
-    });
+    links.forEach(function(l){ html+='<a href="'+l[1]+'">'+l[0]+'</a>'; });
+    html+='<a href="pricing.html" class="__cta">预约演示</a>';
     p.innerHTML=html; document.body.appendChild(p);
     p.addEventListener('click',function(e){ if(e.target.id==='__menuClose'||e.target.tagName==='A'){p.classList.remove('__open');document.documentElement.classList.remove('__navopen');} });
   }
   function toggle(){
-    var p=document.getElementById('__menuPanel'); if(!p)build(),p=document.getElementById('__menuPanel');
+    var p=document.getElementById('__menuPanel'); if(!p){build();p=document.getElementById('__menuPanel');}
     var open=p.classList.toggle('__open');
     document.documentElement.classList.toggle('__navopen',open);
     var btn=document.querySelector('[class*="menu-toggle"],[class*="nav-toggle"]');
@@ -1077,5 +1076,6 @@ box-shadow:0 28px 90px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.65)!impor
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',build); else build();
 })();
 </script>
+
 </body>
 </html>
