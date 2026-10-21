@@ -538,6 +538,7 @@ box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),inset 0 24px 48px -24px rgba(25
 .glass > *{position:relative;z-index:1}
 </style>
 <link rel="stylesheet" href="assets/mobile.css">
+<link rel="stylesheet" href="assets/gidx.css">
 </head>
 <body>
   <a class="sr-only" href="#main">跳到主要内容</a>
@@ -580,7 +581,7 @@ box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),inset 0 24px 48px -24px rgba(25
           <div class="hero-kicker">
             <span>CHANNEL 02 / ARCHITECTURE</span>
             <span class="signal"><span class="signal-dot" aria-hidden="true"></span>双通道待命</span>
-          </div>
+          <nav class="gidx" aria-label="其他架构部件"><div class="gidx__h">其他架构部件</div><div class="gidx__list"><a class="gidx__i" href="arch-cluster.html"><span class="gidx__n">01</span><span class="gidx__t">总控集群</span><span class="gidx__a" aria-hidden="true">→</span></a><a class="gidx__i" href="arch-knowledge.html"><span class="gidx__n">02</span><span class="gidx__t">部门知识库</span><span class="gidx__a" aria-hidden="true">→</span></a><a class="gidx__i" href="arch-a2a.html"><span class="gidx__n">03</span><span class="gidx__t">A2A 协议</span><span class="gidx__a" aria-hidden="true">→</span></a><a class="gidx__i" href="arch-selfheal.html"><span class="gidx__n">04</span><span class="gidx__t">自愈</span><span class="gidx__a" aria-hidden="true">→</span></a></div></nav></div>
           <h1 id="arch-models-title">双模型通道。<span class="definition">定义：主力模型挂了，业务不能跟着挂。</span></h1>
           <p class="hero-definition">把模型接入从一次性的接口调用，抬升为独立运行通道。日常任务有主力承接，强推理任务临时切换，故障时自动降级，恢复后安全回切。</p>
           <div class="hero-actions">
