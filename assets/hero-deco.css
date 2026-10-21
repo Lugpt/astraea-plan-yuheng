@@ -9,7 +9,7 @@ figure.hero-media {
 figure.hero-media img {
   position: absolute !important; inset: 0 !important;
   width: 100% !important; height: 100% !important;
-  object-fit: cover !important; object-position: 50% 42% !important;
+  object-fit: cover !important; object-position: 50% 50% !important;
   margin: 0 !important; border-radius: 0 !important; max-height: none !important;
 }
 /* 压暗渐变，让下部蓝色区有层次不再空 */
@@ -144,4 +144,9 @@ html { scroll-padding-top: 92px; }
     width: calc(100% - 28px) !important; margin: 12px auto 0 !important; z-index: 7;
   }
   .hero-media-glow { top: 52% !important; }
+}
+
+@media (max-width: 768px) {
+  /* 手机端隐藏首屏指标浮字（与站点导航重叠，且下方 proof-strip 已有同组数字） */
+  .hero-meta, [class*="hero-meta"]:not(.hero-media-stream), .hero-metrics, .hero-metric { display: none !important; }
 }
