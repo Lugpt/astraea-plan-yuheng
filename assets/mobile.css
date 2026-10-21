@@ -125,3 +125,43 @@ html.__navopen, html.__navopen body { overflow: hidden !important; }
   [class*="hero"] figure, [class*="hero"] picture { margin: 16px 0 0 !important; width: 100% !important; }
   [class*="hero"] figure img, [class*="hero"] picture img { width: 100% !important; height: auto !important; max-height: 240px !important; object-fit: cover !important; border-radius: 14px !important; }
 }
+
+/* ---------- 修正：盒模型 + header 只留三道杠 ---------- */
+*, *::before, *::after { box-sizing: border-box !important; }
+@media (max-width: 768px) {
+  header > div, header .header-inner, header .nav-inner, header .nav-shell, header .topbar, header .nav-wrap {
+    box-sizing: border-box !important; width: 100% !important; max-width: 100% !important;
+    padding: 0 14px !important; margin: 0 !important;
+  }
+  header { overflow: visible !important; }
+  header [class*="cta"], header .nav-demo, header .header-cta, header [class*="header-actions"] > a {
+    display: none !important; visibility: hidden !important;
+  }
+  header [class*="header-actions"], header [class*="nav-actions"] { margin-left: auto !important; }
+  header [class*="menu-toggle"], header [class*="nav-toggle"] {
+    position: static !important; margin: 0 0 0 auto !important; width: 40px !important; height: 40px !important;
+    min-width: 40px !important; border: 1px solid #DDE2EA !important; border-radius: 10px !important;
+    background: #fff !important; display: inline-flex !important; align-items: center !important;
+    justify-content: center !important; flex: 0 0 auto !important;
+  }
+  header [class*="menu-toggle"] svg, header [class*="nav-toggle"] svg {
+    display: block !important; width: 20px !important; height: 20px !important;
+    stroke: #16233A !important; color: #16233A !important; flex: 0 0 auto !important;
+  }
+  header [class*="menu-toggle"] svg path, header [class*="nav-toggle"] svg path {
+    stroke: #16233A !important; stroke-width: 1.8 !important; fill: none !important;
+  }
+}
+
+@media (max-width: 768px) {
+  header { position: relative !important; }
+  header [class*="menu-toggle"], header [class*="nav-toggle"] {
+    position: absolute !important; right: 14px !important; left: auto !important;
+    top: 50% !important; transform: translateY(-50%) !important;
+    margin: 0 !important; width: 40px !important; height: 40px !important;
+    min-width: 40px !important; z-index: 950 !important;
+  }
+  header .header-inner, header .nav-inner, header .nav-shell, header .topbar, header .nav-wrap, header > div {
+    padding-right: 62px !important;
+  }
+}
