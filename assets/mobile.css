@@ -165,3 +165,14 @@ html.__navopen, html.__navopen body { overflow: hidden !important; }
     padding-right: 62px !important;
   }
 }
+
+@media (max-width: 768px) {
+  [class*="hero-inner"] { display: block !important; padding-left: 0 !important; padding-right: 0 !important; width: 100% !important; max-width: 100% !important; }
+  main { padding-left: 0 !important; padding-right: 0 !important; }
+  .container { padding-left: 0 !important; padding-right: 0 !important; }
+  [class*="hero-inner"] > .glass, [class*="hero-inner"] .glass-panel, [class*="hero-inner"] [class*="glass"] {
+    width: 100% !important; max-width: 100% !important; margin: 0 !important;
+  }
+  [class*="glass"] { max-width: 100% !important; }
+  .gidx { max-width: 100% !important; }
+}
