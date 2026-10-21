@@ -150,3 +150,46 @@ html { scroll-padding-top: 92px; }
   /* 手机端隐藏首屏指标浮字（与站点导航重叠，且下方 proof-strip 已有同组数字） */
   .hero-meta, [class*="hero-meta"]:not(.hero-media-stream), .hero-metrics, .hero-metric { display: none !important; }
 }
+
+/* 图区单一居中玻璃模块 */
+.hero-media-panel {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  z-index: 8; width: min(440px, calc(100% - 68px));
+  padding: 24px 26px 20px; border-radius: 20px;
+  background: rgba(255,255,255,.15);
+  border: 1px solid rgba(255,255,255,.4);
+  -webkit-backdrop-filter: blur(26px) saturate(180%);
+  backdrop-filter: blur(26px) saturate(180%);
+  box-shadow: 0 32px 90px rgba(5,18,55,.45), inset 0 1px 0 rgba(255,255,255,.6);
+  color: #fff;
+}
+.hmp__h {
+  font-size: 11.5px; letter-spacing: .12em; text-transform: uppercase;
+  color: rgba(255,255,255,.8); font-weight: 600; margin-bottom: 15px;
+}
+.hmp__list { list-style: none; margin: 0; padding: 0; }
+.hmp__list li {
+  display: flex; flex-direction: column; gap: 3px;
+  padding: 11px 0; border-top: 1px solid rgba(255,255,255,.16);
+}
+.hmp__list li:first-child { border-top: 0; padding-top: 0; }
+.hmp__list li:last-child { padding-bottom: 0; }
+.hmp__list b {
+  font-size: 15px; font-weight: 600; letter-spacing: .01em; color: #fff;
+  display: flex; align-items: center; gap: 8px;
+}
+.hmp__list b::before {
+  content: ""; width: 5px; height: 5px; border-radius: 50%;
+  background: #7FB0FF; box-shadow: 0 0 0 3px rgba(127,176,255,.22); flex: 0 0 auto;
+}
+.hmp__list span { font-size: 13px; line-height: 1.62; color: rgba(255,255,255,.82); padding-left: 13px; }
+@media (max-width: 768px) {
+  .hero-media-panel {
+    position: relative !important; left: auto !important; top: auto !important; transform: none !important;
+    width: calc(100% - 28px) !important; margin: auto !important; padding: 18px 18px 16px;
+  }
+  .hmp__list b { font-size: 14px; }
+  .hmp__list span { font-size: 12.5px; }
+  .hmp__h { margin-bottom: 11px; }
+  figure.hero-media { min-height: 480px !important; padding: 14px 0 !important; }
+}
