@@ -96,3 +96,32 @@
   font-weight: 600 !important; padding: 15px 2px !important; min-height: 0 !important;
 }
 html.__navopen, html.__navopen body { overflow: hidden !important; }
+
+/* ---------- 首屏收紧：消大面积留白 + 按钮不被拉伸 ---------- */
+@media (max-width: 768px) {
+  [class*="hero"], .hero { padding-top: 14px !important; padding-bottom: 20px !important; }
+  [class*="hero"] > *:first-child, .hero > *:first-child { margin-top: 0 !important; }
+  [class*="eyebrow"], [class*="kicker"] { margin: 0 0 8px !important; }
+  h1 { margin: 0 0 10px !important; }
+  [class*="lede"], [class*="lead"] { margin: 0 0 16px !important; }
+  [class*="button"], [class*="btn"], .button, .btn {
+    flex: 0 0 auto !important; align-self: flex-start !important;
+    height: auto !important; max-height: 48px !important; min-height: 44px !important;
+    width: 100% !important; margin: 0 !important;
+  }
+  [class*="actions"] > *, [class*="buttons"] > *, [class*="cta-group"] > * {
+    flex: 0 0 auto !important; align-self: stretch !important; max-height: 52px !important;
+  }
+  .glass-panel, [class*="glass-panel"] { padding: 16px !important; }
+  section + section { margin-top: 0 !important; }
+}
+
+@media (max-width: 768px) {
+  [class*="metrics"], [class*="stats"], [class*="metric-row"] {
+    display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 10px 14px !important;
+    margin: 18px 0 !important; width: 100% !important;
+  }
+  [class*="metric"] { width: auto !important; min-width: 0 !important; position: static !important; }
+  [class*="hero"] figure, [class*="hero"] picture { margin: 16px 0 0 !important; width: 100% !important; }
+  [class*="hero"] figure img, [class*="hero"] picture img { width: 100% !important; height: auto !important; max-height: 240px !important; object-fit: cover !important; border-radius: 14px !important; }
+}
