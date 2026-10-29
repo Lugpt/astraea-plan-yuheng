@@ -1283,6 +1283,96 @@
       line-height: 1.6;
     }
 
+    .wechat-block {
+      grid-column: 1 / -1;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      margin-top: 22px;
+      padding: 16px 18px;
+      border: 1px solid rgba(80, 200, 175, .28);
+      border-radius: 14px;
+      background: rgba(80, 200, 175, .06);
+    }
+
+    .wechat-icon {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: rgba(12, 60, 52, .55);
+      color: #4dd6a8;
+    }
+
+    .wechat-block .wechat-icon svg { display: block; width: 22px !important; height: 22px !important; }
+    .footer-wechat svg { display: block; width: 16px; height: 16px; flex: 0 0 auto; color: #4dd6a8; }
+
+    .wechat-body { flex: 1 1 auto; min-width: 0; }
+
+    .wechat-label {
+      margin: 0 0 4px;
+      font-size: 12px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .wechat-idline {
+      margin: 0 0 4px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .wechat-idline strong {
+      font-size: 17px;
+      letter-spacing: .02em;
+      color: #7ff0cd;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    .wechat-copy-btn {
+      appearance: none;
+      cursor: pointer;
+      border: 1px solid rgba(125, 240, 205, .45);
+      background: transparent;
+      color: #9df3da;
+      font-size: 12px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      transition: background .18s ease, border-color .18s ease;
+    }
+
+    .wechat-copy-btn:hover { background: rgba(125, 240, 205, .12); border-color: rgba(125, 240, 205, .75); }
+
+    .wechat-copy-btn--inline { padding: 1px 8px; font-size: 11px; }
+
+    .wechat-copy-btn[data-copied="true"] { border-color: rgba(125, 240, 205, .9); color: #c9ffef; }
+
+    .wechat-note {
+      margin: 0;
+      font-size: 12px;
+      line-height: 1.6;
+      color: var(--muted);
+    }
+
+    .footer-wechat {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-right: 18px;
+    }
+
+    .footer-wechat strong {
+      color: #7ff0cd;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: .02em;
+    }
+
     .demo-success {
       margin-top: 30px;
     }
@@ -2170,6 +2260,11 @@ box-shadow:0 28px 90px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.65)!impor
         </nav>
       </div>
       <div class="footer-bottom">
+        <span class="footer-wechat">
+          <svg viewBox="64 64 896 896" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M690.1 377.4c5.9 0 11.8.2 17.6.5-24.4-128.7-158.3-227.1-319.9-227.1C209 150.8 64 271.4 64 420.2c0 81.1 43.6 154.2 111.9 203.6a21.5 21.5 0 019.1 17.6c0 2.4-.5 4.6-1.1 6.9-5.5 20.3-14.2 52.8-14.6 54.3-.7 2.6-1.7 5.2-1.7 7.9 0 5.9 4.8 10.8 10.8 10.8 2.3 0 4.2-.9 6.2-2l70.9-40.9c5.3-3.1 11-5 17.2-5 3.2 0 6.4.5 9.5 1.4 33.1 9.5 68.8 14.8 105.7 14.8 6 0 11.9-.1 17.8-.4-7.1-21-10.9-43.1-10.9-66 0-135.8 132.2-245.8 295.3-245.8zm-194.3-86.5c23.8 0 43.2 19.3 43.2 43.1s-19.3 43.1-43.2 43.1c-23.8 0-43.2-19.3-43.2-43.1s19.4-43.1 43.2-43.1zm-215.9 86.2c-23.8 0-43.2-19.3-43.2-43.1s19.3-43.1 43.2-43.1 43.2 19.3 43.2 43.1-19.4 43.1-43.2 43.1zm586.8 415.6c56.9-41.2 93.2-102 93.2-169.7 0-124-120.8-224.5-269.9-224.5-149 0-269.9 100.5-269.9 224.5S540.9 847.5 690 847.5c30.8 0 60.6-4.4 88.1-12.3 2.6-.8 5.2-1.2 7.9-1.2 5.2 0 9.9 1.6 14.3 4.1l59.1 34c1.7 1 3.3 1.7 5.2 1.7a9 9 0 006.4-2.6 9 9 0 002.6-6.4c0-2.2-.9-4.4-1.4-6.6-.3-1.2-7.6-28.3-12.2-45.3-.5-1.9-.9-3.8-.9-5.7.1-5.9 3.1-11.2 7.6-14.5zM600.2 587.2c-19.9 0-36-16.1-36-35.9 0-19.8 16.1-35.9 36-35.9s36 16.1 36 35.9c0 19.8-16.2 35.9-36 35.9zm179.9 0c-19.9 0-36-16.1-36-35.9 0-19.8 16.1-35.9 36-35.9s36 16.1 36 35.9a36.08 36.08 0 01-36 35.9z"/></svg>
+          微信 <strong>longjunhao</strong>
+          <button class="wechat-copy-btn wechat-copy-btn--inline" type="button" data-copy-wechat>复制</button>
+        </span>
         <span>© <span id="year">2026</span> Astraea Plan. 私有化部署，数据不出公司。</span>
         <span>ENTERPRISE AGENT CLUSTER</span>
       </div>
@@ -2210,8 +2305,22 @@ box-shadow:0 28px 90px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.65)!impor
             <label for="need">希望先接入的业务场景</label>
             <textarea id="need" name="need" placeholder="例如：招聘流程、门店巡检、经营日报或晚间的数据收敛"></textarea>
           </div>
+          <div class="wechat-block">
+            <span class="wechat-icon" aria-hidden="true">
+              <svg viewBox="64 64 896 896" width="22" height="22" aria-hidden="true" focusable="false"><path fill="currentColor" d="M690.1 377.4c5.9 0 11.8.2 17.6.5-24.4-128.7-158.3-227.1-319.9-227.1C209 150.8 64 271.4 64 420.2c0 81.1 43.6 154.2 111.9 203.6a21.5 21.5 0 019.1 17.6c0 2.4-.5 4.6-1.1 6.9-5.5 20.3-14.2 52.8-14.6 54.3-.7 2.6-1.7 5.2-1.7 7.9 0 5.9 4.8 10.8 10.8 10.8 2.3 0 4.2-.9 6.2-2l70.9-40.9c5.3-3.1 11-5 17.2-5 3.2 0 6.4.5 9.5 1.4 33.1 9.5 68.8 14.8 105.7 14.8 6 0 11.9-.1 17.8-.4-7.1-21-10.9-43.1-10.9-66 0-135.8 132.2-245.8 295.3-245.8zm-194.3-86.5c23.8 0 43.2 19.3 43.2 43.1s-19.3 43.1-43.2 43.1c-23.8 0-43.2-19.3-43.2-43.1s19.4-43.1 43.2-43.1zm-215.9 86.2c-23.8 0-43.2-19.3-43.2-43.1s19.3-43.1 43.2-43.1 43.2 19.3 43.2 43.1-19.4 43.1-43.2 43.1zm586.8 415.6c56.9-41.2 93.2-102 93.2-169.7 0-124-120.8-224.5-269.9-224.5-149 0-269.9 100.5-269.9 224.5S540.9 847.5 690 847.5c30.8 0 60.6-4.4 88.1-12.3 2.6-.8 5.2-1.2 7.9-1.2 5.2 0 9.9 1.6 14.3 4.1l59.1 34c1.7 1 3.3 1.7 5.2 1.7a9 9 0 006.4-2.6 9 9 0 002.6-6.4c0-2.2-.9-4.4-1.4-6.6-.3-1.2-7.6-28.3-12.2-45.3-.5-1.9-.9-3.8-.9-5.7.1-5.9 3.1-11.2 7.6-14.5zM600.2 587.2c-19.9 0-36-16.1-36-35.9 0-19.8 16.1-35.9 36-35.9s36 16.1 36 35.9c0 19.8-16.2 35.9-36 35.9zm179.9 0c-19.9 0-36-16.1-36-35.9 0-19.8 16.1-35.9 36-35.9s36 16.1 36 35.9a36.08 36.08 0 01-36 35.9z"/></svg>
+            </span>
+            <div class="wechat-body">
+              <p class="wechat-label">不想填表，直接加微信</p>
+              <p class="wechat-idline">
+                <strong id="wechat-id">longjunhao</strong>
+                <button class="wechat-copy-btn" type="button" data-copy-wechat>复制微信号</button>
+              </p>
+              <p class="wechat-note">添加时请备注「官网预约」。是否通过好友申请，由我本人判断。</p>
+            </div>
+          </div>
+
           <div class="form-footer">
-            <p>本页不会自动向外部发送信息。生成摘要后，请复制并通过项目团队的企业微信发送。</p>
+            <p>本页不会自动向外部发送信息。生成摘要后，请复制并通过微信发送。</p>
             <button class="button button-primary" type="submit">
               生成预约摘要
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
@@ -2291,6 +2400,29 @@ box-shadow:0 28px 90px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.65)!impor
 
       updateHeader();
       window.addEventListener('scroll', updateHeader, { passive: true });
+
+      document.querySelectorAll('[data-copy-wechat]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var idEl = document.getElementById('wechat-id');
+          var wx = idEl ? idEl.textContent.trim() : 'longjunhao';
+          var done = function () {
+            btn.dataset.copied = 'true';
+            var old = btn.textContent;
+            btn.textContent = '已复制';
+            window.setTimeout(function () {
+              btn.textContent = old;
+              btn.dataset.copied = 'false';
+            }, 1800);
+          };
+          if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(wx).then(done).catch(function () {
+              window.prompt('复制微信号：', wx);
+            });
+          } else {
+            window.prompt('复制微信号：', wx);
+          }
+        });
+      });
 
       function openDialog(trigger) {
         lastTrigger = trigger || null;
