@@ -1121,7 +1121,7 @@ box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),inset 0 24px 48px -24px rgba(25
               <span class="status-label">已验证</span>
             </div>
             <h3>读帧监控实测</h3>
-            <p class="experiment-lead">总部运营智能体直连门店画面，读取连续画面帧并识别异常。发现异常之后，是否处置、如何处置，仍由总部运营人员判断与执行。</p>
+            <p class="experiment-lead">总部运营智能体直连门店画面，读取连续画面帧并识别异常。这条链路已在营业中的门店投产运行：门店侧不改动网络、不安排人值守，设备断电或重启后自动恢复接入，全程无需人工操作。发现异常之后，是否处置、如何处置，仍由总部运营人员判断与执行。</p>
             <div class="flow" aria-label="读帧监控验证链路">
               <div class="flow-step"><span>Store</span><strong>门店画面</strong></div>
               <div class="flow-step"><span>HQ agent</span><strong>总部读帧</strong></div>
@@ -1132,6 +1132,9 @@ box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),inset 0 24px 48px -24px rgba(25
               <div><dt>验证链路</dt><dd>总部运营智能体直连门店画面</dd></div>
               <div><dt>系统职责</dt><dd>读取画面帧，识别异常，提供处置信号</dd></div>
               <div><dt>人工边界</dt><dd>处置动作由总部运营人员完成，不由门店端智能体发起</dd></div>
+              <div><dt>运行状态</dt><dd>已在营业中的门店投产；设备断电或重启后自动恢复接入，无需人工操作</dd></div>
+              <div><dt>判定分工</dt><dd>明暗、清晰度、遮挡由程序计算指标判定，只有命中异常才由本地视觉模型复核；画面不上传公有云</dd></div>
+              <div><dt>数据边界</dt><dd>巡检帧只在内存中计算，不落地保存，不进入任何存储池，也不做长期录像留存</dd></div>
             </dl>
           </div>
         </article>
