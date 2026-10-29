@@ -1283,6 +1283,10 @@
       line-height: 1.6;
     }
 
+    .hp-field { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+
+    .form-status { margin: 6px 0 0; font-size: 13px; color: #ffd8a8; min-height: 18px; }
+
     .wechat-block {
       grid-column: 1 / -1;
       display: flex;
@@ -2284,7 +2288,7 @@ box-shadow:0 28px 90px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.65)!impor
       <div id="demo-form-view">
         <p class="dialog-kicker">DEPLOYMENT REVIEW / 30 MIN</p>
         <h2 id="demo-title">把第一个业务场景说清楚。</h2>
-        <p class="dialog-lede">填写企业网络环境与希望先接入的业务。页面会整理一份预约摘要，便于通过项目团队的企业微信继续沟通。</p>
+        <p class="dialog-lede">填写企业网络环境与希望先接入的业务。提交后我本人会收到这条留言，直接与你联系。</p>
 
         <form class="demo-form" id="demo-form">
           <div class="field">
@@ -2321,8 +2325,10 @@ box-shadow:0 28px 90px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.65)!impor
             </div>
           </div>
 
+          <input type="text" name="website" class="hp-field" tabindex="-1" autocomplete="off" aria-hidden="true">
           <div class="form-footer">
-            <p>本页不会自动向外部发送信息。生成摘要后，请复制并通过微信发送。</p>
+            <p>提交后留言进入我的私人留言箱，仅我本人可见。也可以直接加微信。</p>
+            <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
             <button class="button button-primary" type="submit">
               生成预约摘要
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
@@ -2339,11 +2345,11 @@ box-shadow:0 28px 90px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.65)!impor
             <path d="M5 12.5l4.2 4.2L19 7"/>
           </svg>
         </span>
-        <h3>预约摘要已整理</h3>
-        <p class="dialog-lede">复制下面的内容，通过项目团队的企业微信发送，即可继续确认演示时间。</p>
+        <h3>已经收到了</h3>
+        <p class="dialog-lede">留言已进入我的留言箱，我会尽快联系你。想快一点，也可以直接加微信 <strong>longjunhao</strong>。</p>
         <div class="demo-summary" id="demo-summary"></div>
         <div class="success-actions">
-          <button class="button button-primary" id="copy-summary" type="button">复制预约摘要</button>
+          <button class="button button-primary" id="copy-summary" type="button">复制我填的内容</button>
           <button class="button button-outline" id="edit-summary" type="button">返回修改</button>
         </div>
         <span class="copy-status" id="copy-status" aria-live="polite"></span>
@@ -2469,30 +2475,64 @@ box-shadow:0 28px 90px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.65)!impor
         if (event.target === dialog) closeDialog();
       });
 
+      var LEAD_ENDPOINT = 'https://agent.morefunbooks.cn/inbox/api/leads';
+      var formStatus = document.getElementById('form-status');
+      var submitBtn = form.querySelector('button[type="submit"]');
+
       form.addEventListener('submit', function (event) {
         event.preventDefault();
         if (!form.reportValidity()) return;
 
         var data = new FormData(form);
-        var company = String(data.get('company') || '').trim();
-        var name = String(data.get('name') || '').trim();
-        var contact = String(data.get('contact') || '').trim();
-        var scope = String(data.get('scope') || '').trim() || '待确认';
-        var need = String(data.get('need') || '').trim() || '待确认';
+        var payload = {
+          kind: 'demo',
+          company: String(data.get('company') || '').trim(),
+          name: String(data.get('name') || '').trim(),
+          contact: String(data.get('contact') || '').trim(),
+          scale: String(data.get('scope') || '').trim(),
+          message: String(data.get('need') || '').trim(),
+          website: String(data.get('website') || ''),
+          page: location.pathname + location.search
+        };
 
         currentSummary = [
           'Astraea Plan 部署评估预约',
-          '公司：' + company,
-          '联系人：' + name,
-          '联系方式：' + contact,
-          '门店规模：' + scope,
-          '希望先接入：' + need
+          '公司：' + (payload.company || '待确认'),
+          '联系人：' + (payload.name || '待确认'),
+          '联系方式：' + payload.contact,
+          '门店规模：' + (payload.scale || '待确认'),
+          '希望先接入：' + (payload.message || '待确认')
         ].join('\n');
 
-        summary.textContent = currentSummary;
-        formView.hidden = true;
-        successView.hidden = false;
-        successView.focus();
+        if (formStatus) formStatus.textContent = '正在提交……';
+        if (submitBtn) submitBtn.disabled = true;
+
+        function fail(msg) {
+          if (submitBtn) submitBtn.disabled = false;
+          if (formStatus) {
+            formStatus.textContent = msg + ' 你也可以直接加微信 longjunhao。';
+          }
+        }
+
+        fetch(LEAD_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        }).then(function (res) {
+          return res.json().then(function (body) { return { ok: res.ok, body: body }; });
+        }).then(function (r) {
+          if (r.ok && r.body && r.body.ok) {
+            summary.textContent = currentSummary;
+            if (formStatus) formStatus.textContent = '';
+            formView.hidden = true;
+            successView.hidden = false;
+            successView.focus();
+          } else {
+            fail((r.body && r.body.error) ? String(r.body.error) : '提交没成功。');
+          }
+        }).catch(function () {
+          fail('网络不通，没能提交。');
+        });
       });
 
       function selectSummary() {
