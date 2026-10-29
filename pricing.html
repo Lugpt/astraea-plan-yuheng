@@ -1,0 +1,780 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Astraea Plan 投入页：试点、全公司、深度定制三档私有化部署方式，按门店规模与系统边界配置。" />
+  <title>投入｜Astraea Plan</title>
+  <script>document.documentElement.classList.add('has-js');</script>
+  <style>
+    :root {
+      --bg:#F6F7F9; --surface:#FFFFFF; --surface-soft:#F1F3F7;
+      --fg:#16233A; --muted:#6B7689; --border:#DDE2EA;
+      --accent:#FF5A1F; --blue:#2F6BFF; --blue-soft:#5B8DFF; --deep:#123A8F;
+      --font-body:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+      --font-mono:"SFMono-Regular","SF Mono",Menlo,Consolas,monospace;
+      --ease-out: cubic-bezier(0.23,1,0.32,1);
+      --muted-strong: color-mix(in oklch, var(--muted), var(--fg) 26%);
+      --blue-text: color-mix(in oklch, var(--blue), var(--fg) 22%);
+      --blue-soft-bg: color-mix(in oklch, var(--blue) 7%, var(--surface));
+      --accent-hover: color-mix(in oklch, var(--accent) 84%, var(--surface));
+      --container: 1200px;
+      --gutter: clamp(20px, 5vw, 64px);
+      --section-space: clamp(72px, 8vw, 120px);
+    }
+
+    * {box-sizing: border-box;}
+    html {scroll-behavior: smooth;}
+    html, body {max-width: 100%; overflow-x: hidden;}
+    body {margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 17px; line-height: 1.8; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;}
+    body.menu-open {overflow: hidden;}
+    a {color: inherit; text-decoration: none;}
+    button, a {-webkit-tap-highlight-color: transparent;}
+    button {font: inherit;}
+    img {display: block; max-width: 100%;}
+    ::selection {background: var(--accent); color: var(--fg);}
+
+    :focus-visible {outline: 3px solid var(--accent); outline-offset: 4px;}
+    .skip-link {position: fixed; top: 12px; left: 12px; z-index: 1200; padding: 10px 16px; border-radius: 6px; background: var(--surface); color: var(--fg); transform: translateY(-150%); transition: transform .2s var(--ease-out);}
+    .skip-link:focus {transform: translateY(0);}
+
+    .container {width: 100%; max-width: var(--container); margin-inline: auto; padding-inline: var(--gutter);}
+    .eyebrow {display: flex; align-items: center; gap: 12px; margin: 0 0 18px; color: var(--blue-text); font-family: var(--font-mono); font-size: 12px; line-height: 1.4; letter-spacing: .08em; text-transform: uppercase;}
+    .eyebrow::before {content: ""; width: 28px; height: 1px; flex: 0 0 auto; background: currentColor;}
+    .eyebrow--light {color: rgba(255,255,255,.78);}
+    .eyebrow--light::before {background: rgba(255,255,255,.68);}
+    .section-heading {max-width: 760px; margin: 0; font-size: clamp(28px, 3vw, 42px); font-weight: 600; line-height: 1.3; letter-spacing: 0;}
+    .section-lead {max-width: 65ch; margin: 18px 0 0; color: var(--muted-strong); font-size: clamp(16px, 1.4vw, 18px); line-height: 1.8;}
+
+    /* Header */
+    .site-header {position: fixed; inset: 0 0 auto; z-index: 100; height: 82px; background: rgba(12,18,32,.35); border-bottom: 1px solid rgba(255,255,255,.12); -webkit-backdrop-filter: blur(18px) saturate(150%); backdrop-filter: blur(18px) saturate(150%); color: #fff; transition: background .35s var(--ease-out), color .35s var(--ease-out), border-color .35s var(--ease-out);}
+    .site-header.is-light {background: rgba(255,255,255,.72); border-bottom-color: color-mix(in oklch, var(--border) 72%, transparent); color: var(--fg); -webkit-backdrop-filter: blur(14px) saturate(140%); backdrop-filter: blur(14px) saturate(140%);}
+    .nav-shell {width: 100%; height: 100%; max-width: var(--container); margin-inline: auto; padding-inline: var(--gutter); display: grid; grid-template-columns: minmax(140px, 1fr) auto minmax(140px, 1fr); align-items: center; gap: 24px;}
+    .brand {justify-self: start; display: inline-flex; align-items: center; min-height: 44px; font-size: 17px; font-weight: 600; letter-spacing: .01em; white-space: nowrap;}
+    .main-nav {justify-self: center; display: flex; align-items: center; gap: clamp(18px, 2.4vw, 34px);}
+    .main-nav a {position: relative; display: inline-flex; align-items: center; min-height: 44px; font-size: 14px; font-weight: 500; letter-spacing: .02em; opacity: .82; transition: opacity .2s var(--ease-out);}
+    .main-nav a:hover {opacity: 1;}
+    .main-nav a[aria-current="page"] {opacity: 1;}
+    .main-nav a[aria-current="page"]::after {content: ""; position: absolute; right: 0; bottom: 7px; left: 0; height: 2px; background: var(--accent);}
+    .header-actions {justify-self: end; display: flex; align-items: center; gap: 10px;}
+    .button {display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 48px; padding: 0 22px; border: 1px solid transparent; border-radius: 999px; font-size: 15px; font-weight: 600; line-height: 1; letter-spacing: .02em; cursor: pointer; transition: background .22s var(--ease-out), color .22s var(--ease-out), border-color .22s var(--ease-out), transform .22s var(--ease-out), opacity .22s var(--ease-out), visibility .22s var(--ease-out);}
+    .button--accent {background: var(--accent); color: var(--fg);}
+    .button--accent:hover {background: var(--accent-hover); transform: translateY(-1px);}
+    .button--accent:active {transform: translateY(0);}
+    .button--light {background: var(--surface); color: var(--deep); border-color: var(--surface);}
+    .button--light:hover {background: color-mix(in oklch, var(--surface) 88%, var(--blue)); color: var(--deep); transform: translateY(-1px);}
+    .nav-demo {min-width: 104px;}
+    .site-header.cta-in-view .nav-demo {visibility: hidden; opacity: 0; pointer-events: none; transform: translateY(-4px);}
+    .menu-toggle {display: none; position: relative; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: currentColor; cursor: pointer;}
+    .menu-toggle::before,
+    .menu-toggle::after {content: ""; position: absolute; left: 12px; width: 20px; height: 1.5px; background: currentColor; transition: transform .25s var(--ease-out), top .25s var(--ease-out);}
+    .menu-toggle::before {top: 17px;}
+    .menu-toggle::after {top: 25px;}
+    .menu-toggle[aria-expanded="true"]::before {top: 21px; transform: rotate(45deg);}
+    .menu-toggle[aria-expanded="true"]::after {top: 21px; transform: rotate(-45deg);}
+    .mobile-menu {position: fixed; top: 82px; right: 0; left: 0; z-index: 99; display: none; padding: 14px var(--gutter) 24px; background: rgba(12,18,32,.92); border-bottom: 1px solid rgba(255,255,255,.14); -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px); color: #fff;}
+    .mobile-menu.is-open {display: block;}
+    .mobile-menu a {display: flex; align-items: center; min-height: 48px; border-bottom: 1px solid rgba(255,255,255,.10); font-size: 16px;}
+    .mobile-menu a:last-child {border-bottom: 0;}
+    .mobile-menu a[aria-current="page"] {color: var(--accent);}
+
+    /* Hero */
+    .hero {position: relative; min-height: max(760px, 100svh); isolation: isolate; overflow: hidden; background: var(--fg); color: #fff;}
+    .hero-photo {position: absolute; inset: 0; z-index: -3; width: 100%; height: 100%; object-fit: cover; object-position: center 54%;}
+    .hero::before {content: ""; position: absolute; inset: 0; z-index: -2; background: linear-gradient(105deg,rgba(6,10,20,.45),rgba(6,10,20,.12) 60%,transparent);}
+    .hero-inner {min-height: max(760px, 100svh); display: flex; align-items: flex-end; padding-top: 142px; padding-bottom: clamp(56px, 8vh, 88px);}
+    .glass {
+      position:relative; isolation:isolate;
+      background:rgba(255,255,255,.10);
+      -webkit-backdrop-filter:blur(24px) saturate(180%);
+      backdrop-filter:blur(24px) saturate(180%);
+      border:1.5px solid rgba(255,255,255,.45);
+      border-radius:28px;
+      box-shadow:0 28px 90px rgba(0,0,0,.55),
+                 inset 0 1px 0 rgba(255,255,255,.65),
+                 inset 0 -1px 0 rgba(255,255,255,.10);
+      overflow:hidden;
+    }
+    .glass::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+      background:linear-gradient(148deg,rgba(255,255,255,.30) 0%,rgba(255,255,255,.06) 30%,rgba(255,255,255,0) 52%);}
+    .glass::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.12), inset 0 24px 48px -24px rgba(255,255,255,.28);}
+    .glass, .glass h1, .glass h2, .glass h3, .glass p { color:#fff; }
+    .hero-panel {width: min(770px, 100%); padding: clamp(30px, 4.2vw, 52px);}
+    .hero-panel > * {position: relative; z-index: 1;}
+    .hero-title {margin: 0; font-size: clamp(46px, 5.2vw, 64px); font-weight: 600; line-height: 1.3; letter-spacing: 0;}
+    .hero-subtitle {max-width: 24ch; margin: 18px 0 0; font-size: clamp(20px, 2.2vw, 28px); font-weight: 500; line-height: 1.55; letter-spacing: 0;}
+    .hero-copy {max-width: 55ch; margin: 20px 0 0; color: rgba(255,255,255,.82); font-size: 16px; line-height: 1.8;}
+    .hero-facts {display: flex; flex-wrap: wrap; gap: 10px 22px; margin: 28px 0 0; padding: 22px 0 0; border-top: 1px solid rgba(255,255,255,.22); list-style: none; color: rgba(255,255,255,.9); font-size: 13px; line-height: 1.5;}
+    .hero-facts li {display: inline-flex; align-items: center; gap: 9px;}
+    .hero-facts li::before {content: ""; width: 5px; height: 5px; flex: 0 0 auto; border-radius: 50%; background: rgba(255,255,255,.7);}
+    .hero-jump {display: inline-flex; align-items: center; gap: 10px; min-height: 44px; margin-top: 24px; color: #fff; font-size: 14px; font-weight: 500; text-decoration: underline; text-decoration-color: rgba(255,255,255,.48); text-underline-offset: 6px;}
+    .hero-jump svg {width: 16px; height: 16px; transition: transform .25s var(--ease-out);}
+    .hero-jump:hover svg {transform: translateY(3px);}
+
+    /* Deployment tiers */
+    .section {padding-block: var(--section-space);}
+    .section--white {background: var(--surface);}
+    .section--soft {background: var(--surface-soft);}
+    .section-intro {display: flex; align-items: flex-end; justify-content: space-between; gap: 32px; margin-bottom: clamp(34px, 5vw, 58px);}
+    .intro-aside {flex: 0 0 min(320px, 32%); margin: 0; color: var(--muted-strong); font-size: 14px; line-height: 1.8; text-align: right;}
+    .tier-grid {display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: stretch;}
+    .tier-card {display: flex; min-width: 0; flex-direction: column; padding: clamp(24px, 2.8vw, 34px); background: var(--surface); border: 1px solid var(--border); border-radius: 8px;}
+    .tier-card--deep {background: var(--deep); border-color: var(--deep); color: #fff;}
+    .tier-top {display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding-bottom: 24px; border-bottom: 1px solid var(--border);}
+    .tier-card--deep .tier-top {border-bottom-color: rgba(255,255,255,.20);}
+    .tier-number {color: var(--blue-text); font-family: var(--font-mono); font-size: 12px; line-height: 1.4; letter-spacing: .08em;}
+    .tier-card--deep .tier-number {color: rgba(255,255,255,.70);}
+    .tier-title {margin: 7px 0 0; font-size: clamp(23px, 2.2vw, 28px); font-weight: 600; line-height: 1.35; letter-spacing: 0;}
+    .tier-cycle {flex: 0 0 auto; padding: 7px 10px; border: 1px solid var(--border); border-radius: 999px; color: var(--muted-strong); font-family: var(--font-mono); font-size: 11px; line-height: 1.4; letter-spacing: .04em; white-space: nowrap;}
+    .tier-card--deep .tier-cycle {border-color: rgba(255,255,255,.26); color: rgba(255,255,255,.86);}
+    .tier-summary {min-height: 5.4em; margin: 20px 0 4px; color: var(--muted-strong); font-size: 15px; line-height: 1.8;}
+    .tier-card--deep .tier-summary {color: rgba(255,255,255,.78);}
+    .tier-details {margin: auto 0 0;}
+    .tier-details > div {display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 13px; padding: 16px 0; border-top: 1px solid var(--border);}
+    .tier-card--deep .tier-details > div {border-top-color: rgba(255,255,255,.18);}
+    .tier-details > div:first-child {border-top: 0;}
+    .tier-details dt {margin: 0; color: var(--muted-strong); font-size: 12px; line-height: 1.9; letter-spacing: .02em;}
+    .tier-card--deep .tier-details dt {color: rgba(255,255,255,.64);}
+    .tier-details dd {margin: 0; color: var(--fg); font-size: 14px; line-height: 1.85;}
+    .tier-card--deep .tier-details dd {color: #fff;}
+
+    /* Cost structure */
+    .cost-layout {display: grid; grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr); gap: clamp(36px, 6vw, 84px); align-items: start;}
+    .cost-copy {position: sticky; top: 124px;}
+    .cost-note {display: flex; gap: 12px; max-width: 480px; margin: 28px 0 0; padding-top: 24px; border-top: 1px solid var(--border); color: var(--fg); font-size: 14px; line-height: 1.8;}
+    .cost-note svg {width: 20px; height: 20px; flex: 0 0 auto; margin-top: 2px; color: var(--blue-text);}
+    .cost-panel {background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden;}
+    .cost-panel-head {display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 18px 24px; border-bottom: 1px solid var(--border); background: var(--blue-soft-bg);}
+    .cost-panel-head strong {font-size: 14px; font-weight: 600;}
+    .cost-panel-head span {color: var(--muted-strong); font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase;}
+    .cost-list {margin: 0; padding: 0; list-style: none;}
+    .cost-list li {display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 18px; padding: 28px 24px; border-top: 1px solid var(--border);}
+    .cost-list li:first-child {border-top: 0;}
+    .cost-index {color: var(--blue-text); font-family: var(--font-mono); font-size: 12px; line-height: 1.8; letter-spacing: .06em;}
+    .cost-list h3 {margin: 0; font-size: 20px; font-weight: 600; line-height: 1.45; letter-spacing: 0;}
+    .cost-list p {max-width: 54ch; margin: 7px 0 0; color: var(--muted-strong); font-size: 14px; line-height: 1.8;}
+
+    /* Comparison table */
+    .comparison-head {display: flex; align-items: flex-end; justify-content: space-between; gap: 32px; margin-bottom: 34px;}
+    .comparison-head p {flex: 0 0 min(360px, 38%); margin: 0; color: var(--muted-strong); font-size: 14px; line-height: 1.8; text-align: right;}
+    .table-shell {width: 100%; overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); scrollbar-width: thin; scrollbar-color: color-mix(in oklch, var(--blue) 32%, var(--border)) transparent;}
+    .comparison-table {width: 100%; min-width: 900px; border-collapse: collapse; font-size: 14px; line-height: 1.7;}
+    .comparison-table caption {position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;}
+    .comparison-table th,
+    .comparison-table td {padding: 19px 18px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); text-align: left; vertical-align: top;}
+    .comparison-table tr:last-child th,
+    .comparison-table tr:last-child td {border-bottom: 0;}
+    .comparison-table th:last-child,
+    .comparison-table td:last-child {border-right: 0;}
+    .comparison-table thead th {background: var(--surface-soft); color: var(--fg); font-size: 13px; font-weight: 600; line-height: 1.5;}
+    .comparison-table thead th:not(:first-child) {min-width: 205px;}
+    .comparison-table thead th:nth-child(3) {background: var(--blue-soft-bg);}
+    .comparison-table tbody th {position: sticky; left: 0; z-index: 1; width: 140px; background: var(--surface); color: var(--muted-strong); font-size: 12px; font-weight: 500; letter-spacing: .02em; white-space: nowrap;}
+    .comparison-table td {color: var(--fg);}
+    .comparison-table td:nth-child(3) {background: color-mix(in oklch, var(--blue) 3.5%, var(--surface));}
+    .table-note {margin: 16px 0 0; color: var(--muted-strong); font-size: 12px; line-height: 1.7;}
+
+    /* Final CTA */
+    .final-cta {position: relative; overflow: hidden; padding-block: clamp(84px, 10vw, 136px); background: var(--deep); color: #fff;}
+    .final-cta::before {content: ""; position: absolute; top: -80px; right: clamp(-100px, 3vw, 40px); width: min(540px, 48vw); aspect-ratio: 1; border: 1px solid rgba(255,255,255,.13); border-radius: 50%; box-shadow: 0 0 0 52px rgba(255,255,255,.025), 0 0 0 104px rgba(255,255,255,.018); pointer-events: none;}
+    .final-cta::after {content: ""; position: absolute; right: clamp(48px, 12vw, 180px); bottom: -94px; width: 1px; height: 310px; background: linear-gradient(to bottom, transparent, rgba(255,255,255,.32)); transform: rotate(28deg); pointer-events: none;}
+    .final-cta-inner {position: relative; z-index: 1;}
+    .final-cta .eyebrow {color: rgba(255,255,255,.72);}
+    .final-cta .eyebrow::before {background: rgba(255,255,255,.62);}
+    .final-cta h2 {max-width: 13ch; margin: 0; font-size: clamp(32px, 3.6vw, 42px); font-weight: 600; line-height: 1.35; letter-spacing: 0;}
+    .final-cta p {max-width: 58ch; margin: 20px 0 30px; color: rgba(255,255,255,.78); font-size: 16px; line-height: 1.8;}
+    .final-cta .button {min-height: 52px; padding-inline: 26px;}
+
+    /* Footer */
+    .site-footer {background: var(--deep); color: #fff; border-top: 1px solid rgba(255,255,255,.14);}
+    .footer-grid {display: grid; grid-template-columns: 1.35fr .8fr .9fr 1fr; gap: clamp(26px, 5vw, 72px); padding-block: 64px 52px;}
+    .footer-brand p {max-width: 30ch; margin: 0; color: rgba(255,255,255,.78); font-size: 14px; line-height: 1.8;}
+    .footer-brand strong {display: block; margin-bottom: 14px; font-size: 18px; font-weight: 600; letter-spacing: .01em;}
+    .footer-col h3 {margin: 0 0 16px; color: rgba(255,255,255,.62); font-family: var(--font-mono); font-size: 11px; font-weight: 500; line-height: 1.4; letter-spacing: .08em; text-transform: uppercase;}
+    .footer-links {display: grid; gap: 5px;}
+    .footer-links a {display: inline-flex; align-items: center; min-height: 38px; color: rgba(255,255,255,.88); font-size: 14px; line-height: 1.5; transition: color .2s var(--ease-out);}
+    .footer-links a:hover {color: #fff; text-decoration: underline; text-underline-offset: 5px;}
+    .footer-bottom {display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-block: 20px; border-top: 1px solid rgba(255,255,255,.16); color: rgba(255,255,255,.7); font-size: 12px; line-height: 1.6;}
+    .footer-bottom p {margin: 0;}
+    .footer-bottom span {font-family: var(--font-mono); letter-spacing: .04em;}
+
+    .demo-dialog {width: min(520px, calc(100vw - 32px)); padding: 0; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--fg); box-shadow: 0 28px 90px rgba(12,18,32,.28);}
+    .demo-dialog::backdrop {background: rgba(6,10,20,.58); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);}
+    .demo-dialog-inner {padding: clamp(26px, 5vw, 38px);}
+    .demo-dialog .eyebrow {margin-bottom: 14px;}
+    .demo-dialog h2 {margin: 0; font-size: clamp(26px, 4vw, 32px); font-weight: 600; line-height: 1.4; letter-spacing: 0;}
+    .demo-dialog p {margin: 16px 0 0; color: var(--muted-strong); font-size: 15px; line-height: 1.8;}
+    .demo-dialog ol {margin: 20px 0 28px; padding-left: 1.25em; color: var(--fg); font-size: 14px; line-height: 1.9;}
+    .demo-dialog .button {width: 100%;}
+    .button--outline {background: transparent; border-color: var(--border); color: var(--fg);}
+    .button--outline:hover {background: var(--surface-soft); border-color: color-mix(in oklch, var(--border), var(--fg) 14%); color: var(--fg);}
+
+    .reveal {transition: opacity .7s var(--ease-out), transform .7s var(--ease-out);}
+    .has-js .reveal:not(.is-visible) {opacity: 0; transform: translateY(20px);}
+    .reveal[data-delay="1"] {transition-delay: .08s;}
+    .reveal[data-delay="2"] {transition-delay: .16s;}
+    .reveal[data-delay="3"] {transition-delay: .24s;}
+
+    @media (max-width: 1040px) {
+      .nav-shell {grid-template-columns: 1fr auto;}
+      .main-nav {display: none;}
+      .menu-toggle {display: inline-block; order: 2;}
+      .header-actions {justify-self: end;}
+      .nav-demo {margin-right: 2px;}
+      .tier-grid {grid-template-columns: 1fr;}
+      .tier-summary {min-height: 0;}
+      .tier-details {margin-top: 8px;}
+      .cost-layout {grid-template-columns: 1fr;}
+      .cost-copy {position: static;}
+      .footer-grid {grid-template-columns: 1.2fr 1fr 1fr;}
+      .footer-brand {grid-column: 1 / -1;}
+    }
+
+    @media (max-width: 760px) {
+      body {font-size: 16px;}
+      .site-header {height: 72px;}
+      .mobile-menu {top: 72px;}
+      .nav-shell {gap: 10px;}
+      .brand {font-size: 15px;}
+      .nav-demo {min-width: 0; min-height: 44px; padding-inline: 15px; font-size: 13px;}
+      .section-intro,
+      .comparison-head {display: block;}
+      .intro-aside,
+      .comparison-head p {margin-top: 16px; text-align: left;}
+      .hero-inner {padding-top: 118px; padding-bottom: 32px;}
+      .hero-panel {padding: 28px 24px; border-radius: 24px;}
+      .hero-title {font-size: clamp(42px, 12vw, 56px); line-height: 1.3;}
+      .hero-subtitle {font-size: 20px; line-height: 1.6;}
+      .hero-copy {font-size: 15px;}
+      .hero-facts {display: grid; gap: 9px;}
+      .hero {min-height: max(720px, 100svh);}
+      .hero-photo {object-position: 56% center;}
+      .cost-list li {grid-template-columns: 34px minmax(0, 1fr); gap: 10px; padding: 24px 20px;}
+      .cost-panel-head {padding-inline: 20px;}
+      .footer-grid {grid-template-columns: 1fr 1fr; padding-block: 52px 38px;}
+      .footer-brand {grid-column: 1 / -1;}
+      .footer-bottom {display: block;}
+      .footer-bottom span {display: block; margin-top: 6px;}
+      .final-cta::before {right: -180px; width: 420px;}
+    }
+
+    @media (max-width: 520px) {
+      .brand {font-size: 14px;}
+      .nav-shell {padding-inline: 16px;}
+      .nav-demo {padding-inline: 13px;}
+      .menu-toggle {width: 44px;}
+      .footer-grid {grid-template-columns: 1fr; gap: 24px;}
+      .footer-brand {grid-column: auto;}
+      .tier-card {padding: 24px 20px;}
+      .tier-details > div {grid-template-columns: 68px minmax(0, 1fr); gap: 10px;}
+      .table-shell {border-radius: 6px;}
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {scroll-behavior: auto;}
+      *, *::before, *::after {scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important;}
+      .has-js .reveal:not(.is-visible) {opacity: 1; transform: none;}
+    }
+
+    @media print {
+      .site-header, .mobile-menu, .hero-jump, .final-cta .button {display: none !important;}
+      body {background: #fff;}
+      .hero {min-height: 600px; break-inside: avoid;}
+      .section, .final-cta {break-inside: avoid;}
+      .reveal {opacity: 1 !important; transform: none !important;}
+    }
+  </style>
+<style>
+.inline-figure{margin:56px auto;max-width:1200px;padding-inline:clamp(20px,5vw,64px);box-sizing:border-box}
+.inline-figure .fig-box{border-radius:24px;overflow:hidden;box-shadow:0 28px 70px rgba(48,58,86,.14);border:1px solid #DDE2EA}
+.inline-figure img{display:block;width:100%;height:clamp(220px,30vw,400px);object-fit:cover}
+.inline-figure figcaption{padding:14px 22px;font-size:14px;line-height:1.6;color:#6B7689;background:#fff}
+</style>
+<style>
+html,body{overflow-x:hidden;max-width:100%}
+*,*::before,*::after{box-sizing:border-box}
+img{max-width:100%;height:auto}
+</style>
+<style>
+svg{max-width:100%;vertical-align:middle}
+.button svg,.button--primary svg,.button--glass svg,button svg,a.button svg,.hero-actions svg{width:18px;height:18px;flex:none;display:inline-block}
+</style>
+<style>
+[class*="node"] svg,[class*="icon"] svg,[class*="step"] svg,[class*="badge"] svg,[class*="mark"] svg,[class*="chip"] svg{width:44px;height:44px;flex:none;display:inline-block}
+[class*="number"] svg,[class*="num"] svg{width:32px;height:32px}
+</style>
+<style>
+[class*="hero"] img{object-fit:cover;object-position:center;max-height:96vh}
+</style>
+<style>
+[class*="scene"] img,[class*="media"] img:not(.hero-photo),[class*="shot"] img{height:auto;max-height:520px;object-fit:cover;width:100%}
+</style>
+<style>
+.hero img,section img,figure img{max-width:100%}
+</style>
+<style>
+.hero__media{overflow:hidden;width:100%}
+.hero__image{width:100%;height:100%;object-fit:cover;display:block}
+</style>
+<style>
+.hero__image{transform:none!important}
+</style>
+<style>
+.glass{position:relative;isolation:isolate;
+background:rgba(255,255,255,.10)!important;
+-webkit-backdrop-filter:blur(24px) saturate(180%)!important;
+backdrop-filter:blur(24px) saturate(180%)!important;
+border:1.5px solid rgba(255,255,255,.45)!important;border-radius:28px!important;
+box-shadow:0 28px 90px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.65)!important;
+overflow:hidden;}
+.glass::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+background:linear-gradient(148deg,rgba(255,255,255,.30) 0%,rgba(255,255,255,.06) 30%,rgba(255,255,255,0) 52%);}
+.glass::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),inset 0 24px 48px -24px rgba(255,255,255,.28);}
+.glass > *{position:relative;z-index:1}
+</style>
+<link rel="stylesheet" href="assets/mobile.css">
+<link rel="stylesheet" href="assets/gidx.css">
+<link rel="stylesheet" href="assets/cap-layout.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主要内容</a>
+
+  <header class="site-header" id="site-header">
+    <div class="nav-shell">
+      <a class="brand" href="index.html" aria-label="Astraea Plan 首页">Astraea Plan</a>
+      <nav class="main-nav" aria-label="主导航">
+        <a href="capabilities.html">能力</a>
+        <a href="architecture.html">架构</a>
+        <a href="cases.html">案例</a>
+        <a href="pricing.html" aria-current="page">投入</a>
+        <a href="about.html">关于</a>
+      </nav>
+      <div class="header-actions">
+        <button class="button button--accent nav-demo" type="button" data-nav-demo data-demo-open data-od-id="nav-book-demo">预约演示</button>
+        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" aria-label="打开导航菜单"></button>
+      </div>
+    </div>
+  </header>
+
+  <nav class="mobile-menu" id="mobile-menu" aria-label="移动端导航">
+    <a href="capabilities.html">能力</a>
+    <a href="architecture.html">架构</a>
+    <a href="cases.html">案例</a>
+    <a href="pricing.html" aria-current="page">投入</a>
+    <a href="about.html">关于</a>
+  </nav>
+
+  <main id="main">
+    <section class="hero" id="top" data-od-id="pricing-hero" aria-labelledby="hero-title">
+      <img decoding="async" fetchpriority="high" class="hero-photo" src="data:image/jpeg;base64,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" width="2000" height="1333" alt="" fetchpriority="high" />
+      <div class="container hero-inner">
+        <div class="glass hero-panel" data-od-id="pricing-hero-glass">
+          <p class="eyebrow eyebrow--light">投入 / PRICING</p>
+          <h1 class="hero-title" id="hero-title" data-od-id="pricing-hero-title">投入</h1>
+          <p class="hero-subtitle">按门店规模配置，一次性部署，长期自己掌握。</p>
+          <p class="hero-copy">三档部署方式围绕实际边界展开：从一个场景验证，到多部门协同，再到接入现有 ERP / POS。范围先确认，节奏再安排。</p>
+          <ul class="hero-facts" aria-label="投入方式要点">
+            <li>私有化部署</li>
+            <li>模型调用按量</li>
+            <li>数据不出公司</li>
+          </ul>
+          <a class="hero-jump" href="#deployment" data-od-id="pricing-hero-jump">
+            查看部署方式
+            <svg aria-hidden="true" viewBox="0 0 16 16" fill="none">
+              <path d="M8 2v11M3.75 8.75 8 13l4.25-4.25" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+        <nav class="gidx" aria-label="站点导航"><div class="gidx__h">站点导航</div><div class="gidx__list"><a class="gidx__i" href="index.html"><span class="gidx__n">01</span><span class="gidx__t">首页</span><span class="gidx__a" aria-hidden="true">→</span></a><a class="gidx__i" href="capabilities.html"><span class="gidx__n">02</span><span class="gidx__t">能力</span><span class="gidx__a" aria-hidden="true">→</span></a><a class="gidx__i" href="architecture.html"><span class="gidx__n">03</span><span class="gidx__t">架构</span><span class="gidx__a" aria-hidden="true">→</span></a><a class="gidx__i" href="cases.html"><span class="gidx__n">04</span><span class="gidx__t">案例</span><span class="gidx__a" aria-hidden="true">→</span></a><a class="gidx__i" href="pricing.html"><span class="gidx__n">05</span><span class="gidx__t">投入</span><span class="gidx__a" aria-hidden="true">→</span></a><a class="gidx__i" href="about.html"><span class="gidx__n">06</span><span class="gidx__t">关于</span><span class="gidx__a" aria-hidden="true">→</span></a></div></nav></div>
+      </div>
+    </section>
+
+    <section class="section" id="deployment" data-od-id="deployment-tiers" aria-labelledby="deployment-title">
+      <div class="container">
+        <div class="section-intro reveal">
+          <div>
+            <p class="eyebrow">01 / 部署方式</p>
+            <h2 class="section-heading" id="deployment-title" data-od-id="deployment-heading">三档部署方式</h2>
+            <p class="section-lead">从单个部门与单个场景开始，或直接建立全公司智能体协作体系，也可以围绕已有 ERP / POS 做系统级接入。</p>
+          </div>
+          <p class="intro-aside">不设统一的“标准包”。每一档都先明确适用边界、交付内容与参与角色。</p>
+        </div>
+
+        <div class="tier-grid">
+          <article class="tier-card reveal" data-od-id="tier-pilot">
+            <div class="tier-top">
+              <div>
+                <span class="tier-number">01 / 试点方式</span>
+                <h3 class="tier-title" data-od-id="tier-pilot-title">试点</h3>
+              </div>
+              <span class="tier-cycle">4–6 周</span>
+            </div>
+            <p class="tier-summary">先把一个部门的单场景跑通，验证流程、数据与协作方式，再决定下一步范围。</p>
+            <dl class="tier-details">
+              <div><dt>适合谁</dt><dd>希望先验证价值、控制实施边界的单部门团队</dd></div>
+              <div><dt>包含什么</dt><dd>单场景智能体、流程梳理、部署与上线验收</dd></div>
+              <div><dt>交付周期</dt><dd>4–6 周</dd></div>
+              <div><dt>谁来做</dt><dd>Astraea Plan 实施顾问与客户业务负责人</dd></div>
+            </dl>
+          </article>
+
+          <article class="tier-card tier-card--deep reveal" data-od-id="tier-company" data-delay="1">
+            <div class="tier-top">
+              <div>
+                <span class="tier-number">02 / 协同体系</span>
+                <h3 class="tier-title" data-od-id="tier-company-title">全公司</h3>
+              </div>
+              <span class="tier-cycle">8–12 周</span>
+            </div>
+            <p class="tier-summary">把多部门智能体、知识库与定时任务体系组织成一套可持续运行的日常工作机制。</p>
+            <dl class="tier-details">
+              <div><dt>适合谁</dt><dd>需要跨部门协同、统一知识入口与自动化任务的连锁企业</dd></div>
+              <div><dt>包含什么</dt><dd>多部门智能体、知识库、定时任务体系与整体部署</dd></div>
+              <div><dt>交付周期</dt><dd>8–12 周</dd></div>
+              <div><dt>谁来做</dt><dd>Astraea Plan 交付团队与客户联合项目组</dd></div>
+            </dl>
+          </article>
+
+          <article class="tier-card reveal" data-od-id="tier-custom" data-delay="2">
+            <div class="tier-top">
+              <div>
+                <span class="tier-number">03 / 系统接入</span>
+                <h3 class="tier-title" data-od-id="tier-custom-title">深度定制</h3>
+              </div>
+              <span class="tier-cycle">按需</span>
+            </div>
+            <p class="tier-summary">围绕已有 ERP / POS 和既有系统边界做定制接入，把智能体能力放进真实业务流程。</p>
+            <dl class="tier-details">
+              <div><dt>适合谁</dt><dd>已有 ERP / POS 体系、需要系统级连接的连锁企业</dd></div>
+              <div><dt>包含什么</dt><dd>全公司范围能力、ERP / POS 对接与按需定制</dd></div>
+              <div><dt>交付周期</dt><dd>按对接范围评估，按需推进</dd></div>
+              <div><dt>谁来做</dt><dd>Astraea Plan 技术团队与客户 IT / 数据负责人</dd></div>
+            </dl>
+          </article>
+        </div>
+      </div>
+    </section>
+<figure class="inline-figure"><div class="fig-box"><img loading="lazy" decoding="async" src="assets/kb-c.jpg" alt="Astraea Plan 运行场景"></div></figure>
+
+
+    <section class="section section--white" id="cost" data-od-id="cost-structure" aria-labelledby="cost-title">
+      <div class="container cost-layout">
+        <div class="cost-copy reveal">
+          <p class="eyebrow">02 / 成本构成</p>
+          <h2 class="section-heading" id="cost-title" data-od-id="cost-heading">投入怎么构成</h2>
+          <p class="section-lead">系统部署在客户自己的机器上，模型调用按量发生。部署完成后，环境、数据与权限边界都留在公司内部。</p>
+          <p class="cost-note">
+            <svg aria-hidden="true" viewBox="0 0 20 20" fill="none">
+              <path d="M10 2.5 16 5v4.6c0 3.7-2.4 6.4-6 7.9-3.6-1.5-6-4.2-6-7.9V5l6-2.5Z" stroke="currentColor" stroke-width="1.35"/>
+              <path d="m7.4 9.8 1.7 1.7 3.6-3.8" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>一次性部署之后，公司可以按自己的节奏扩展智能体、知识库与任务体系。</span>
+          </p>
+        </div>
+
+        <div class="cost-panel reveal" data-od-id="cost-panel" data-delay="1">
+          <div class="cost-panel-head">
+            <strong>私有化部署边界</strong>
+            <span>客户自有环境</span>
+          </div>
+          <ol class="cost-list">
+            <li>
+              <span class="cost-index">01</span>
+              <div>
+                <h3 data-od-id="cost-private-deployment-title">私有化部署</h3>
+                <p>部署在客户自己的机器上。系统、知识库与业务数据沿着公司既有环境和权限体系运行。</p>
+              </div>
+            </li>
+            <li>
+              <span class="cost-index">02</span>
+              <div>
+                <h3 data-od-id="cost-model-usage-title">模型调用按量</h3>
+                <p>调用随实际使用量发生，按实际任务与场景计算。部署范围越明确，调用边界越容易管理。</p>
+              </div>
+            </li>
+            <li>
+              <span class="cost-index">03</span>
+              <div>
+                <h3 data-od-id="cost-data-boundary-title">数据不出公司</h3>
+                <p>数据留在公司环境内，访问与调用策略按企业要求配置。智能体围绕内部知识与任务工作。</p>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </section>
+<figure class="inline-figure"><div class="fig-box"><img loading="lazy" decoding="async" src="assets/code-1.jpg" alt="Astraea Plan 运行场景"></div></figure>
+
+
+    <section class="section section--soft" id="compare" data-od-id="deployment-comparison" aria-labelledby="compare-title">
+      <div class="container">
+        <div class="comparison-head reveal">
+          <div>
+            <p class="eyebrow">03 / 对比</p>
+            <h2 class="section-heading" id="compare-title" data-od-id="comparison-heading">三档部署方式对比</h2>
+          </div>
+          <p>从适用对象、能力范围、周期与参与角色看差异。最终范围以项目评估与系统边界确认为准。</p>
+        </div>
+
+        <div class="table-shell reveal" role="region" aria-label="三档部署方式对比表" tabindex="0" data-od-id="comparison-table-shell">
+          <table class="comparison-table">
+            <caption>试点、全公司、深度定制三档部署方式在适用对象、包含内容、交付周期、系统边界和参与角色上的比较</caption>
+            <thead>
+              <tr>
+                <th scope="col">维度</th>
+                <th scope="col">试点</th>
+                <th scope="col">全公司</th>
+                <th scope="col">深度定制</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">适用对象</th>
+                <td>单部门、单场景</td>
+                <td>多部门协同的连锁企业</td>
+                <td>已有 ERP / POS 的企业</td>
+              </tr>
+              <tr>
+                <th scope="row">包含内容</th>
+                <td>单场景智能体、流程梳理、部署上线</td>
+                <td>多部门智能体、知识库、定时任务体系</td>
+                <td>全公司范围能力、ERP / POS 对接与按需定制</td>
+              </tr>
+              <tr>
+                <th scope="row">交付周期</th>
+                <td>4–6 周</td>
+                <td>8–12 周</td>
+                <td>按需，随对接范围评估</td>
+              </tr>
+              <tr>
+                <th scope="row">系统边界</th>
+                <td>围绕单一场景接入</td>
+                <td>连接多部门流程与知识</td>
+                <td>对接已有 ERP / POS 与内部系统</td>
+              </tr>
+              <tr>
+                <th scope="row">参与角色</th>
+                <td>实施顾问 + 业务负责人</td>
+                <td>交付团队 + 客户联合项目组</td>
+                <td>技术团队 + 客户 IT / 数据负责人</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="table-note">表格可在窄屏内左右查看；部署环境与数据边界在三档中保持一致。</p>
+      </div>
+    </section>
+
+    <section class="final-cta" id="contact" data-od-id="final-cta" data-final-cta aria-labelledby="cta-title">
+      <div class="container final-cta-inner">
+        <p class="eyebrow">预约演示</p>
+        <h2 id="cta-title" data-od-id="final-cta-title">把部署范围定下来，再看落地节奏。</h2>
+        <p>围绕门店规模、现有系统与数据要求，梳理适合的部署方式与参与角色。先从真实边界开始。</p>
+        <button class="button button--accent" type="button" data-demo-open data-od-id="cta-book-demo">预约演示</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer" data-od-id="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <strong>Astraea Plan</strong>
+          <p>给连锁企业装一套私有化智能体团队，数据不出公司。</p>
+        </div>
+        <div class="footer-col">
+          <h3>能力</h3>
+          <div class="footer-links">
+            <a href="capabilities.html">能力总览</a>
+            <a href="cases.html">客户案例</a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h3>架构</h3>
+          <div class="footer-links">
+            <a href="architecture.html">私有化架构</a>
+            <a href="about.html">关于 Astraea Plan</a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h3>联系</h3>
+          <div class="footer-links">
+            <a href="#contact" data-demo-open>预约演示</a>
+            <a href="pricing.html">部署方式</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2026 Astraea Plan · 数据不出公司</p>
+        <span>私有化智能体团队 / 200+ 门店</span>
+      </div>
+    </div>
+  </footer>
+
+  <dialog class="demo-dialog" id="demo-dialog" aria-labelledby="demo-dialog-title">
+    <div class="demo-dialog-inner">
+      <p class="eyebrow">预约演示</p>
+      <h2 id="demo-dialog-title">在现有项目沟通群发起预约</h2>
+      <p>为避免遗漏信息，预约统一通过项目沟通群确认。发送以下三项，交付团队即可判断适合的部署方式。</p>
+      <ol>
+        <li>希望试点的部门或单场景</li>
+        <li>现有 ERP / POS 与数据边界</li>
+        <li>期望上线时间与参与角色</li>
+      </ol>
+      <form method="dialog">
+        <button class="button button--outline" type="submit">知道了</button>
+      </form>
+    </div>
+  </dialog>
+
+  <script>
+    (function () {
+      var header = document.getElementById('site-header');
+      var hero = document.querySelector('.hero');
+      var menuButton = document.querySelector('.menu-toggle');
+      var mobileMenu = document.getElementById('mobile-menu');
+      var navDemo = document.querySelector('[data-nav-demo]');
+      var finalCta = document.querySelector('[data-final-cta]');
+      var demoDialog = document.getElementById('demo-dialog');
+      var demoButtons = Array.prototype.slice.call(document.querySelectorAll('[data-demo-open]'));
+      var lastDemoTrigger = null;
+      var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      function setHeaderState() {
+        var threshold = hero ? hero.offsetTop + hero.offsetHeight : 500;
+        header.classList.toggle('is-light', window.scrollY > threshold);
+      }
+
+      function closeMenu() {
+        menuButton.setAttribute('aria-expanded', 'false');
+        menuButton.setAttribute('aria-label', '打开导航菜单');
+        mobileMenu.classList.remove('is-open');
+        document.body.classList.remove('menu-open');
+      }
+
+      menuButton.addEventListener('click', function () {
+        var open = menuButton.getAttribute('aria-expanded') === 'true';
+        menuButton.setAttribute('aria-expanded', String(!open));
+        menuButton.setAttribute('aria-label', open ? '打开导航菜单' : '关闭导航菜单');
+        mobileMenu.classList.toggle('is-open', !open);
+        document.body.classList.toggle('menu-open', !open);
+      });
+
+      mobileMenu.addEventListener('click', function (event) {
+        if (event.target.closest('a')) closeMenu();
+      });
+
+      demoButtons.forEach(function (trigger) {
+        trigger.addEventListener('click', function (event) {
+          event.preventDefault();
+          lastDemoTrigger = trigger;
+          closeMenu();
+          if (typeof demoDialog.showModal === 'function') demoDialog.showModal();
+        });
+      });
+
+      demoDialog.addEventListener('close', function () {
+        if (lastDemoTrigger) lastDemoTrigger.focus();
+      });
+
+      demoDialog.addEventListener('click', function (event) {
+        if (event.target !== demoDialog) return;
+        var rect = demoDialog.getBoundingClientRect();
+        var inside = event.clientX >= rect.left && event.clientX <= rect.right && event.clientY >= rect.top && event.clientY <= rect.bottom;
+        if (!inside) demoDialog.close();
+      });
+
+      document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && mobileMenu.classList.contains('is-open')) {
+          closeMenu();
+          menuButton.focus();
+        }
+      });
+
+      var ticking = false;
+      window.addEventListener('scroll', function () {
+        if (ticking) return;
+        ticking = true;
+        window.requestAnimationFrame(function () {
+          setHeaderState();
+          ticking = false;
+        });
+      }, { passive: true });
+      setHeaderState();
+
+      if (finalCta && navDemo && 'IntersectionObserver' in window) {
+        var ctaObserver = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            var visible = entry.isIntersecting && entry.intersectionRatio > 0.22;
+            header.classList.toggle('cta-in-view', visible);
+            navDemo.setAttribute('aria-hidden', visible ? 'true' : 'false');
+            navDemo.tabIndex = visible ? -1 : 0;
+          });
+        }, { threshold: [0, 0.22, 0.45] });
+        ctaObserver.observe(finalCta);
+      }
+
+      var revealItems = Array.prototype.slice.call(document.querySelectorAll('.reveal'));
+      if (!('IntersectionObserver' in window) || reduceMotion) {
+        revealItems.forEach(function (item) { item.classList.add('is-visible'); });
+      } else {
+        var revealObserver = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              revealObserver.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+        revealItems.forEach(function (item) { revealObserver.observe(item); });
+      }
+    })();
+  </script>
+
+
+
+
+<script id="menu-final-js">
+(function(){
+  if(window.__menuFinal)return; window.__menuFinal=true;
+  function build(){
+    var old=document.getElementById('__menuPanel'); if(old)old.remove();
+    var p=document.createElement('div'); p.id='__menuPanel';
+    var links=[];
+    var src=document.querySelector('header nav, .mobile-panel, .mobile-menu, nav');
+    if(src){src.querySelectorAll('a').forEach(function(a){
+      var t=(a.textContent||'').trim(); if(!t||t.length>16)return;
+      var h=a.getAttribute('href')||'#'; if(h==='#'||h.charAt(0)==='#')return;
+      if(/演示|预约/.test(t))return;
+      if(links.some(function(x){return x[0]===t;}))return;
+      links.push([t,h]);});}
+    if(links.length<3){
+      links=[['能力','capabilities.html'],['架构','architecture.html'],['案例','cases.html'],['投入','pricing.html'],['关于','about.html']];
+    }
+    if(!links.some(function(x){return x[0]==='首页';})) links.unshift(['首页','index.html']);
+    var html='<div class="__close"><span id="__menuClose">✕</span></div>';
+    links.forEach(function(l){ html+='<a href="'+l[1]+'">'+l[0]+'</a>'; });
+    html+='<a href="pricing.html" class="__cta">预约演示</a>';
+    p.innerHTML=html; document.body.appendChild(p);
+    p.addEventListener('click',function(e){ if(e.target.id==='__menuClose'||e.target.tagName==='A'){p.classList.remove('__open');document.documentElement.classList.remove('__navopen');} });
+  }
+  function toggle(){
+    var p=document.getElementById('__menuPanel'); if(!p){build();p=document.getElementById('__menuPanel');}
+    var open=p.classList.toggle('__open');
+    document.documentElement.classList.toggle('__navopen',open);
+    var btn=document.querySelector('[class*="menu-toggle"],[class*="nav-toggle"]');
+    if(btn)btn.setAttribute('aria-expanded',open?'true':'false');
+  }
+  document.addEventListener('click',function(e){
+    var btn=e.target.closest('[class*="menu-toggle"],[class*="nav-toggle"]');
+    if(!btn)return;
+    e.preventDefault(); e.stopImmediatePropagation(); e.stopPropagation();
+    toggle();
+  },true);
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',build); else build();
+})();
+</script>
+
+</body>
+</html>
