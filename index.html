@@ -1978,6 +1978,32 @@ box-shadow:0 28px 90px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.65)!impor
 <link rel="stylesheet" href="assets/gidx.css">
 <link rel="stylesheet" href="assets/hero-deco.css">
 <link rel="stylesheet" href="assets/cap-layout.css">
+
+<style>
+/* 2026-10-30 手机端：首屏横图不再塞进竖框（只作用首页，别影响其它页的 .hero-media） */
+@media (max-width: 768px) {
+  .hero { display: block !important; grid-template-rows: auto !important; height: auto !important; }
+  figure[data-od-id="hero-keyboard"] {
+    min-height: 0 !important; height: auto !important; max-height: none !important;
+    aspect-ratio: auto !important; padding: 0 !important; margin: 14px 0 0 !important;
+    background: transparent !important; overflow: visible !important;
+  }
+  figure[data-od-id="hero-keyboard"] img {
+    position: static !important; inset: auto !important; display: block !important;
+    width: 100% !important; height: 200px !important; max-height: 200px !important;
+    object-fit: cover !important; object-position: center 45% !important;
+    border-radius: 14px !important;
+  }
+  figure[data-od-id="hero-keyboard"]::after,
+  figure[data-od-id="hero-keyboard"]::before { display: none !important; }
+  figure[data-od-id="hero-keyboard"] .hero-media-glow,
+  figure[data-od-id="hero-keyboard"] .hero-media-ticks { display: none !important; }
+  figure[data-od-id="hero-keyboard"] .hero-media-panel {
+    position: static !important; transform: none !important; left: auto !important; top: auto !important;
+    margin: 12px 0 0 !important; width: 100% !important; max-width: 100% !important;
+  }
+}
+</style>
 </head>
 <body>
   <a class="skip-link" href="#main">跳到主要内容</a>
