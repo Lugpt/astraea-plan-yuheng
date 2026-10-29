@@ -176,3 +176,32 @@ html.__navopen, html.__navopen body { overflow: hidden !important; }
   [class*="glass"] { max-width: 100% !important; }
   .gidx { max-width: 100% !important; }
 }
+
+/* ---------- 2026-10-30 手机端细节修复 ---------- */
+@media (max-width: 768px) {
+  /* ① 顶部那个「预约演示」按钮在窄屏被挤出屏幕 → 直接不显示（菜单里有） */
+  header .header-action, header a.button-primary, header a.button { display: none !important; }
+
+  /* ② 三档对比表：真横向滚动，页面本身不左右跑 */
+  .table-shell, [class*="table-shell"], [class*="table-wrap"], [role="region"] {
+    overflow-x: auto !important; -webkit-overflow-scrolling: touch !important;
+    max-width: 100% !important; border-radius: 12px !important;
+  }
+  .table-shell .comparison-table, .comparison-table { min-width: 720px !important; }
+  section, main, footer, .container, .wrap { max-width: 100% !important; }
+
+  /* ③ 首屏大图的修正只写在 index.html 里（别的页面也有 .hero-media，全局改会弄坏）*/
+
+  /* ④ 9~11px 的标签抬到 12px，别在手机上糊成一团 */
+  .step-no, .flow-step__index, .result-index, .scope-type, .signal-line__code,
+  .labor-status, .flow-token, .tier-cycle, .boundary-media-caption,
+  .gidx__n, .gidx__h, figcaption, small { font-size: 12px !important; line-height: 1.45 !important; }
+
+  /* ⑤ 兜底：任何行内元素都不许撑破屏幕 */
+  img, table, pre, video, svg { max-width: 100% !important; }
+}
+
+@media (max-width: 400px) {
+  .table-shell .comparison-table, .comparison-table { min-width: 660px !important; }
+  .hero-media, [class*="hero-media"] { max-height: 330px !important; }
+}
